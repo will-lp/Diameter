@@ -87,6 +87,9 @@ function Diameter.UI:CreateBars(f)
         bar.icon:SetSize(18, 18) -- Slightly smaller than the bar height
         bar.icon:SetPoint("LEFT", bar, "LEFT", 2, 0)
 
+        -- This crops the outer 7% of the icon to remove the built-in border
+        bar.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+
         -- Stack them vertically
         if i == 1 then
             bar:SetPoint("TOPLEFT", f.Header, "BOTTOMLEFT", 0, -2)

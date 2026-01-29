@@ -29,26 +29,24 @@ function Diameter.Loop:UpdateMeter(frame)
     
     if container and container.combatSources then
         local sources = container.combatSources
-        local topValue = sources[1] and sources[1].totalAmount
+        local topValue = sources[1] and sources[1][ModeToField[Diameter.Modes.CurrentMode]]
 
         -- Loop through your 10 UI bars
         for i = 1, 10 do
             local bar = frame.Bars[i]
             local data = sources[i]
 
-            self:ConfigureBar(bar, data, topValue)
+            self:UpdateBar(bar, data, topValue)
         end
     end
 end
 
 
-function Diameter.Loop:ConfigureBar(bar, data, topValue)
+function Diameter.Loop:UpdateBar(bar, data, topValue)
     if data and topValue then
 
-        Diameter.Debug:dumpTable(data)
-
         local displayValue = data[ModeToField[Diameter.Modes.CurrentMode]] or 0
-        
+
         -- Update bar labels
         bar.nameText:SetText(data.name)
         
@@ -58,16 +56,13 @@ function Diameter.Loop:ConfigureBar(bar, data, topValue)
             bar.icon:SetTexture(data.specIconID)
             bar.icon:Show()
         else
-            -- If no spec data, maybe show a generic class icon or hide it
+            -- If no spec data, hide it
             bar.icon:Hide()
         end
         
-        local color = RAID_CLASS_COLORS[data.classFilename]
-        if color then
-            bar:SetStatusBarColor(color.r, color.g, color.b)
-        else
-            bar:SetStatusBarColor(0.5, 0.5, 0.5) -- Gray fallback
-        end
+        -- Set the bar color
+        local color = RAID_CLASS_COLORS[data.classFilename] or {r=0.5, g=0.5, b=0.5} -- Gray fallback
+        bar:SetStatusBarColor(color.r, color.g, color.b)
 
         -- Update bar fill relative to the top player
         bar:SetMinMaxValues(0, topValue)
