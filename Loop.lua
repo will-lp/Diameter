@@ -7,28 +7,37 @@ Diameter.Loop = {}
 -- 4. The Update Function
 -- @param f = CreateFrame
 function Diameter.Loop:UpdateMeter(frame)
-    -- Get the most recent combat session
-    print("frame", frame)
     local sessions = C_DamageMeter.GetAvailableCombatSessions()
     if #sessions == 0 then return end
     
     local sessionID = sessions[#sessions].sessionID
-    local container = C_DamageMeter.GetCombatSessionFromID(sessionID, BlizzardDamageMeter.Type.DamageDone)
+    -- Using the current mode from your Modes file
+    local mode = Diameter.Modes.CurrentMode or 0
+    local container = C_DamageMeter.GetCombatSessionFromID(sessionID, mode)
     
-    if container and container.combatSources and #container.combatSources > 0 then
-        -- Blizzard sorts these for us. Index 1 is the top damage.
-        local topSource = container.combatSources[1]
+    if container and container.combatSources then
+        local sources = container.combatSources
+        local topValue = sources[1] and sources[1].totalAmount
 
-        -- NO TOSTRING, NO MATH. 
-        -- We pass the Secret Values directly to the UI.
-        frame.nameText:SetText(topSource.name)
-        frame.valueText:SetText(topSource.totalAmount)
+        -- Loop through your 10 UI bars
+        for i = 1, 10 do
+            local bar = frame.Bars[i]
+            local data = sources[i]
 
-        -- Set the bar to full since it's the top source (Max / Max = 1)
-        -- In a multi-bar setup, you'd use topSource.totalAmount as the Max for everyone.
-        frame.bar:SetMinMaxValues(0, topSource.totalAmount)
-        frame.bar:SetValue(topSource.totalAmount)
+            if data and topValue then
+                -- Update bar labels
+                bar.nameText:SetText(data.name)
+                bar.valueText:SetText(data.totalAmount)
+                
+                -- Update bar fill relative to the top player
+                bar:SetMinMaxValues(0, topValue)
+                bar:SetValue(data.totalAmount)
+                
+                bar:Show()
+            else
+                -- Hide bars if there's no player data for this slot
+                bar:Hide()
+            end
+        end
     end
 end
-
-

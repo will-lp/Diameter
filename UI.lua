@@ -42,7 +42,7 @@ function Diameter.UI:Boot()
     
     f.HeaderText = f.Header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     f.HeaderText:SetPoint("LEFT", f.MenuBtn, "RIGHT", 5, 0)
-    f.HeaderText:SetText("Gravy: Damage Done")
+    f.HeaderText:SetText("Diameter: Damage Done")
 
     -- 4. Resize Handle (Bottom Right)
     f.Resizer = CreateFrame("Button", nil, f)
@@ -55,18 +55,34 @@ function Diameter.UI:Boot()
     f.Resizer:SetScript("OnMouseUp", function() f:StopMovingOrSizing() end)
 
     -- 5. Data Bar (Container for your current bar)
-    -- We'll just update your existing bar logic to anchor to the Header
-    f.bar = CreateFrame("StatusBar", nil, f)
-    f.bar:SetPoint("TOPLEFT", f.Header, "BOTTOMLEFT", 0, -2)
-    f.bar:SetPoint("TOPRIGHT", f.Header, "BOTTOMRIGHT", 0, -2)
-    f.bar:SetHeight(20)
-    f.bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
-    f.bar:SetStatusBarColor(0.8, 0.2, 0.2)
 
-    f.nameText = f.bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    f.nameText:SetPoint("LEFT", 5, 0)
-    f.valueText = f.bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    f.valueText:SetPoint("RIGHT", -5, 0)
+    f.Bars = {} -- This is your Pool
+    
+    -- Create 10 bars initially
+    for i = 1, 10 do
+        local bar = CreateFrame("StatusBar", nil, f)
+        bar:SetHeight(20)
+        -- Stack them vertically
+        if i == 1 then
+            bar:SetPoint("TOPLEFT", f.Header, "BOTTOMLEFT", 0, -2)
+            bar:SetPoint("TOPRIGHT", f.Header, "BOTTOMRIGHT", 0, -2)
+        else
+            bar:SetPoint("TOPLEFT", f.Bars[i-1], "BOTTOMLEFT", 0, -1)
+            bar:SetPoint("TOPRIGHT", f.Bars[i-1], "BOTTOMRIGHT", 0, -1)
+        end
+        
+        bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+        bar:SetStatusBarColor(0.8, 0.2, 0.2)
+        
+        bar.nameText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        bar.nameText:SetPoint("LEFT", 5, 0)
+        
+        bar.valueText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        bar.valueText:SetPoint("RIGHT", -5, 0)
+
+        bar:Hide() -- Hide them until we have data
+        f.Bars[i] = bar
+    end
 
     return f
 end
