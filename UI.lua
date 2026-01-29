@@ -20,6 +20,7 @@ function Diameter.UI:Boot()
     })
     f:SetBackdropColor(0, 0, 0, 0.8)
 
+    -- 2. Header Bar and button
     self:CreateHeader(f)
 
     -- Make the Header the handle for moving
@@ -41,34 +42,7 @@ function Diameter.UI:Boot()
     f.Resizer:SetScript("OnMouseUp", function() f:StopMovingOrSizing() end)
 
     -- 5. Data Bar (Container for your current bar)
-
-    f.Bars = {} -- This is your Pool
-    
-    -- Create 10 bars initially
-    for i = 1, 10 do
-        local bar = CreateFrame("StatusBar", nil, f)
-        bar:SetHeight(20)
-        -- Stack them vertically
-        if i == 1 then
-            bar:SetPoint("TOPLEFT", f.Header, "BOTTOMLEFT", 0, -2)
-            bar:SetPoint("TOPRIGHT", f.Header, "BOTTOMRIGHT", 0, -2)
-        else
-            bar:SetPoint("TOPLEFT", f.Bars[i-1], "BOTTOMLEFT", 0, -1)
-            bar:SetPoint("TOPRIGHT", f.Bars[i-1], "BOTTOMRIGHT", 0, -1)
-        end
-        
-        bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
-        bar:SetStatusBarColor(0.8, 0.2, 0.2)
-        
-        bar.nameText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        bar.nameText:SetPoint("LEFT", 5, 0)
-        
-        bar.valueText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        bar.valueText:SetPoint("RIGHT", -5, 0)
-
-        bar:Hide() -- Hide them until we have data
-        f.Bars[i] = bar
-    end
+    self:CreateBars(f)
 
     return f
 end
@@ -98,3 +72,34 @@ function Diameter.UI:CreateMenuButton(f)
     f.MenuBtn:SetNormalTexture("Interface\\Icons\\INV_Misc_Gear_01") -- Cogwheel icon
 
 end
+
+
+function Diameter.UI:CreateBars(f)
+    f.Bars = {} -- This is your Pool
+    
+    -- Create 10 bars initially
+    for i = 1, 10 do
+        local bar = CreateFrame("StatusBar", nil, f)
+        bar:SetHeight(20)
+        -- Stack them vertically
+        if i == 1 then
+            bar:SetPoint("TOPLEFT", f.Header, "BOTTOMLEFT", 0, -2)
+            bar:SetPoint("TOPRIGHT", f.Header, "BOTTOMRIGHT", 0, -2)
+        else
+            bar:SetPoint("TOPLEFT", f.Bars[i-1], "BOTTOMLEFT", 0, -1)
+            bar:SetPoint("TOPRIGHT", f.Bars[i-1], "BOTTOMRIGHT", 0, -1)
+        end
+        
+        bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+        bar:SetStatusBarColor(0.8, 0.2, 0.2)
+        
+        bar.nameText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        bar.nameText:SetPoint("LEFT", 5, 0)
+        
+        bar.valueText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        bar.valueText:SetPoint("RIGHT", -5, 0)
+
+        bar:Hide() -- Hide them until we have data
+        f.Bars[i] = bar
+    end
+end 

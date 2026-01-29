@@ -34,7 +34,7 @@ function Diameter:ShowMenu(anchor)
         for _, value in ipairs(MenuOrder) do
             local label = Labels[value]
             rootDescription:CreateButton(label, function() 
-                print("Switched to mode:", label)
+                Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
                 Diameter.Modes.CurrentMode = value
             end)
         end

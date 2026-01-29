@@ -2,18 +2,18 @@
 
 local addonName, Diameter = ...
 
-local frame = Diameter.UI:Boot()
+Diameter.UI.mainFrame = Diameter.UI:Boot()
 
 Diameter.Modes = {
     CurrentMode = BlizzardDamageMeter.Mode.DamageDone,
     CurrentSessionType = BlizzardDamageMeter.SessionType.Current,
 }
 
-frame.MenuBtn:SetScript("OnClick", function(self)
+Diameter.UI.mainFrame.MenuBtn:SetScript("OnClick", function(self)
     Diameter:ShowMenu(self)
 end)
 
 -- 5. Set it to update every second
 C_Timer.NewTicker(10.0, function() 
-    Diameter.Loop:UpdateMeter(frame) 
+    Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame) 
 end)
