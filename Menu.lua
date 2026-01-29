@@ -1,19 +1,45 @@
 local addonName, Diameter = ...
 
+local M = BlizzardDamageMeter.Mode
+
+local Labels = {
+    [M.DamageDone] = "Damage Done",
+    [M.Dps] = "DPS",
+    [M.HealingDone] = "Healing Done",
+    [M.Hps] = "HPS",
+    [M.Absorbs] = "Absorbs",
+    [M.Interrupts] = "Interrupts",
+    [M.Dispels] = "Dispels",
+    [M.DamageTaken] = "Damage Taken",
+    [M.AvoidableDamageTaken] = "Avoidable Damage Taken",
+}
+
+local MenuOrder = {
+    M.DamageDone,
+    M.Dps,
+    M.HealingDone,
+    M.Hps,
+    M.Absorbs,
+    M.Interrupts,
+    M.Dispels,
+    M.DamageTaken,
+    M.AvoidableDamageTaken,
+}
+
 function Diameter:ShowMenu(anchor)
-    -- This is the modern 11.0+ Menu API
+    
     MenuUtil.CreateContextMenu(anchor, function(owner, rootDescription)
         rootDescription:CreateTitle("Select Mode")
-        
-        rootDescription:CreateButton("Damage Done", function() 
-            print("Switched to Damage")
-            -- Set mode variable here
-        end)
-        
-        rootDescription:CreateButton("Healing", function() 
-            print("Switched to Healing")
-        end)
 
+        for _, value in ipairs(MenuOrder) do
+            local label = Labels[value]
+            rootDescription:CreateButton(label, function() 
+                print("Switched to mode:", label)
+                Diameter.Modes.CurrentMode = value
+            end)
+        end
+
+        
         rootDescription:CreateDivider()
         
         rootDescription:CreateButton("Reset Data", function() 

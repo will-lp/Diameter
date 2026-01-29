@@ -1,5 +1,5 @@
 BlizzardDamageMeter = {
-    Type = {
+    Mode = {
         DamageDone = 0,
         Dps = 1,
         HealingDone = 2,

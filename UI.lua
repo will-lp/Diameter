@@ -20,29 +20,15 @@ function Diameter.UI:Boot()
     })
     f:SetBackdropColor(0, 0, 0, 0.8)
 
-    -- 2. Header Bar (Drag this to move)
-    f.Header = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    f.Header:SetPoint("TOPLEFT", f, "TOPLEFT", 4, -4)
-    f.Header:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4)
-    f.Header:SetHeight(20)
-    f.Header:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8X8"})
-    f.Header:SetBackdropColor(0.2, 0.2, 0.2, 0.9)
-    
+    self:CreateHeader(f)
+
     -- Make the Header the handle for moving
     f:SetScript("OnMouseDown", function(self, button) 
         if button == "LeftButton" then self:StartMoving() end 
     end)
     f:SetScript("OnMouseUp", f.StopMovingOrSizing)
 
-    -- 3. Menu Button (The Skada-style Icon)
-    f.MenuBtn = CreateFrame("Button", nil, f.Header)
-    f.MenuBtn:SetSize(16, 16)
-    f.MenuBtn:SetPoint("LEFT", 2, 0)
-    f.MenuBtn:SetNormalTexture("Interface\\Icons\\INV_Misc_Gear_01") -- Cogwheel icon
     
-    f.HeaderText = f.Header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    f.HeaderText:SetPoint("LEFT", f.MenuBtn, "RIGHT", 5, 0)
-    f.HeaderText:SetText("Diameter: Damage Done")
 
     -- 4. Resize Handle (Bottom Right)
     f.Resizer = CreateFrame("Button", nil, f)
@@ -85,4 +71,30 @@ function Diameter.UI:Boot()
     end
 
     return f
+end
+
+function Diameter.UI:CreateHeader(f)
+    -- 2. Header Bar (Drag this to move)
+    f.Header = CreateFrame("Frame", nil, f, "BackdropTemplate")
+    f.Header:SetPoint("TOPLEFT", f, "TOPLEFT", 4, -4)
+    f.Header:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4)
+    f.Header:SetHeight(20)
+    f.Header:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8X8"})
+    f.Header:SetBackdropColor(0.2, 0.2, 0.2, 0.9)
+
+    self:CreateMenuButton(f)
+    
+    f.HeaderText = f.Header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    f.HeaderText:SetPoint("LEFT", f.MenuBtn, "RIGHT", 5, 0)
+    f.HeaderText:SetText("Diameter: Damage Done")
+end
+
+
+function Diameter.UI:CreateMenuButton(f)
+    -- 3. Menu Button (The Skada-style Icon)
+    f.MenuBtn = CreateFrame("Button", nil, f.Header)
+    f.MenuBtn:SetSize(16, 16)
+    f.MenuBtn:SetPoint("LEFT", 2, 0)
+    f.MenuBtn:SetNormalTexture("Interface\\Icons\\INV_Misc_Gear_01") -- Cogwheel icon
+
 end
