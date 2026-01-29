@@ -81,6 +81,12 @@ function Diameter.UI:CreateBars(f)
     for i = 1, 10 do
         local bar = CreateFrame("StatusBar", nil, f)
         bar:SetHeight(20)
+
+        -- Create the Icon Texture
+        bar.icon = bar:CreateTexture(nil, "OVERLAY")
+        bar.icon:SetSize(18, 18) -- Slightly smaller than the bar height
+        bar.icon:SetPoint("LEFT", bar, "LEFT", 2, 0)
+
         -- Stack them vertically
         if i == 1 then
             bar:SetPoint("TOPLEFT", f.Header, "BOTTOMLEFT", 0, -2)
@@ -94,7 +100,9 @@ function Diameter.UI:CreateBars(f)
         bar:SetStatusBarColor(0.8, 0.2, 0.2)
         
         bar.nameText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        bar.nameText:SetPoint("LEFT", 5, 0)
+        -- Adjust the Name Text so it doesn't overlap the icon
+        bar.nameText:ClearAllPoints()
+        bar.nameText:SetPoint("LEFT", bar.icon, "RIGHT", 4, 0)
         
         bar.valueText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         bar.valueText:SetPoint("RIGHT", -5, 0)

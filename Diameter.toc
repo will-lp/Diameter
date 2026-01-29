@@ -8,4 +8,5 @@ BlizzardDamageMeter.lua
 UI.lua
 Menu.lua
 Loop.lua
+Debug.lua
 Diameter.lua
