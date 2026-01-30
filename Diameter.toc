@@ -3,6 +3,8 @@
 ## Notes: A simple damage meter for the Midnight API.
 ## Author: YourName
 ## Version: 1.0
+## IconTexture: Interface\Icons\inv_misc_gear_02
+
 
 BlizzardDamageMeter.lua
 Navigation.lua
