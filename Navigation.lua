@@ -11,6 +11,7 @@ local viewState = {
     targetGUID = nil,
     targetName = nil,
     targetIndex = nil,
+    secretTargetGUID = nil, -- here we hold to the secretTargetGUID. No use for now, though :-(
 }
 
 Diameter.Navigation = {}
@@ -29,9 +30,15 @@ end
 
 function Diameter.Navigation:DrillDown(guid, name, i)
     viewState.mode = Modes.SPELL
-    viewState.targetGUID = guid
+
+    if (issecretvalue(guid)) then
+        viewState.secretTargetGUID = guid
+    end
+    
+    viewState.targetGUID = issecretvalue(guid) and UnitGUID("player") or guid
     viewState.targetName = name
     viewState.targetIndex = i
+
     -- Force a UI refresh
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
 end

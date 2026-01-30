@@ -1,5 +1,5 @@
 ## Interface: 120000
-## Title: Gravy
+## Title: Diameter
 ## Notes: A simple damage meter for the Midnight API.
 ## Author: YourName
 ## Version: 1.0

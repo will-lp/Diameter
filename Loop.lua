@@ -25,12 +25,9 @@ end
 
 function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode)
     
-    local dataArray = Diameter.Data:GetSpellMeter(Diameter.Navigation.getTargetGUID(), mode)
+    local dataArray = Diameter.Data:GetSpellMeter(Diameter.Navigation.getTargetGUID(), mode, sessionID)
 
     -- local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode)[Diameter.Navigation:getTargetIndex()].breakdown
-
-    print("-- Spell dataArray --")
-    Diameter.Debug:dump(dataArray)
 
     self:UpdateBarsFromDataArray(frame, dataArray)
 
@@ -68,9 +65,7 @@ end
     @param topValue = number used as a reference to 100% fill
 ]]--
 function Diameter.Loop:UpdateBar(bar, data, topValue)
-    print("Updating bar:", bar, data, topValue)
-    Diameter.Debug:dump(data)
-    print("done debugging data")
+    
     if data and topValue then
 
         local displayValue = data.value or 0

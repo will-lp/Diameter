@@ -88,7 +88,7 @@ function Diameter.UI:CreateBars(f)
         bar:SetScript("OnMouseDown", function(self, button)
             if button == "LeftButton" then
                 -- Tell the meter to drill down into this player
-                Diameter.Navigation:DrillDown(self.data.sourceGUID, self.data.name)
+                Diameter.Navigation:DrillDown(self.data.sourceGUID, self.data.name, i)
             elseif button == "RightButton" then
                 -- Right click usually goes "Back" to the main list
                 Diameter.Navigation:ResetView()

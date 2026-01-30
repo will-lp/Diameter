@@ -43,18 +43,12 @@ function Diameter.Data:GetGroupMeter(sessionID, mode)
         
     end
 
-    print("-- dataArray --")
-    Diameter.Debug:dump(dataArray)
-
     return dataArray
 end
 
-function Diameter.Data:GetSpellMeter(targetGUID, mode)
-    print("-- GetSpellMeter for GUID: "..tostring(targetGUID).." Mode: "..tostring(mode).." --")
-    local details = C_DamageMeter.GetCombatSessionSourceFromType(
-        Diameter.Current.SessionType, 
-        mode, 
-        targetGUID)
+function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID)
+    
+    local details = C_DamageMeter.GetCombatSessionSourceFromID(sessionID, mode, targetGUID)
 
     local dataArray = {}
 
