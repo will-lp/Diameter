@@ -23,18 +23,71 @@ function Diameter.Loop:UpdateMeter(frame)
     if #sessions == 0 then return end
     
     local sessionID = sessions[#sessions].sessionID
+    
     -- Using the current mode from your Modes file
     local mode = Diameter.Modes.CurrentMode or 0
+
+    if (Diameter.Navigation.isSpellView()) then
+        self:UpdatePlayerSpellMeter(frame, sessionID, mode)
+    else
+        self:UpdateGroupMeter(frame, sessionID, mode)
+    end
+    
+end
+
+function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode)
+    
+    local details = C_DamageMeter.GetCombatSessionSourceFromType(
+        Diameter.Modes.CurrentSessionType, 
+        mode, 
+        Diameter.Navigation.getTargetGUID())
+
+    if details and details.combatSpells then
+        -- Transform Blizzard's spell details into a format UpdateBar understands
+        local topValue = details.combatSpells[1][ModeToField[Diameter.Modes.CurrentMode]]
+
+        for i, combatSpell in ipairs(details.combatSpells) do
+            
+            local bar = frame.Bars[i]
+            
+            local data = {
+                name = C_Spell.GetSpellName(combatSpell.spellID) or "Unknown",
+                totalAmount = combatSpell.totalAmount,
+                amountPerSecond = combatSpell.amountPerSecond, 
+                specIconID = C_Spell.GetSpellTexture(combatSpell.spellID),
+                isSpell = true -- Flag for coloring
+            }
+
+            data.value = combatSpell[ModeToField[Diameter.Modes.CurrentMode]]
+
+            print(
+                "ModeToField[Diameter.Modes.CurrentMode]", ModeToField[Diameter.Modes.CurrentMode], 
+                "data.value", data.value,
+                "topValue", topValue)
+
+            self:UpdateBar(bar, data, topValue)
+        end
+    end
+
+    
+end
+
+function Diameter.Loop:UpdateGroupMeter(frame, sessionID, mode)
+    
     local container = C_DamageMeter.GetCombatSessionFromID(sessionID, mode)
     
     if container and container.combatSources then
         local sources = container.combatSources
         local topValue = sources[1] and sources[1][ModeToField[Diameter.Modes.CurrentMode]]
 
-        -- Loop through your 10 UI bars
-        for i = 1, 10 do
+        -- Loop through UI bars
+        for i = 1, Diameter.UI.MaxBars do
             local bar = frame.Bars[i]
             local data = sources[i]
+
+            if data then
+                data.value = data[ModeToField[Diameter.Modes.CurrentMode]]
+            end
 
             self:UpdateBar(bar, data, topValue)
         end
@@ -43,16 +96,19 @@ end
 
 
 function Diameter.Loop:UpdateBar(bar, data, topValue)
+    
     if data and topValue then
 
-        local displayValue = data[ModeToField[Diameter.Modes.CurrentMode]] or 0
+        local displayValue = data.value or 0
 
         -- Update bar labels
         bar.nameText:SetText(data.name)
+
+        bar.data = data
         
         bar.valueText:SetText(AbbreviateLargeNumbers(displayValue))
 
-        if data.specIconID and data.specIconID > 0 then
+        if data.specIconID then
             bar.icon:SetTexture(data.specIconID)
             bar.icon:Show()
         else

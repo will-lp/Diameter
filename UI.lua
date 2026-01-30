@@ -1,5 +1,6 @@
 local addonName, Diameter = ...
 Diameter.UI = {}
+Diameter.UI.MaxBars = 40
 
 function Diameter.UI:Boot()
     -- 1. Main Frame
@@ -78,9 +79,21 @@ function Diameter.UI:CreateBars(f)
     f.Bars = {} -- This is your Pool
     
     -- Create 10 bars initially
-    for i = 1, 10 do
+    for i = 1, Diameter.UI.MaxBars do
         local bar = CreateFrame("StatusBar", nil, f)
         bar:SetHeight(20)
+
+        -- Handling breakdown on click and coming back
+        bar:EnableMouse(true)
+        bar:SetScript("OnMouseDown", function(self, button)
+            if button == "LeftButton" then
+                -- Tell the meter to drill down into this player
+                Diameter.Navigation:DrillDown(self.data.sourceGUID, self.data.name)
+            elseif button == "RightButton" then
+                -- Right click usually goes "Back" to the main list
+                Diameter.Navigation:ResetView()
+            end
+        end)
 
         -- Create the Icon Texture
         bar.icon = bar:CreateTexture(nil, "OVERLAY")
