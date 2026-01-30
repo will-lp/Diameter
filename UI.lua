@@ -24,40 +24,14 @@ function Diameter.UI:Boot()
     -- 2. Header Bar and button
     self:CreateHeader(f)
 
-    -- 3. THE SCROLLING ENGINE
-    -- We use a template to get a standard WoW scrollbar for free
-    local sf = CreateFrame("ScrollFrame", "$parentScrollFrame", f, "UIPanelScrollFrameTemplate")
-    sf:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -30) -- -30 to stay below header
-    sf:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -25, 10) -- -25 to leave room for the bar
-
-    -- This is the 'Long Paper' that holds the bars
-    local scrollChild = CreateFrame("Frame", "$parentScrollChild", sf)
-    scrollChild:SetSize(sf:GetWidth(), 1) -- Height will be auto-calculated later
-    sf:SetScrollChild(scrollChild)
-
-    f.ScrollFrame = sf
-    f.ScrollChild = scrollChild
-
-    -- 4. Mouse Wheel Support (Essential for UX)
-    sf:EnableMouseWheel(true)
-    sf:SetScript("OnMouseWheel", function(self, delta)
-        local cur = self:GetVerticalScroll()
-        local step = 20 -- Pixels per notch
-        if delta > 0 then
-            self:SetVerticalScroll(math.max(0, cur - step))
-        else
-            self:SetVerticalScroll(math.min(self:GetVerticalScrollRange(), cur + step))
-        end
-    end)
+    local sf, scrollChild = self:CreateScrollEngine(f)
 
     -- Make the Header the handle for moving
     f:SetScript("OnMouseDown", function(self, button) 
         if button == "LeftButton" then self:StartMoving() end 
     end)
     f:SetScript("OnMouseUp", f.StopMovingOrSizing)
-
     
-
     -- 4. Resize Handle (Bottom Right)
     f.Resizer = CreateFrame("Button", nil, f)
     f.Resizer:SetSize(16, 16)
@@ -85,6 +59,39 @@ function Diameter.UI:Boot()
 
     return f
 end
+
+
+function Diameter.UI:CreateScrollEngine(f)
+    -- 3. THE SCROLLING ENGINE
+    -- We use a template to get a standard WoW scrollbar for free
+    local sf = CreateFrame("ScrollFrame", "$parentScrollFrame", f, "UIPanelScrollFrameTemplate")
+    sf:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -30) -- -30 to stay below header
+    sf:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -25, 10) -- -25 to leave room for the bar
+
+    -- This is the 'Long Paper' that holds the bars
+    local scrollChild = CreateFrame("Frame", "$parentScrollChild", sf, "BackdropTemplate")
+    scrollChild:SetSize(sf:GetWidth(), 1) -- Height will be auto-calculated later
+    sf:SetScrollChild(scrollChild)
+
+    f.ScrollFrame = sf
+    f.ScrollChild = scrollChild
+
+    -- 4. Mouse Wheel Support (Essential for UX)
+    sf:EnableMouseWheel(true)
+    sf:SetScript("OnMouseWheel", function(self, delta)
+        local cur = self:GetVerticalScroll()
+        local step = 20 -- Pixels per notch
+        if delta > 0 then
+            self:SetVerticalScroll(math.max(0, cur - step))
+        else
+            self:SetVerticalScroll(math.min(self:GetVerticalScrollRange(), cur + step))
+        end
+    end)
+    scrollChild:SetBackdropColor(0, 0, 0, 0)
+
+    return sf, scrollChild
+end
+
 
 function Diameter.UI:CreateHeader(f)
     -- 2. Header Bar (Drag this to move)

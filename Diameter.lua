@@ -17,6 +17,6 @@ Diameter.UI.mainFrame.MenuBtn:SetScript("OnClick", function(self)
 end)
 
 -- 5. Main loop
-C_Timer.NewTicker(5.0, function() 
+C_Timer.NewTicker(0.5, function() 
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame) 
 end)
