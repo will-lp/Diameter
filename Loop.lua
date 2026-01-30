@@ -4,17 +4,6 @@ local addonName, Diameter = ...
 Diameter.Loop = {}
 
 
-local ModeToField ={
-    [BlizzardDamageMeter.Mode.DamageDone] = "totalAmount",
-    [BlizzardDamageMeter.Mode.Dps] = "amountPerSecond",
-    [BlizzardDamageMeter.Mode.HealingDone] = "totalHealing",
-    [BlizzardDamageMeter.Mode.Hps] = "hps",
-    [BlizzardDamageMeter.Mode.Absorbs] = "totalAbsorbs",
-    [BlizzardDamageMeter.Mode.Interrupts] = "interrupts",
-    [BlizzardDamageMeter.Mode.Dispels] = "dispels",
-    [BlizzardDamageMeter.Mode.DamageTaken] = "totalDamageTaken",
-    [BlizzardDamageMeter.Mode.AvoidableDamageTaken] = "avoidableDamageTaken",
-}
 
 -- 4. The Update Function
 -- @param f = CreateFrame
@@ -24,8 +13,7 @@ function Diameter.Loop:UpdateMeter(frame)
     
     local sessionID = sessions[#sessions].sessionID
     
-    -- Using the current mode from your Modes file
-    local mode = Diameter.Modes.CurrentMode or 0
+    local mode = Diameter.Current.Mode or 0
 
     if (Diameter.Navigation.isSpellView()) then
         self:UpdatePlayerSpellMeter(frame, sessionID, mode)
@@ -37,66 +25,52 @@ end
 
 function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode)
     
-    local details = C_DamageMeter.GetCombatSessionSourceFromType(
-        Diameter.Modes.CurrentSessionType, 
-        mode, 
-        Diameter.Navigation.getTargetGUID())
+    local dataArray = Diameter.Data:GetSpellMeter(Diameter.Navigation.getTargetGUID(), mode)
 
-    if details and details.combatSpells then
-        -- Transform Blizzard's spell details into a format UpdateBar understands
-        local topValue = details.combatSpells[1][ModeToField[Diameter.Modes.CurrentMode]]
+    -- local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode)[Diameter.Navigation:getTargetIndex()].breakdown
 
-        for i, combatSpell in ipairs(details.combatSpells) do
-            
-            local bar = frame.Bars[i]
-            
-            local data = {
-                name = C_Spell.GetSpellName(combatSpell.spellID) or "Unknown",
-                totalAmount = combatSpell.totalAmount,
-                amountPerSecond = combatSpell.amountPerSecond, 
-                specIconID = C_Spell.GetSpellTexture(combatSpell.spellID),
-                isSpell = true -- Flag for coloring
-            }
+    print("-- Spell dataArray --")
+    Diameter.Debug:dump(dataArray)
 
-            data.value = combatSpell[ModeToField[Diameter.Modes.CurrentMode]]
+    self:UpdateBarsFromDataArray(frame, dataArray)
 
-            print(
-                "ModeToField[Diameter.Modes.CurrentMode]", ModeToField[Diameter.Modes.CurrentMode], 
-                "data.value", data.value,
-                "topValue", topValue)
-
-            self:UpdateBar(bar, data, topValue)
-        end
-    end
-
-    
 end
 
 function Diameter.Loop:UpdateGroupMeter(frame, sessionID, mode)
     
-    local container = C_DamageMeter.GetCombatSessionFromID(sessionID, mode)
+    local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode)
+
+    self:UpdateBarsFromDataArray(frame, dataArray)
     
-    if container and container.combatSources then
-        local sources = container.combatSources
-        local topValue = sources[1] and sources[1][ModeToField[Diameter.Modes.CurrentMode]]
+end
 
-        -- Loop through UI bars
-        for i = 1, Diameter.UI.MaxBars do
-            local bar = frame.Bars[i]
-            local data = sources[i]
+function Diameter.Loop:UpdateBarsFromDataArray(frame, dataArray)
+    -- fill the bars with data
+    for i, _ in ipairs(dataArray) do
+        local data = dataArray[i]
+        local bar = frame.Bars[i]
+        self:UpdateBar(bar, data, dataArray.topValue)
+    end
 
-            if data then
-                data.value = data[ModeToField[Diameter.Modes.CurrentMode]]
-            end
-
-            self:UpdateBar(bar, data, topValue)
-        end
+    -- To hide the bars we don't have data for
+    for i = #dataArray + 1, Diameter.UI.MaxBars do
+        local bar = frame.Bars[i]
+        self:UpdateBar(bar, nil, nil)
     end
 end
 
 
+--[[
+    Update a single bar in the meter.
+
+    @param bar = the StatusBar object itself
+    @param data = table { name=string, value=number, icon=textureID, color={r,g,b} }
+    @param topValue = number used as a reference to 100% fill
+]]--
 function Diameter.Loop:UpdateBar(bar, data, topValue)
-    
+    print("Updating bar:", bar, data, topValue)
+    Diameter.Debug:dump(data)
+    print("done debugging data")
     if data and topValue then
 
         local displayValue = data.value or 0
@@ -108,8 +82,8 @@ function Diameter.Loop:UpdateBar(bar, data, topValue)
         
         bar.valueText:SetText(AbbreviateLargeNumbers(displayValue))
 
-        if data.specIconID then
-            bar.icon:SetTexture(data.specIconID)
+        if data.icon then
+            bar.icon:SetTexture(data.icon)
             bar.icon:Show()
         else
             -- If no spec data, hide it
@@ -117,8 +91,7 @@ function Diameter.Loop:UpdateBar(bar, data, topValue)
         end
         
         -- Set the bar color
-        local color = RAID_CLASS_COLORS[data.classFilename] or {r=0.5, g=0.5, b=0.5} -- Gray fallback
-        bar:SetStatusBarColor(color.r, color.g, color.b)
+        bar:SetStatusBarColor(data.color.r, data.color.g, data.color.b)
 
         -- Update bar fill relative to the top player
         bar:SetMinMaxValues(0, topValue)

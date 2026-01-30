@@ -4,9 +4,9 @@ local addonName, Diameter = ...
 
 Diameter.UI.mainFrame = Diameter.UI:Boot()
 
-Diameter.Modes = {
-    CurrentMode = BlizzardDamageMeter.Mode.DamageDone,
-    CurrentSessionType = BlizzardDamageMeter.SessionType.Current,
+Diameter.Current = {
+    Mode = BlizzardDamageMeter.Mode.DamageDone,
+    SessionType = BlizzardDamageMeter.SessionType.Current,
 }
 
 Diameter.UI.mainFrame.MenuBtn:SetScript("OnClick", function(self)

@@ -9,7 +9,8 @@ local Modes = {
 local viewState = {
     mode = Modes.MAIN,
     targetGUID = nil,
-    targetName = nil
+    targetName = nil,
+    targetIndex = nil,
 }
 
 Diameter.Navigation = {}
@@ -18,14 +19,19 @@ function Diameter.Navigation:getTargetGUID()
     return viewState.targetGUID
 end
 
+function Diameter.Navigation:getTargetIndex()
+    return viewState.targetIndex
+end
+
 function Diameter.Navigation:isSpellView()
     return viewState.mode == Modes.SPELL
 end
 
-function Diameter.Navigation:DrillDown(guid, name)
+function Diameter.Navigation:DrillDown(guid, name, i)
     viewState.mode = Modes.SPELL
     viewState.targetGUID = guid
     viewState.targetName = name
+    viewState.targetIndex = i
     -- Force a UI refresh
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
 end

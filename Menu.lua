@@ -35,7 +35,7 @@ function Diameter:ShowMenu(anchor)
             local label = Labels[value]
             rootDescription:CreateButton(label, function() 
                 Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
-                Diameter.Modes.CurrentMode = value
+                Diameter.Current.Mode = value
             end)
         end
 
