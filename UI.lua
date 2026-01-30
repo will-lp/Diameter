@@ -24,6 +24,32 @@ function Diameter.UI:Boot()
     -- 2. Header Bar and button
     self:CreateHeader(f)
 
+    -- 3. THE SCROLLING ENGINE
+    -- We use a template to get a standard WoW scrollbar for free
+    local sf = CreateFrame("ScrollFrame", "$parentScrollFrame", f, "UIPanelScrollFrameTemplate")
+    sf:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -30) -- -30 to stay below header
+    sf:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -25, 10) -- -25 to leave room for the bar
+
+    -- This is the 'Long Paper' that holds the bars
+    local scrollChild = CreateFrame("Frame", "$parentScrollChild", sf)
+    scrollChild:SetSize(sf:GetWidth(), 1) -- Height will be auto-calculated later
+    sf:SetScrollChild(scrollChild)
+
+    f.ScrollFrame = sf
+    f.ScrollChild = scrollChild
+
+    -- 4. Mouse Wheel Support (Essential for UX)
+    sf:EnableMouseWheel(true)
+    sf:SetScript("OnMouseWheel", function(self, delta)
+        local cur = self:GetVerticalScroll()
+        local step = 20 -- Pixels per notch
+        if delta > 0 then
+            self:SetVerticalScroll(math.max(0, cur - step))
+        else
+            self:SetVerticalScroll(math.min(self:GetVerticalScrollRange(), cur + step))
+        end
+    end)
+
     -- Make the Header the handle for moving
     f:SetScript("OnMouseDown", function(self, button) 
         if button == "LeftButton" then self:StartMoving() end 
@@ -41,9 +67,21 @@ function Diameter.UI:Boot()
     
     f.Resizer:SetScript("OnMouseDown", function() f:StartSizing("BOTTOMRIGHT") end)
     f.Resizer:SetScript("OnMouseUp", function() f:StopMovingOrSizing() end)
+    
+    f:SetScript("OnSizeChanged", function(self, width, height)
+        -- 1. Update the ScrollFrame width (minus room for the scrollbar)
+        sf:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -25, 10) 
+        
+        -- 2. CRITICAL: Force the ScrollChild to match the new width
+        -- This is what will pull your bars wider
+        scrollChild:SetWidth(sf:GetWidth())
+        
+        -- 3. Optional: Trigger a refresh of the scroll logic
+        sf:UpdateScrollChildRect()
+    end)
 
     -- 5. Data Bar (Container for your current bar)
-    self:CreateBars(f)
+    scrollChild.Bars = self:CreateBars(scrollChild)
 
     return f
 end
@@ -75,12 +113,12 @@ function Diameter.UI:CreateMenuButton(f)
 end
 
 
-function Diameter.UI:CreateBars(f)
-    f.Bars = {} -- This is your Pool
+function Diameter.UI:CreateBars(scrollChild)
+    local bars = {}
     
     -- Creating bars
     for i = 1, Diameter.UI.MaxBars do
-        local bar = CreateFrame("StatusBar", nil, f)
+        local bar = CreateFrame("StatusBar", nil, scrollChild)
         bar:SetHeight(20)
 
         -- Handling breakdown on click and coming back
@@ -105,11 +143,12 @@ function Diameter.UI:CreateBars(f)
 
         -- Stack them vertically
         if i == 1 then
-            bar:SetPoint("TOPLEFT", f.Header, "BOTTOMLEFT", 0, -2)
-            bar:SetPoint("TOPRIGHT", f.Header, "BOTTOMRIGHT", 0, -2)
+            -- Note: Using TOPLEFT/TOPRIGHT ensures the bar stretches to the width of the scrollChild
+            bar:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, 0)
+            bar:SetPoint("TOPRIGHT", scrollChild, "TOPRIGHT", 0, 0)
         else
-            bar:SetPoint("TOPLEFT", f.Bars[i-1], "BOTTOMLEFT", 0, -1)
-            bar:SetPoint("TOPRIGHT", f.Bars[i-1], "BOTTOMRIGHT", 0, -1)
+            bar:SetPoint("TOPLEFT", bars[i-1], "BOTTOMLEFT", 0, -1)
+            bar:SetPoint("TOPRIGHT", bars[i-1], "BOTTOMRIGHT", 0, -1)
         end
         
         bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
@@ -123,7 +162,14 @@ function Diameter.UI:CreateBars(f)
         bar.valueText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         bar.valueText:SetPoint("RIGHT", -5, 0)
 
+        -- some z-index level of debauchery
+        bar:SetFrameLevel(scrollChild:GetFrameLevel() + 5)
+
         bar:Hide() -- Hide them until we have data
-        f.Bars[i] = bar
+        bars[i] = bar
+
+        scrollChild:SetHeight(Diameter.UI.MaxBars * (20 + 2)) -- 100 bars * (height + spacing)
     end
+
+    return bars
 end 

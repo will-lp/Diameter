@@ -45,13 +45,13 @@ function Diameter.Loop:UpdateBarsFromDataArray(frame, dataArray)
     -- fill the bars with data
     for i, _ in ipairs(dataArray) do
         local data = dataArray[i]
-        local bar = frame.Bars[i]
+        local bar = frame.ScrollChild.Bars[i]
         self:UpdateBar(bar, data, dataArray.topValue)
     end
 
     -- To hide the bars we don't have data for
     for i = #dataArray + 1, Diameter.UI.MaxBars do
-        local bar = frame.Bars[i]
+        local bar = frame.ScrollChild.Bars[i]
         self:UpdateBar(bar, nil, nil)
     end
 end
