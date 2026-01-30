@@ -78,7 +78,7 @@ end
 function Diameter.UI:CreateBars(f)
     f.Bars = {} -- This is your Pool
     
-    -- Create 10 bars initially
+    -- Creating bars
     for i = 1, Diameter.UI.MaxBars do
         local bar = CreateFrame("StatusBar", nil, f)
         bar:SetHeight(20)
