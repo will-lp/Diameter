@@ -20,3 +20,9 @@ end)
 C_Timer.NewTicker(0.5, function() 
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame) 
 end)
+
+function Diameter:SetMode(value)
+    local label = Diameter.Menu.Labels[value]
+    Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
+    Diameter.Current.Mode = value
+end

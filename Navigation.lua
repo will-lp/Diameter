@@ -1,13 +1,13 @@
 local addonName, Diameter = ...
 
-local Modes = {
+local Pages = {
     MODES = "MODES",
-    MAIN = "MAIN",
-    SPELL = "SPELL"
+    GROUP = "GROUP",
+    SPELL = "SPELL",
 }
 
 local viewState = {
-    mode = Modes.MAIN,
+    mode = Pages.GROUP,
     targetGUID = nil,
     targetName = nil,
     targetIndex = nil,
@@ -24,27 +24,54 @@ function Diameter.Navigation:getTargetIndex()
     return viewState.targetIndex
 end
 
-function Diameter.Navigation:isSpellView()
-    return viewState.mode == Modes.SPELL
+function Diameter.Navigation.isSpellView()
+    return viewState.mode == Pages.SPELL
 end
 
-function Diameter.Navigation:DrillDown(guid, name, i)
-    viewState.mode = Modes.SPELL
+function Diameter.Navigation.isGroupView()
+    return viewState.mode == Pages.GROUP
+end
 
-    if (issecretvalue(guid)) then
-        viewState.secretTargetGUID = guid
+function Diameter.Navigation.isModesView()
+    return viewState.mode == Pages.MODES
+end
+
+function Diameter.Navigation:NavigateToGroup()
+    viewState.mode = Pages.GROUP
+    viewState.targetGUID = nil
+    viewState.targetName = nil
+    Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
+end
+
+function Diameter.Navigation:NavigateDown(data)
+    if self:isModesView() then 
+        viewState.mode = Pages.GROUP
+
+        -- data.mode comes from the list of BlizzardDamageMeter modes
+        Diameter:SetMode(data.mode)
+    elseif self:isGroupView() then
+        viewState.mode = Pages.SPELL
+        local guid, name = data.sourceGUID, data.name
+
+        if (issecretvalue(guid)) then
+            viewState.secretTargetGUID = guid
+        end
+        
+        viewState.targetGUID = issecretvalue(guid) and UnitGUID("player") or guid
+        viewState.targetName = name
     end
-    
-    viewState.targetGUID = issecretvalue(guid) and UnitGUID("player") or guid
-    viewState.targetName = name
-    viewState.targetIndex = i
 
     -- Force a UI refresh
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
 end
 
-function Diameter.Navigation:ResetView()
-    viewState.mode = Modes.MAIN
-    viewState.targetGUID = nil
+function Diameter.Navigation:NavigateUp(data)
+    if self:isSpellView() then
+        viewState.mode = Pages.GROUP
+        viewState.targetGUID = nil
+        viewState.targetName = nil
+    elseif self:isGroupView() then
+        viewState.mode = Pages.MODES
+    end
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
 end

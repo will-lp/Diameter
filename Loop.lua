@@ -17,17 +17,33 @@ function Diameter.Loop:UpdateMeter(frame)
 
     if (Diameter.Navigation.isSpellView()) then
         self:UpdatePlayerSpellMeter(frame, sessionID, mode)
-    else
+    elseif (Diameter.Navigation.isGroupView()) then
         self:UpdateGroupMeter(frame, sessionID, mode)
+    elseif (Diameter.Navigation.isModesView()) then
+        self:PrintModesMenu(frame)
     end
     
+end
+
+function Diameter.Loop:PrintModesMenu(frame)
+    for index, mode in ipairs(Diameter.Menu.MenuOrder) do
+        local label = Diameter.Menu.Labels[mode]
+        local data = {
+            name = label,
+            mode = mode, -- this will be used by Navigation to set the mode
+            value = 1, -- this is used to draw a bar according to the top value
+            icon = nil,
+            color = {r=0.3, g=0.3, b=0.9},
+            sourceGUID = nil,
+        }
+        local bar = frame.ScrollChild.Bars[index]
+        self:UpdateBar(bar, data, 1)
+    end
 end
 
 function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode)
     
     local dataArray = Diameter.Data:GetSpellMeter(Diameter.Navigation.getTargetGUID(), mode, sessionID)
-
-    -- local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode)[Diameter.Navigation:getTargetIndex()].breakdown
 
     self:UpdateBarsFromDataArray(frame, dataArray)
 

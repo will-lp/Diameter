@@ -5,13 +5,15 @@ Diameter.Data = {}
 local ModeToField ={
     [BlizzardDamageMeter.Mode.DamageDone] = "totalAmount",
     [BlizzardDamageMeter.Mode.Dps] = "amountPerSecond",
-    [BlizzardDamageMeter.Mode.HealingDone] = "totalHealing",
-    [BlizzardDamageMeter.Mode.Hps] = "hps",
-    [BlizzardDamageMeter.Mode.Absorbs] = "totalAbsorbs",
-    [BlizzardDamageMeter.Mode.Interrupts] = "interrupts",
-    [BlizzardDamageMeter.Mode.Dispels] = "dispels",
-    [BlizzardDamageMeter.Mode.DamageTaken] = "totalDamageTaken",
-    [BlizzardDamageMeter.Mode.AvoidableDamageTaken] = "avoidableDamageTaken",
+    [BlizzardDamageMeter.Mode.HealingDone] = "totalAmount",
+    [BlizzardDamageMeter.Mode.Hps] = "amountPerSecond",
+
+    -- I am guessing all of these. They also have totalAmount
+    [BlizzardDamageMeter.Mode.Absorbs] = "amountPerSecond",
+    [BlizzardDamageMeter.Mode.Interrupts] = "amountPerSecond",
+    [BlizzardDamageMeter.Mode.Dispels] = "amountPerSecond",
+    [BlizzardDamageMeter.Mode.DamageTaken] = "amountPerSecond",
+    [BlizzardDamageMeter.Mode.AvoidableDamageTaken] = "amountPerSecond",
 }
 
 Diameter.Data.ModeToField = ModeToField
@@ -28,14 +30,12 @@ function Diameter.Data:GetGroupMeter(sessionID, mode)
         dataArray.topValue = sources[1] and sources[1][ModeToField[Diameter.Current.Mode]]
 
         for i = 1, #sources do
-
             local data = {
                 value = sources[i][ModeToField[Diameter.Current.Mode]],
                 icon = sources[i].specIconID,
                 name = sources[i].name,
                 color = RAID_CLASS_COLORS[sources[i].classFilename] or {r=0.5, g=0.5, b=0.5},
                 sourceGUID = sources[i].sourceGUID,
-                --breakdown = Diameter.Data:GetSpellMeter(sources[i].sourceGUID, mode),
             }
             
             table.insert(dataArray, data)
@@ -54,7 +54,8 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID)
 
     if details and details.combatSpells then
         -- Transform Blizzard's spell details into a format UpdateBar understands
-        dataArray.topValue = details.combatSpells[1][ModeToField[Diameter.Current.Mode]]
+        local fieldName = ModeToField[Diameter.Current.Mode]
+        dataArray.topValue = details.combatSpells[1][fieldName]
 
         for i, combatSpell in ipairs(details.combatSpells) do
             

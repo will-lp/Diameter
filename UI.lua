@@ -87,6 +87,14 @@ function Diameter.UI:CreateScrollEngine(f)
             self:SetVerticalScroll(math.min(self:GetVerticalScrollRange(), cur + step))
         end
     end)
+
+    -- So we can go back up the navigation stack clicking anywhere in the scroll area
+    sf:SetScript("OnMouseDown", function(self, button)
+        if button == "RightButton" then
+            Diameter.Navigation:NavigateUp(self.data)
+        end
+    end)
+
     scrollChild:SetBackdropColor(0, 0, 0, 0)
 
     return sf, scrollChild
@@ -132,11 +140,11 @@ function Diameter.UI:CreateBars(scrollChild)
         bar:EnableMouse(true)
         bar:SetScript("OnMouseDown", function(self, button)
             if button == "LeftButton" then
-                -- Tell the meter to drill down into this player
-                Diameter.Navigation:DrillDown(self.data.sourceGUID, self.data.name, i)
+                -- Tell the meter to navigate down into group data or details of the player
+                Diameter.Navigation:NavigateDown(self.data)
             elseif button == "RightButton" then
-                -- Right click usually goes "Back" to the main list
-                Diameter.Navigation:ResetView()
+                -- Right click goes "Back" to the group data or modes list
+                Diameter.Navigation:NavigateUp(self.data)
             end
         end)
 
