@@ -12,6 +12,20 @@ Diameter.Current = {
     SessionType = BlizzardDamageMeter.SessionType.Current,
 }
 
+function Diameter:RefreshUI()
+    Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
+    Diameter.UI:ResetScrollPosition()
+end
+
+function Diameter:SetMode(value)
+    local label = Diameter.Menu.Labels[value]
+    Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
+    Diameter.Current.Mode = value
+end
+
+
+-- Boot operations
+
 Diameter.UI.mainFrame.MenuBtn:SetScript("OnClick", function(self)
     Diameter.Menu:ShowMenu(self)
 end)
@@ -21,8 +35,11 @@ C_Timer.NewTicker(0.5, function()
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame) 
 end)
 
-function Diameter:SetMode(value)
-    local label = Diameter.Menu.Labels[value]
-    Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
-    Diameter.Current.Mode = value
-end
+-- this is needed to properly set the scroll child height initially,
+-- otherwise we can scroll the child frame while it has no content.
+Diameter.UI:UpdateScrollChildHeight()
+
+-- this is needed to boot the UI, or sometimes it will show a black frame, 
+-- even though there is data in blizzard's dps meter.
+Diameter:RefreshUI()
+

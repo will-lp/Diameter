@@ -40,7 +40,8 @@ function Diameter.Navigation:NavigateToGroup()
     viewState.mode = Pages.GROUP
     viewState.targetGUID = nil
     viewState.targetName = nil
-    Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
+
+    Diameter:RefreshUI()
 end
 
 function Diameter.Navigation:NavigateDown(data)
@@ -62,7 +63,7 @@ function Diameter.Navigation:NavigateDown(data)
     end
 
     -- Force a UI refresh
-    Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
+    Diameter:RefreshUI()
 end
 
 function Diameter.Navigation:NavigateUp(data)
@@ -73,5 +74,6 @@ function Diameter.Navigation:NavigateUp(data)
     elseif self:isGroupView() then
         viewState.mode = Pages.MODES
     end
-    Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
+
+    Diameter:RefreshUI()
 end

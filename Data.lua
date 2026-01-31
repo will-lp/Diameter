@@ -8,10 +8,10 @@ local ModeToField ={
     [BlizzardDamageMeter.Mode.HealingDone] = "totalAmount",
     [BlizzardDamageMeter.Mode.Hps] = "amountPerSecond",
 
-    -- I am guessing all of these. They also have totalAmount
+    -- I am guessing all of these:
     [BlizzardDamageMeter.Mode.Absorbs] = "amountPerSecond",
-    [BlizzardDamageMeter.Mode.Interrupts] = "amountPerSecond",
-    [BlizzardDamageMeter.Mode.Dispels] = "amountPerSecond",
+    [BlizzardDamageMeter.Mode.Interrupts] = "totalAmount",
+    [BlizzardDamageMeter.Mode.Dispels] = "totalAmount",
     [BlizzardDamageMeter.Mode.DamageTaken] = "amountPerSecond",
     [BlizzardDamageMeter.Mode.AvoidableDamageTaken] = "amountPerSecond",
 }
@@ -46,15 +46,25 @@ function Diameter.Data:GetGroupMeter(sessionID, mode)
     return dataArray
 end
 
+
+--[[
+    Obtains and returns the spell meter data for a given targetGUID (player).
+
+    @param targetGUID The GUID of the player whose spell meter is to be retrieved.
+    @param mode The current mode of the damage meter (e.g., Damage Done, Healing Done).
+    @param sessionID The ID of the combat session.
+    @return A table containing spell meter data formatted for the UI.
+]]--
 function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID)
     
     local details = C_DamageMeter.GetCombatSessionSourceFromID(sessionID, mode, targetGUID)
 
     local dataArray = {}
 
-    if details and details.combatSpells then
+    if details and details.combatSpells and #details.combatSpells > 0 then
         -- Transform Blizzard's spell details into a format UpdateBar understands
         local fieldName = ModeToField[Diameter.Current.Mode]
+        
         dataArray.topValue = details.combatSpells[1][fieldName]
 
         for i, combatSpell in ipairs(details.combatSpells) do

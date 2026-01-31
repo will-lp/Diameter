@@ -9,20 +9,35 @@ Diameter.Loop = {}
 -- @param f = CreateFrame
 function Diameter.Loop:UpdateMeter(frame)
     local sessions = C_DamageMeter.GetAvailableCombatSessions()
-    if #sessions == 0 then return end
+
+    -- If no sessions, modes can be shown
+    if Diameter.Navigation.isModesView() then
+        self:PrintModesMenu(frame)
+        return
+    end
+    
+    if #sessions == 0 then 
+        self:PrintEmptyBars(frame)
+        return 
+    end
     
     local sessionID = sessions[#sessions].sessionID
     
-    local mode = Diameter.Current.Mode or 0
+    local mode = Diameter.Current.Mode
 
     if (Diameter.Navigation.isSpellView()) then
         self:UpdatePlayerSpellMeter(frame, sessionID, mode)
     elseif (Diameter.Navigation.isGroupView()) then
         self:UpdateGroupMeter(frame, sessionID, mode)
-    elseif (Diameter.Navigation.isModesView()) then
-        self:PrintModesMenu(frame)
     end
     
+end
+
+function Diameter.Loop:PrintEmptyBars(frame)
+    for i = 1, Diameter.UI.MaxBars do
+        local bar = frame.ScrollChild.Bars[i]
+        self:UpdateBar(bar, nil, nil)
+    end
 end
 
 function Diameter.Loop:PrintModesMenu(frame)
