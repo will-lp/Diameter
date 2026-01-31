@@ -62,7 +62,6 @@ end
 
 
 function Diameter.UI:CreateScrollEngine(f)
-    -- 3. THE SCROLLING ENGINE
     -- We use a template to get a standard WoW scrollbar for free
     local sf = CreateFrame("ScrollFrame", "$parentScrollFrame", f, "UIPanelScrollFrameTemplate")
     sf:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -30) -- -30 to stay below header
