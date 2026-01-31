@@ -13,7 +13,7 @@ Diameter.Current = {
 }
 
 Diameter.UI.mainFrame.MenuBtn:SetScript("OnClick", function(self)
-    Diameter:ShowMenu(self)
+    Diameter.Menu:ShowMenu(self)
 end)
 
 -- 5. Main loop

@@ -27,7 +27,7 @@ Diameter.Menu = {
     }
 }
 
-function Diameter:ShowMenu(anchor)
+function Diameter.Menu:ShowMenu(anchor)
     
     MenuUtil.CreateContextMenu(anchor, function(owner, rootDescription)
         rootDescription:CreateTitle("Select Mode")
