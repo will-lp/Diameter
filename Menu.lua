@@ -8,7 +8,7 @@ local addonName, Diameter = ...
     Should also provide settings in the future.
 ]]--
 
-local M = BlizzardDamageMeter.Mode
+local M = Diameter.BlizzardDamageMeter.Mode
 
 Diameter.Menu = {
     Labels = {

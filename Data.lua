@@ -9,18 +9,20 @@ local addonName, Diameter = ...
 
 Diameter.Data = {}
 
+local BDM = Diameter.BlizzardDamageMeter
+
 local ModeToField ={
-    [BlizzardDamageMeter.Mode.DamageDone] = "totalAmount",
-    [BlizzardDamageMeter.Mode.Dps] = "amountPerSecond",
-    [BlizzardDamageMeter.Mode.HealingDone] = "totalAmount",
-    [BlizzardDamageMeter.Mode.Hps] = "amountPerSecond",
+    [BDM.Mode.DamageDone] = "totalAmount",
+    [BDM.Mode.Dps] = "amountPerSecond",
+    [BDM.Mode.HealingDone] = "totalAmount",
+    [BDM.Mode.Hps] = "amountPerSecond",
 
     -- I am guessing all of these:
-    [BlizzardDamageMeter.Mode.Absorbs] = "amountPerSecond",
-    [BlizzardDamageMeter.Mode.Interrupts] = "totalAmount",
-    [BlizzardDamageMeter.Mode.Dispels] = "totalAmount",
-    [BlizzardDamageMeter.Mode.DamageTaken] = "amountPerSecond",
-    [BlizzardDamageMeter.Mode.AvoidableDamageTaken] = "amountPerSecond",
+    [BDM.Mode.Absorbs] = "amountPerSecond",
+    [BDM.Mode.Interrupts] = "totalAmount",
+    [BDM.Mode.Dispels] = "totalAmount",
+    [BDM.Mode.DamageTaken] = "amountPerSecond",
+    [BDM.Mode.AvoidableDamageTaken] = "amountPerSecond",
 }
 
 Diameter.Data.ModeToField = ModeToField

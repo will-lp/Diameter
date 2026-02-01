@@ -1,4 +1,6 @@
-BlizzardDamageMeter = {
+local addonName, Diameter = ...
+
+Diameter.BlizzardDamageMeter = {
     Mode = {
         DamageDone = 0,
         Dps = 1,

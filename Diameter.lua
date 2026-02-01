@@ -12,8 +12,8 @@ Diameter.UI.mainFrame = Diameter.UI:Boot()
 _G["Diameter"] = Diameter
 
 Diameter.Current = {
-    Mode = BlizzardDamageMeter.Mode.DamageDone,
-    SessionType = BlizzardDamageMeter.SessionType.Current,
+    Mode = Diameter.BlizzardDamageMeter.Mode.DamageDone,
+    SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
 }
 
 function Diameter:RefreshUI()
