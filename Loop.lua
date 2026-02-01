@@ -1,6 +1,12 @@
 
 local addonName, Diameter = ...
 
+--[[
+    This module provides the main loop functionality for Diameter.
+    It updates the meter display based on the current view (modes, group, or spell).
+    It binds together UI components with Data and Navigation modules.
+]]
+
 Diameter.Loop = {}
 
 

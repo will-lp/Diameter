@@ -1,5 +1,12 @@
 local addonName, Diameter = ...
 
+--[[
+    This module is responsible for obtaining and formatting data from Blizzard's Damage Meter API
+    into a format that Diameter's UI can utilize.
+
+    It provides functions to retrieve group and spell meter data based on the current mode and session.
+]]--
+
 Diameter.Data = {}
 
 local ModeToField ={

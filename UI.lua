@@ -1,4 +1,12 @@
 local addonName, Diameter = ...
+
+--[[
+    This module provides the building of the User Interface for Diameter.
+    It creates the main frame, header, scrollable area, and data bars.
+    
+    Ideally it should only handle UI-related tasks and not data manipulation.
+]]
+
 Diameter.UI = {
     MaxBars = 40,
 }

@@ -1,5 +1,13 @@
 local addonName, Diameter = ...
 
+--[[
+    This module provides the menu functionality for Diameter, allowing users to select modes and reset data.
+
+    Should also provide segment selection in the future.
+    Should also provide session type selection in the future.
+    Should also provide settings in the future.
+]]--
+
 local M = BlizzardDamageMeter.Mode
 
 Diameter.Menu = {

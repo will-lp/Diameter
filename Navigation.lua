@@ -1,5 +1,21 @@
 local addonName, Diameter = ...
 
+--[[
+    This module provides the navigation functionality for Diameter.
+    It manages the current view state (modes, group, or spell) and handles navigation actions.
+
+    Currently it enables navigation of three pages:
+    - Modes View: where the user can select the mode (Damage Done, Healing Done, etc.)
+    - Group View: where the user can see the group meter for the selected mode.
+    - Spell View: where the user can see the spell meter (breakdown) for a selected player.
+
+    Due to Blizzard restrictions spell meter seems to only work on the player while in combat. 
+
+    Future improvements may include:
+    - Remembering the last selected mode between sessions.
+    - Detailed data of spell breakdown
+]]
+
 local Pages = {
     MODES = "MODES",
     GROUP = "GROUP",
