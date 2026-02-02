@@ -13,6 +13,7 @@ Diameter.UI = {
 
 -- the height of each bar including spacing, used to calculate scroll height
 local step = 20
+local spacing = 1
 
 function Diameter.UI:Boot()
     -- 1. Main Frame
@@ -80,7 +81,10 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
 
     -- This is the 'Long Paper' that holds the bars
     local scrollChild = CreateFrame("Frame", "$parentScrollChild", scrollFrame, "BackdropTemplate")
-    scrollChild:SetSize(scrollFrame:GetWidth(), 1) -- Height will be auto-calculated later
+    -- Anchor the child flush to the scroll frame so there are no secret insets
+    scrollChild:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
+    scrollChild:SetPoint("TOPRIGHT", scrollFrame, "TOPRIGHT", 0, 0)
+    scrollChild:SetHeight(1) -- updated dynamically by UpdateScrollChildHeight()
     scrollFrame:SetScrollChild(scrollChild)
 
     mainFrame.ScrollFrame = scrollFrame
@@ -91,19 +95,6 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
 
     -- 4. Mouse Wheel Support (Essential for UX)
     scrollFrame:EnableMouseWheel(true)
-    scrollFrame:SetScript("OnMouseWheel", function(self, delta)
-        local cur = self:GetVerticalScroll()
-
-        Diameter.UI:UpdateScrollChildHeight()
-
-        local maxScroll = self:GetVerticalScrollRange()
-
-        if delta > 0 then
-            self:SetVerticalScroll(math.max(0, cur - step))
-        else
-            self:SetVerticalScroll(math.min(maxScroll, cur + step))
-        end
-    end)
 
     -- So we can go back up the navigation stack clicking anywhere in the scroll area
     scrollFrame:SetScript("OnMouseDown", function(self, button)
@@ -120,6 +111,10 @@ end
 --[[
     Calculates and returns the height of the scroll child based on shown bars.
     Also updates the scroll child's height to ensure proper scrolling behavior.
+
+    If there are no shown bars, the height will be set to the size of the screen,
+    this way, we prevent the error that sometimes, combat will start, the data
+    will be fetched, but the scroll child height will remain 0, causing a black frame.
 ]]
 function Diameter.UI:UpdateScrollChildHeight()
 
@@ -129,7 +124,17 @@ function Diameter.UI:UpdateScrollChildHeight()
     local amountOfShownBars = Diameter.Util.count(scrollChild.Bars, function(bar)
         return bar:IsShown()
     end)
-    local contentHeight = amountOfShownBars * step
+
+    -- account for spacing between bars so the calculated range matches GetVerticalScrollRange()
+    local contentHeight = amountOfShownBars * step + math.max(0, amountOfShownBars - 1) * spacing
+
+
+    if not contentHeight or contentHeight == 0 then
+        -- This is needed when the game just started (or after /reload) and there's 
+        -- no meter data. Then combat starts, and the UI will stay black forever,
+        -- unless there's some interaction like a click or scrolling.
+        contentHeight = self.mainFrame.ScrollFrame:GetHeight()
+    end
 
     -- update scroll range dynamically
     scrollChild:SetHeight(contentHeight)
@@ -209,8 +214,8 @@ function Diameter.UI:CreateBars(scrollChild)
             bar:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, 0)
             bar:SetPoint("TOPRIGHT", scrollChild, "TOPRIGHT", 0, 0)
         else
-            bar:SetPoint("TOPLEFT", bars[i-1], "BOTTOMLEFT", 0, -1)
-            bar:SetPoint("TOPRIGHT", bars[i-1], "BOTTOMRIGHT", 0, -1)
+            bar:SetPoint("TOPLEFT", bars[i-1], "BOTTOMLEFT", 0, -spacing)
+            bar:SetPoint("TOPRIGHT", bars[i-1], "BOTTOMRIGHT", 0, -spacing)
         end
         
         bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
@@ -229,9 +234,10 @@ function Diameter.UI:CreateBars(scrollChild)
 
         bar:Hide() -- Hide them until we have data
         bars[i] = bar
-
-        scrollChild:SetHeight(Diameter.UI.MaxBars * (step + 2)) -- 100 bars * (height + spacing)
     end
 
+    -- set a sensible initial height (MaxBars * step + (MaxBars - 1) * spacing)
+    scrollChild:SetHeight(Diameter.UI.MaxBars * step + math.max(0, Diameter.UI.MaxBars - 1) * spacing)
+
     return bars
-end 
+end

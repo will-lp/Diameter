@@ -14,14 +14,15 @@ Diameter.Loop = {}
 -- 4. The Update Function
 -- @param f = CreateFrame
 function Diameter.Loop:UpdateMeter(frame)
-    local sessions = C_DamageMeter.GetAvailableCombatSessions()
-
+    
     -- If no sessions, modes can be shown
     if Diameter.Navigation.isModesView() then
         self:PrintModesMenu(frame)
         return
     end
-    
+
+    local sessions = C_DamageMeter.GetAvailableCombatSessions()
+
     if #sessions == 0 then 
         self:PrintEmptyBars(frame)
         return 
@@ -79,6 +80,7 @@ function Diameter.Loop:UpdateGroupMeter(frame, sessionID, mode)
 end
 
 function Diameter.Loop:UpdateBarsFromDataArray(frame, dataArray)
+
     -- fill the bars with data
     for i, _ in ipairs(dataArray) do
         local data = dataArray[i]
