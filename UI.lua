@@ -18,8 +18,8 @@ local spacing = 1
 function Diameter.UI:Boot()
     -- 1. Main Frame
     local mainFrame = CreateFrame("Frame", "DiameterMainFrame", UIParent, "BackdropTemplate")
-    mainFrame:SetSize(250, 100) -- Taller starting size
-    mainFrame:SetPoint("CENTER")
+    mainFrame:SetSize(300, 150)
+    mainFrame:SetPoint("BOTTOMRIGHT")
     mainFrame:SetMovable(true)
     mainFrame:SetResizable(true)
     mainFrame:SetResizeBounds(150, 50, 600, 800)
