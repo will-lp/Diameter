@@ -2,6 +2,7 @@ local addonName, Diameter = ...
 
 Diameter.UIHeader = {}
 
+local EVT = Diameter.EventBus.Events
 
 function Diameter.UIHeader:CreateHeader(mainFrame)
     -- 2. Header Bar (Drag this to move)
@@ -17,7 +18,6 @@ function Diameter.UIHeader:CreateHeader(mainFrame)
     
     mainFrame.HeaderText = mainFrame.Header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     mainFrame.HeaderText:SetPoint("LEFT", mainFrame.MenuBtn, "RIGHT", 5, 0)
-    mainFrame.HeaderText:SetText("Diameter: Damage Done")
 end
 
 
@@ -34,41 +34,33 @@ function Diameter.UIHeader:CreateMenuButton(mainFrame)
 end
 
 
---[[function Diameter.UIHeader:CreateSegmentButton(mainFrame)
-    mainFrame.SegmentBtn = CreateFrame("Button", nil, mainFrame.Header)
-    mainFrame.SegmentBtn:SetSize(16, 16)
-    mainFrame.SegmentBtn:SetPoint("RIGHT", mainFrame.Header, "RIGHT", -2, 0)
+local function GetIndicatorText(current)
     
-    -- Force the button to be on a higher layer than the header background
-    mainFrame.SegmentBtn:SetFrameLevel(mainFrame.Header:GetFrameLevel() + 1)
-
-    local tex = mainFrame.SegmentBtn:CreateTexture(nil, "ARTWORK")
-    tex:SetTexture("Interface\\Icons\\INV_Misc_Statue_02")
-    tex:SetAllPoints()
-    mainFrame.SegmentBtn:SetNormalTexture(tex)
-
-    mainFrame.SegmentBtn:SetScript("OnClick", function(self, button)
-        Diameter.Menu:ShowSessions(self)
-    end)
-end]]
-
-local function GetIndicatorText()
-    local cur = Diameter.Current
-    if cur.SessionType == Diameter.BlizzardDamageMeter.SessionType.Overall then 
+    if current.SessionType == Diameter.BlizzardDamageMeter.SessionType.Overall then 
         return "O" 
     end
     
     -- Check if it's the latest session
-    if cur.SessionID == #Diameter.Data:GetSessions() then 
+    if current.SessionType == Diameter.BlizzardDamageMeter.SessionType.Current then 
         return "C" 
     end
     
-    return cur.SessionID
+    return current.SessionID
 end
 
-function Diameter.UIHeader:UpdateTypeAndSessionIndicator()
-    Diameter.UI.mainFrame.SessionIndicator:SetText(GetIndicatorText())
-end
+Diameter.EventBus:Listen(EVT.CURRENT_CHANGED, function(data)
+    Diameter.UI.mainFrame.SessionIndicator:SetText(GetIndicatorText(data))
+end)
+
+Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
+    Diameter.UI.mainFrame.SessionIndicator:SetText(GetIndicatorText({ SessionType = data }))
+end)
+
+Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
+    Diameter.UI.mainFrame.SessionIndicator:SetText(GetIndicatorText(data))
+end)
+
+
 
 
 

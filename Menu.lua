@@ -10,6 +10,8 @@ local addonName, Diameter = ...
 
 local M = Diameter.BlizzardDamageMeter.Mode
 
+local EVT = Diameter.EventBus.Events
+
 Diameter.Menu = {
     Labels = {
         [M.DamageDone] = "Damage Done",
@@ -43,7 +45,7 @@ function Diameter.Menu:ShowMenu(anchor)
         for _, value in ipairs(Diameter.Menu.MenuOrder) do
             local label = Diameter.Menu.Labels[value]
             rootDescription:CreateButton(label, function() 
-                Diameter:SetMode(value)
+                Diameter.EventBus:Fire(EVT.MODE_CHANGED, value)
                 Diameter.Navigation:NavigateToGroup()
             end)
         end
@@ -66,13 +68,11 @@ function Diameter.Menu:ShowSessions(anchor)
         rootDescription:CreateTitle("Segments")
 
         rootDescription:CreateButton("Current", function() 
-            Diameter.SetSessionType(Diameter.BlizzardDamageMeter.SessionType.Current)
-            Diameter.UIHeader:UpdateTypeAndSessionIndicator()
+            Diameter.EventBus:Fire(EVT.SESSION_TYPE_CHANGED, Diameter.BlizzardDamageMeter.SessionType.Current)
         end)
 
         rootDescription:CreateButton("Overall", function() 
-            Diameter:SetSessionType( Diameter.BlizzardDamageMeter.SessionType.Overall )
-            Diameter.UIHeader:UpdateTypeAndSessionIndicator()
+            Diameter.EventBus:Fire(EVT.SESSION_TYPE_CHANGED, Diameter.BlizzardDamageMeter.SessionType.Overall)
         end)
 
         rootDescription:CreateDivider()
@@ -81,9 +81,10 @@ function Diameter.Menu:ShowSessions(anchor)
         for _, value in ipairs(sessions) do
             local label = value.sessionID .. ": " .. value.name
             rootDescription:CreateButton(label, function() 
-                Diameter:SetSessionType(Diameter.BlizzardDamageMeter.SessionType.Expired)
-                Diameter:SetSessionID(value.sessionID)
-                Diameter.UIHeader:UpdateTypeAndSessionIndicator()
+                Diameter.EventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, {
+                    SessionType = Diameter.BlizzardDamageMeter.SessionType.Expired,
+                    SessionID = value.sessionID
+                })
             end)
         end
     end)

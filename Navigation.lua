@@ -23,12 +23,14 @@ local Pages = {
 }
 
 local viewState = {
-    mode = Pages.GROUP,
+    page = Pages.GROUP,
     targetGUID = nil,
     targetName = nil,
     targetIndex = nil,
-    secretTargetGUID = nil, -- here we hold to the secretTargetGUID. No use for now, though :-(
+    secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for now, though :-(
 }
+
+local EVT = Diameter.EventBus.Events
 
 Diameter.Navigation = {}
 
@@ -41,33 +43,34 @@ function Diameter.Navigation:getTargetIndex()
 end
 
 function Diameter.Navigation.isSpellView()
-    return viewState.mode == Pages.SPELL
+    return viewState.page == Pages.SPELL
 end
 
 function Diameter.Navigation.isGroupView()
-    return viewState.mode == Pages.GROUP
+    return viewState.page == Pages.GROUP
 end
 
 function Diameter.Navigation.isModesView()
-    return viewState.mode == Pages.MODES
+    return viewState.page == Pages.MODES
 end
 
 function Diameter.Navigation:NavigateToGroup()
-    viewState.mode = Pages.GROUP
+    viewState.page = Pages.GROUP
     viewState.targetGUID = nil
     viewState.targetName = nil
 
     Diameter:RefreshUI()
+    Diameter.EventBus:Fire(EVT.PAGE_CHANGED, viewState)
 end
 
 function Diameter.Navigation:NavigateDown(data)
     if self:isModesView() then 
-        viewState.mode = Pages.GROUP
+        viewState.page = Pages.GROUP
 
         -- data.mode comes from the list of BlizzardDamageMeter modes
-        Diameter:SetMode(data.mode)
+        Diameter.EventBus:Fire(EVT.MODE_CHANGED, data.mode)
     elseif self:isGroupView() then
-        viewState.mode = Pages.SPELL
+        viewState.page = Pages.SPELL
         local guid, name = data.sourceGUID, data.name
 
         if (issecretvalue(guid)) then
@@ -79,17 +82,19 @@ function Diameter.Navigation:NavigateDown(data)
     end
 
     -- Force a UI refresh
+    Diameter.EventBus:Fire(EVT.PAGE_CHANGED, viewState)
     Diameter:RefreshUI()
 end
 
 function Diameter.Navigation:NavigateUp(data)
     if self:isSpellView() then
-        viewState.mode = Pages.GROUP
+        viewState.page = Pages.GROUP
         viewState.targetGUID = nil
         viewState.targetName = nil
     elseif self:isGroupView() then
-        viewState.mode = Pages.MODES
+        viewState.page = Pages.MODES
     end
 
+    Diameter.EventBus:Fire(EVT.PAGE_CHANGED, viewState)
     Diameter:RefreshUI()
 end

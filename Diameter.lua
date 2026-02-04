@@ -8,6 +8,8 @@ local addonName, Diameter = ...
 
 Diameter.UI.mainFrame = Diameter.UI:Boot()
 
+local EVT = Diameter.EventBus.Events
+
 -- This makes Diameter accessible to the Chat Frame and other files
 _G["Diameter"] = Diameter
 
@@ -17,27 +19,33 @@ Diameter.Current = {
     SessionID = nil
 }
 
+
+
+Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
+    local label = Diameter.Menu.Labels[mode]
+    Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
+    Diameter.Current.Mode = mode
+    DiameterDB.LastMode = mode
+end)
+
+Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(sessionType)
+    Diameter.Current.SessionType = sessionType
+    DiameterDB.LastSessionType = sessionType
+end)
+
+Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
+    Diameter.Current.SessionType = data.SessionType
+    Diameter.Current.SessionID = data.SessionID
+    DiameterDB.LastSessionType = data.SessionType
+    DiameterDB.LastSessionID = data.SessionID
+end)
+
+
 function Diameter:RefreshUI()
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
     Diameter.UI:ResetScrollPosition()
 end
 
-function Diameter:SetMode(mode)
-    local label = Diameter.Menu.Labels[mode]
-    Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
-    Diameter.Current.Mode = mode
-    DiameterDB.LastMode = mode
-end
-
-function Diameter:SetSessionType(sessionType)
-    Diameter.Current.SessionType = sessionType
-    DiameterDB.LastSessionType = sessionType
-end
-
-function Diameter:SetSessionID(sessionId)
-    Diameter.Current.SessionID = sessionId
-    DiameterDB.LastSessionID = sessionId
-end
 
 
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
@@ -51,10 +59,14 @@ end
             DiameterDB = DiameterDB or {}
 
             -- 2. Load saved Mode (default to DamageDone if nil)
-            local savedMode = DiameterDB.LastMode or Diameter.BlizzardDamageMeter.Mode.DamageDone
-            Diameter:SetMode(savedMode)
-            Diameter:SetSessionType(DiameterDB.LastSessionType or Diameter.BlizzardDamageMeter.SessionType.Current)
-            Diameter:SetSessionID(DiameterDB.LastSessionID)
+            Diameter.Current = {
+                Mode = DiameterDB.LastMode or Diameter.BlizzardDamageMeter.Mode.DamageDone,
+                SessionType = DiameterDB.LastSessionType or Diameter.BlizzardDamageMeter.SessionType.Current,
+                SessionID = DiameterDB.LastSessionID
+            }
+
+            Diameter.EventBus:Fire(EVT.CURRENT_CHANGED, Diameter.Current)
+            Diameter.EventBus:Fire(EVT.MODE_CHANGED, Diameter.Current.Mode)
             
             -- Now that data is loaded, refresh everything
             Diameter:RefreshUI()

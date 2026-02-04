@@ -9,37 +9,79 @@ local addonName, Diameter = ...
 
 Diameter.Loop = {}
 
+local EVT = Diameter.EventBus.Events
+local viewState = { page = 'GROUP' }
 
 
--- 4. The Update Function
--- @param f = CreateFrame
+local current = {}
+
+--[[
+    On addon boot we grab values from DiameterDB (sessionID, sessionType and mode)
+    and do a single UpdateBars because we are probably not in combat.
+]]
+Diameter.EventBus:Listen(EVT.CURRENT_CHANGED, function(data)
+    current = data
+    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+end)
+
+Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(data)
+    current.Mode = data
+    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+end)
+
+Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
+    current.SessionType = data
+    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+end)
+
+Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
+    current.SessionType = data.SessionType
+    current.SessionID = data.SessionID
+    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+end)
+
+--[[
+    When a page is changed we store that data and do a 
+    single UpdateBars in case we are not in combat.
+
+    @type data { page, targetGUID, targetName, targetIndex }
+]]
+Diameter.EventBus:Listen(EVT.PAGE_CHANGED, function(data)
+    viewState = data
+    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+end)
+
+
+
 function Diameter.Loop:UpdateMeter(frame)
-    
-    -- If no sessions, modes can be shown
-    if Diameter.Navigation.isModesView() then
-        self:PrintModesMenu(frame)
-        return
-    end
 
     local inCombat = UnitAffectingCombat("player")
     if not inCombat then
         return
     end
-
-    local sessionID = Diameter.Current.SessionID
-
-    local mode = Diameter.Current.Mode
-
-    local sessionType = Diameter.Current.SessionType
-
-    if Diameter.Navigation.isSpellView() then
-        self:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
-    elseif Diameter.Navigation.isGroupView() then
-        self:UpdateGroupMeter(frame, sessionID, mode, sessionType)
-    end
     
+    self:UpdateBars(frame)
 end
 
+function Diameter.Loop:UpdateBars(frame) 
+    
+    if viewState.page == 'MODES' then
+        self:PrintModesMenu(frame)
+        return
+    end
+    
+    local sessionID = current.SessionID
+    local mode = current.Mode
+    local sessionType = current.SessionType
+
+    --print("Loop:sessionID", sessionID, "mode", mode, "sessionType", sessionType)
+
+    if viewState.page == 'SPELL' then
+        self:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
+    elseif viewState.page == 'GROUP' then
+        self:UpdateGroupMeter(frame, sessionID, mode, sessionType)
+    end
+end
 
 function Diameter.Loop:PrintEmptyBars(frame)
     for i = 1, Diameter.UI.MaxBars do

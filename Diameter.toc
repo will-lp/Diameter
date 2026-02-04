@@ -8,6 +8,8 @@
 
 
 BlizzardDamageMeter.lua
+Debug.lua
+EventBus.lua
 Util.lua
 Navigation.lua
 Data.lua
@@ -15,5 +17,4 @@ UIHeader.lua
 UI.lua
 Menu.lua
 Loop.lua
-Debug.lua
 Diameter.lua
