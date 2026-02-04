@@ -5,6 +5,16 @@ local addonName, Diameter = ...
     into a format that Diameter's UI can utilize.
 
     It provides functions to retrieve group and spell meter data based on the current mode and session.
+
+    There are the functions available on C_DamageMeter:
+
+    GetCombatSessionFromType
+    ResetAllCombatSessions
+    GetCombatSessionFromID
+    GetAvailableCombatSessions
+    GetCombatSessionSourceFromID
+    IsDamageMeterAvailable
+    GetCombatSessionSourceFromType
 ]]--
 
 Diameter.Data = {}
@@ -27,9 +37,23 @@ local ModeToField ={
 
 Diameter.Data.ModeToField = ModeToField
 
-function Diameter.Data:GetGroupMeter(sessionID, mode)
 
-    local container = C_DamageMeter.GetCombatSessionFromID(sessionID, mode)
+--[[
+    Returns the group meter; the data with the player's names and their
+    dps, but no details.
+    
+    @return dataArray in a format Loop can understand.
+]]--
+function Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
+
+    local SessionType = Diameter.BlizzardDamageMeter.SessionType
+    local container
+
+    if sessionType == SessionType.Overall or sessionType == SessionType.Current then
+        container = C_DamageMeter.GetCombatSessionFromType(sessionType, mode) 
+    else
+        container = C_DamageMeter.GetCombatSessionFromID(sessionID, mode)
+    end
     
     local dataArray = {}
 
@@ -64,9 +88,16 @@ end
     @param sessionID The ID of the combat session.
     @return A table containing spell meter data formatted for the UI.
 ]]--
-function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID)
+function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType)
     
-    local details = C_DamageMeter.GetCombatSessionSourceFromID(sessionID, mode, targetGUID)
+    local SessionType = Diameter.BlizzardDamageMeter.SessionType
+    local details
+
+    if sessionType == SessionType.Overall or sessionType == SessionType.Current then
+        details = C_DamageMeter.GetCombatSessionSourceFromType(sessionType, mode, targetGUID)
+    else 
+        details = C_DamageMeter.GetCombatSessionSourceFromID(sessionID, mode, targetGUID)
+    end
 
     local dataArray = {}
 
@@ -91,4 +122,16 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID)
     end
 
     return dataArray
+end
+
+
+--[[
+    Returns the available combat sessions.
+
+    @return @type name=string, sessionID=number
+]]--
+function Diameter.Data:GetSessions()
+    local sessions = C_DamageMeter.GetAvailableCombatSessions()
+
+    return sessions
 end

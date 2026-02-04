@@ -14,6 +14,7 @@ _G["Diameter"] = Diameter
 Diameter.Current = {
     Mode = Diameter.BlizzardDamageMeter.Mode.DamageDone,
     SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
+    SessionID = nil
 }
 
 function Diameter:RefreshUI()
@@ -31,10 +32,6 @@ end
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
 (function() 
     
-    Diameter.UI.mainFrame.MenuBtn:SetScript("OnClick", function(self)
-        Diameter.Menu:ShowMenu(self)
-    end)
-
     -- start the main loop
     C_Timer.NewTicker(0.5, function() 
         Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame) 

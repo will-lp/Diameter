@@ -21,24 +21,20 @@ function Diameter.Loop:UpdateMeter(frame)
         return
     end
 
-    local sessions = C_DamageMeter.GetAvailableCombatSessions()
+    local sessionID = Diameter.Current.SessionID
 
-    if #sessions == 0 then 
-        self:PrintEmptyBars(frame)
-        return 
-    end
-    
-    local sessionID = sessions[#sessions].sessionID
-    
     local mode = Diameter.Current.Mode
 
-    if (Diameter.Navigation.isSpellView()) then
-        self:UpdatePlayerSpellMeter(frame, sessionID, mode)
-    elseif (Diameter.Navigation.isGroupView()) then
-        self:UpdateGroupMeter(frame, sessionID, mode)
+    local sessionType = Diameter.Current.SessionType
+    
+    if Diameter.Navigation.isSpellView() then
+        self:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
+    elseif Diameter.Navigation.isGroupView() then
+        self:UpdateGroupMeter(frame, sessionID, mode, sessionType)
     end
     
 end
+
 
 function Diameter.Loop:PrintEmptyBars(frame)
     for i = 1, Diameter.UI.MaxBars do
@@ -63,17 +59,17 @@ function Diameter.Loop:PrintModesMenu(frame)
     end
 end
 
-function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode)
+function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
     
-    local dataArray = Diameter.Data:GetSpellMeter(Diameter.Navigation.getTargetGUID(), mode, sessionID)
+    local dataArray = Diameter.Data:GetSpellMeter(Diameter.Navigation.getTargetGUID(), mode, sessionID, sessionType)
 
     self:UpdateBarsFromDataArray(frame, dataArray)
 
 end
 
-function Diameter.Loop:UpdateGroupMeter(frame, sessionID, mode)
+function Diameter.Loop:UpdateGroupMeter(frame, sessionID, mode, sessionType)
     
-    local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode)
+    local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
 
     self:UpdateBarsFromDataArray(frame, dataArray)
     

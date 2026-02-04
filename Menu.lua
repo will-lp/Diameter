@@ -56,3 +56,37 @@ function Diameter.Menu:ShowMenu(anchor)
         end)
     end)
 end
+
+
+function Diameter.Menu:ShowSessions(anchor)
+    MenuUtil.CreateContextMenu(anchor, function(owner, rootDescription)
+
+        local sessions = Diameter.Data:GetSessions()
+
+        rootDescription:CreateTitle("Segments")
+
+        rootDescription:CreateButton("Current", function() 
+            Diameter.Current.SessionID = #sessions
+            Diameter.Current.SessionType = Diameter.BlizzardDamageMeter.SessionType.Current
+            Diameter.UIHeader:UpdateTypeAndSessionIndicator()
+        end)
+
+        rootDescription:CreateButton("Overall", function() 
+            Diameter.Current.SessionType = Diameter.BlizzardDamageMeter.SessionType.Overall
+            Diameter.UIHeader:UpdateTypeAndSessionIndicator()
+        end)
+
+        rootDescription:CreateDivider()
+
+        -- @type name=string, sessionID=number
+        for _, value in ipairs(sessions) do
+            local label = value.sessionID .. ": " .. value.name
+            rootDescription:CreateButton(label, function() 
+                Diameter.Current.SessionType = Diameter.BlizzardDamageMeter.SessionType.Expired
+                Diameter.Current.SessionID = value.sessionID
+                Diameter.UIHeader:UpdateTypeAndSessionIndicator()
+            end)
+        end
+    end)
+end
+

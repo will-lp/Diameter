@@ -9,10 +9,11 @@ local addonName, Diameter = ...
 
 Diameter.UI = {
     MaxBars = 40,
+    step = 20
 }
 
 -- the height of each bar including spacing, used to calculate scroll height
-local step = 20
+local step = Diameter.UI.step
 local spacing = 1
 
 function Diameter.UI:Boot()
@@ -35,7 +36,7 @@ function Diameter.UI:Boot()
     mainFrame:SetBackdropColor(0, 0, 0, 0.8)
 
     -- 2. Header Bar and button
-    self:CreateHeader(mainFrame)
+    Diameter.UIHeader:CreateHeader(mainFrame)
 
     local scrollFrame, scrollChild = self:CreateScrollEngine(mainFrame)
 
@@ -153,31 +154,7 @@ function Diameter.UI:ResetScrollPosition()
 end
 
 
-function Diameter.UI:CreateHeader(f)
-    -- 2. Header Bar (Drag this to move)
-    f.Header = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    f.Header:SetPoint("TOPLEFT", f, "TOPLEFT", 4, -4)
-    f.Header:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4)
-    f.Header:SetHeight(step)
-    f.Header:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8X8"})
-    f.Header:SetBackdropColor(0.2, 0.2, 0.2, 0.9)
 
-    self:CreateMenuButton(f)
-    
-    f.HeaderText = f.Header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    f.HeaderText:SetPoint("LEFT", f.MenuBtn, "RIGHT", 5, 0)
-    f.HeaderText:SetText("Diameter: Damage Done")
-end
-
-
-function Diameter.UI:CreateMenuButton(f)
-    -- 3. Menu Button (The Skada-style Icon)
-    f.MenuBtn = CreateFrame("Button", nil, f.Header)
-    f.MenuBtn:SetSize(16, 16)
-    f.MenuBtn:SetPoint("LEFT", 2, 0)
-    f.MenuBtn:SetNormalTexture("Interface\\Icons\\INV_Misc_Gear_01") -- Cogwheel icon
-
-end
 
 
 function Diameter.UI:CreateBars(scrollChild)

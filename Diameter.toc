@@ -10,6 +10,7 @@ BlizzardDamageMeter.lua
 Util.lua
 Navigation.lua
 Data.lua
+UIHeader.lua
 UI.lua
 Menu.lua
 Loop.lua
