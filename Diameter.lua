@@ -22,16 +22,46 @@ function Diameter:RefreshUI()
     Diameter.UI:ResetScrollPosition()
 end
 
-function Diameter:SetMode(value)
-    local label = Diameter.Menu.Labels[value]
+function Diameter:SetMode(mode)
+    local label = Diameter.Menu.Labels[mode]
     Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
-    Diameter.Current.Mode = value
+    Diameter.Current.Mode = mode
+    DiameterDB.LastMode = mode
+end
+
+function Diameter:SetSessionType(sessionType)
+    Diameter.Current.SessionType = sessionType
+    DiameterDB.LastSessionType = sessionType
+end
+
+function Diameter:SetSessionID(sessionId)
+    Diameter.Current.SessionID = sessionId
+    DiameterDB.LastSessionID = sessionId
 end
 
 
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
 (function() 
     
+    local bootFrame = CreateFrame("Frame")
+    bootFrame:RegisterEvent("ADDON_LOADED")
+    bootFrame:SetScript("OnEvent", function(self, event, loadedAddon)
+        if loadedAddon == addonName then
+            -- 1. Initialize DB if it doesn't exist
+            DiameterDB = DiameterDB or {}
+
+            -- 2. Load saved Mode (default to DamageDone if nil)
+            local savedMode = DiameterDB.LastMode or Diameter.BlizzardDamageMeter.Mode.DamageDone
+            Diameter:SetMode(savedMode)
+            Diameter:SetSessionType(DiameterDB.LastSessionType or Diameter.BlizzardDamageMeter.SessionType.Current)
+            Diameter:SetSessionID(DiameterDB.LastSessionID)
+            
+            -- Now that data is loaded, refresh everything
+            Diameter:RefreshUI()
+            self:UnregisterEvent("ADDON_LOADED")
+        end
+    end)
+
     -- start the main loop
     C_Timer.NewTicker(0.5, function() 
         Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame) 

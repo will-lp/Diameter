@@ -21,12 +21,17 @@ function Diameter.Loop:UpdateMeter(frame)
         return
     end
 
+    local inCombat = UnitAffectingCombat("player")
+    if not inCombat then
+        return
+    end
+
     local sessionID = Diameter.Current.SessionID
 
     local mode = Diameter.Current.Mode
 
     local sessionType = Diameter.Current.SessionType
-    
+
     if Diameter.Navigation.isSpellView() then
         self:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
     elseif Diameter.Navigation.isGroupView() then
