@@ -2,9 +2,13 @@
 ## Title: Diameter
 ## Notes: A simple damage meter for the Midnight API. Features navigation through right and left clicks.
 ## Author: testforecho
-## Version: 1.0
+## Version: 1.0.0
 ## IconTexture: Interface\Icons\inv_misc_gear_02
 ## SavedVariables: DiameterDB
+## X-Category: Combat
+## X-Curse-Project-Name: Diameter
+## X-Curse-Project-ID: 1460194
+
 
 
 Constants.lua
