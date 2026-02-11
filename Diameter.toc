@@ -1,13 +1,13 @@
-## Interface: 120000
+## Interface: 120001
 ## Title: Diameter
-## Notes: A simple damage meter for the Midnight API.
-## Author: YourName
+## Notes: A simple damage meter for the Midnight API. Features navigation through right and left clicks.
+## Author: testforecho
 ## Version: 1.0
 ## IconTexture: Interface\Icons\inv_misc_gear_02
 ## SavedVariables: DiameterDB
 
 
-BlizzardDamageMeter.lua
+Constants.lua
 Debug.lua
 EventBus.lua
 Util.lua

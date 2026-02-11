@@ -1,5 +1,9 @@
 local addonName, Diameter = ...
 
+
+--[[
+    The options available on Blizzard's own damage meter.
+]]
 Diameter.BlizzardDamageMeter = {
     Mode = {
         DamageDone = 0,
@@ -22,4 +26,15 @@ Diameter.BlizzardDamageMeter = {
 		Combat = 1,
 		Encounter = 2,
 	},
+}
+
+
+
+--[[
+    Used in navigation
+]]
+Diameter.Pages = {
+    MODES = "MODES",
+    GROUP = "GROUP",
+    SPELL = "SPELL",
 }

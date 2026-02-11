@@ -16,11 +16,7 @@ local addonName, Diameter = ...
     - Detailed data of spell breakdown
 ]]
 
-local Pages = {
-    MODES = "MODES",
-    GROUP = "GROUP",
-    SPELL = "SPELL",
-}
+local Pages = Diameter.Pages
 
 local viewState = {
     page = Pages.GROUP,
@@ -33,6 +29,10 @@ local viewState = {
 local EVT = Diameter.EventBus.Events
 
 Diameter.Navigation = {}
+
+Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(value)
+    Diameter.Navigation:NavigateToGroup()
+end)
 
 function Diameter.Navigation:getTargetGUID()
     return viewState.targetGUID
@@ -73,6 +73,9 @@ function Diameter.Navigation:NavigateDown(data)
         viewState.page = Pages.SPELL
         local guid, name = data.sourceGUID, data.name
 
+        -- if we click another player during battle, that will throw an error because
+        -- it's a secret value. Can only look at other players' data after combat ends.
+        -- Blizzard's own dps meter doesn't seem to have this limitation.
         if (issecretvalue(guid)) then
             viewState.secretTargetGUID = guid
         end

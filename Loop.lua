@@ -9,6 +9,7 @@ local addonName, Diameter = ...
 
 Diameter.Loop = {}
 
+local Pages = Diameter.Pages
 local EVT = Diameter.EventBus.Events
 local viewState = { page = 'GROUP' }
 
@@ -65,7 +66,7 @@ end
 
 function Diameter.Loop:UpdateBars(frame) 
     
-    if viewState.page == 'MODES' then
+    if viewState.page == Pages.MODES then
         self:PrintModesMenu(frame)
         return
     end
@@ -76,9 +77,9 @@ function Diameter.Loop:UpdateBars(frame)
 
     --print("Loop:sessionID", sessionID, "mode", mode, "sessionType", sessionType)
 
-    if viewState.page == 'SPELL' then
+    if viewState.page == Pages.SPELL then
         self:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
-    elseif viewState.page == 'GROUP' then
+    elseif viewState.page == Pages.GROUP then
         self:UpdateGroupMeter(frame, sessionID, mode, sessionType)
     end
 end
