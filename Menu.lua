@@ -46,7 +46,6 @@ function Diameter.Menu:ShowMenu(anchor)
             local label = Diameter.Menu.Labels[value]
             rootDescription:CreateButton(label, function() 
                 Diameter.EventBus:Fire(EVT.MODE_CHANGED, value)
-                Diameter.Navigation:NavigateToGroup()
             end)
         end
 
