@@ -1,0 +1,20 @@
+name: Release Addon
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers when you push a tag like v1.0.4
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build and Release
+        uses: BigWigsMods/packager@v2
+        env:
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
