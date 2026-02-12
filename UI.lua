@@ -12,9 +12,13 @@ Diameter.UI = {
     step = 20
 }
 
--- the height of each bar including spacing, used to calculate scroll height
+local EVT = Diameter.EventBus.Events
+
+-- the height of each bar, used to calculate scroll height
 local step = Diameter.UI.step
 local spacing = 1
+local filledBars = 0
+local currentScrollPos = 0
 
 function Diameter.UI:Boot()
     -- 1. Main Frame
@@ -67,16 +71,14 @@ function Diameter.UI:Boot()
         -- 3. Optional: Trigger a refresh of the scroll logic
         scrollFrame:UpdateScrollChildRect()
     end)
-
     
-
     return mainFrame
 end
 
 
 function Diameter.UI:CreateScrollEngine(mainFrame)
     -- We use a template to get a standard WoW scrollbar for free
-    local scrollFrame = CreateFrame("ScrollFrame", "$parentScrollFrame", mainFrame, "UIPanelScrollFrameTemplate")
+    local scrollFrame = CreateFrame("ScrollFrame", "$parentScrollFrame", mainFrame)
     scrollFrame:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 10, -30) -- -30 to stay below header
     scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -25, 10) -- -25 to leave room for the bar
 
@@ -88,14 +90,37 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
     scrollChild:SetHeight(1) -- updated dynamically by UpdateScrollChildHeight()
     scrollFrame:SetScrollChild(scrollChild)
 
+    
+    scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+        
+        -- 1. calculate the max height based on dataArray
+        local manualMax = Diameter.UI:CalculateMaxHeight(self)
+
+        -- 2. modify a local variable and not a "Secret" value
+        if delta > 0 then
+            currentScrollPos = currentScrollPos - step
+        else
+            currentScrollPos = currentScrollPos + step
+        end
+
+        -- 3. upper and lower limits
+        if currentScrollPos < 0 then currentScrollPos = 0 end
+        if currentScrollPos > manualMax then currentScrollPos = manualMax end
+        
+        -- 4. set the height with our own variable
+        -- Blizzard allows SetVerticalScroll with a tainted number, 
+        -- they just won't let you perform math ON a secret value.
+        self:SetVerticalScroll(currentScrollPos)
+    end)
+
     mainFrame.ScrollFrame = scrollFrame
     mainFrame.ScrollChild = scrollChild
-
-    -- 5. Data Bar (Container for your current bar)
-    scrollChild.Bars = self:CreateBars(scrollChild)
-
-    -- 4. Mouse Wheel Support (Essential for UX)
+    
+    -- 4. Mouse Wheel Support
     scrollFrame:EnableMouseWheel(true)
+
+    -- 5. Data Bars
+    scrollChild.Bars = self:CreateBars(scrollChild)
 
     -- So we can go back up the navigation stack clicking anywhere in the scroll area
     scrollFrame:SetScript("OnMouseDown", function(self, button)
@@ -108,6 +133,30 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
 
     return scrollFrame, scrollChild
 end
+
+
+function Diameter.UI:CalculateMaxHeight(frame) 
+    local contentHeight = filledBars * (step + spacing)
+    local windowHeight = frame:GetHeight()
+    local manualMax = math.max(0, contentHeight - windowHeight)
+    
+    return manualMax
+end
+
+
+Diameter.EventBus:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
+    filledBars = #dataArray
+
+    local scrollFrame = Diameter.UI.mainFrame.ScrollFrame
+
+    local maxHeight = Diameter.UI:CalculateMaxHeight(scrollFrame)
+
+    if currentScrollPos > maxHeight then currentScrollPos = maxHeight end
+
+    scrollFrame:SetVerticalScroll(currentScrollPos)
+end)
+
+
 
 --[[
     Calculates and returns the height of the scroll child based on shown bars.
@@ -143,6 +192,8 @@ function Diameter.UI:UpdateScrollChildHeight()
     return contentHeight
 
 end
+
+
 
 function Diameter.UI:ResetScrollPosition()
 

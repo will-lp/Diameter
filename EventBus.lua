@@ -24,7 +24,8 @@ local events = createEventTable({
     "CURRENT_CHANGED",
     "MODE_CHANGED",
     "SESSION_TYPE_CHANGED",
-    "SESSION_TYPE_ID_CHANGED"
+    "SESSION_TYPE_ID_CHANGED",
+    "PAGE_DATA_LOADED"
 })
 
 
@@ -40,7 +41,7 @@ end
 
 local function validateEventExists(evt) 
     if not events[evt] then 
-        error("Event does not exists: " .. tostring(evt))
+        error("Event does not exist: " .. tostring(evt))
     end
 end
 
@@ -48,7 +49,6 @@ end
 function Diameter.EventBus:Listen(evt, fn)
     validateEventExists(evt)
     table.insert(listeners[evt], fn)
-
 end
 
 

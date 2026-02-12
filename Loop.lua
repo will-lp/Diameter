@@ -105,6 +105,8 @@ function Diameter.Loop:PrintModesMenu(frame)
         local bar = frame.ScrollChild.Bars[index]
         self:UpdateBar(bar, data, 1)
     end
+
+    Diameter.EventBus:Fire(EVT.PAGE_DATA_LOADED, Diameter.Menu.MenuOrder)
 end
 
 function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
@@ -132,12 +134,18 @@ function Diameter.Loop:UpdateBarsFromDataArray(frame, dataArray)
         self:UpdateBar(bar, data, dataArray.topValue)
     end
 
+
+    Diameter.EventBus:Fire(EVT.PAGE_DATA_LOADED, dataArray)
+    
+
     -- To hide the bars we don't have data for
     for i = #dataArray + 1, Diameter.UI.MaxBars do
         local bar = frame.ScrollChild.Bars[i]
         self:UpdateBar(bar, nil, nil)
     end
 end
+
+
 
 
 --[[
