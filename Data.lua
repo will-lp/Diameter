@@ -69,6 +69,7 @@ function Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
                 name = sources[i].name,
                 color = RAID_CLASS_COLORS[sources[i].classFilename] or {r=0.5, g=0.5, b=0.5},
                 sourceGUID = sources[i].sourceGUID,
+                sourceCreatureID = sources[i].sourceCreatureID
             }
             
             table.insert(dataArray, data)
@@ -88,15 +89,15 @@ end
     @param sessionID The ID of the combat session.
     @return A table containing spell meter data formatted for the UI.
 ]]--
-function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType)
+function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, sourceCreatureID)
     
     local SessionType = Diameter.BlizzardDamageMeter.SessionType
     local details
 
     if sessionType == SessionType.Overall or sessionType == SessionType.Current then
-        details = C_DamageMeter.GetCombatSessionSourceFromType(sessionType, mode, targetGUID)
+        details = C_DamageMeter.GetCombatSessionSourceFromType(sessionType, mode, targetGUID, sourceCreatureID)
     else 
-        details = C_DamageMeter.GetCombatSessionSourceFromID(sessionID, mode, targetGUID)
+        details = C_DamageMeter.GetCombatSessionSourceFromID(sessionID, mode, targetGUID, sourceCreatureID)
     end
 
     local dataArray = {}

@@ -13,12 +13,13 @@ local EVT = Diameter.EventBus.Events
 -- This makes Diameter accessible to the Chat Frame and other files
 _G["Diameter"] = Diameter
 
+
+-- this is the options loaded when the addon is loaded on the very first time.
 Diameter.Current = {
     Mode = Diameter.BlizzardDamageMeter.Mode.DamageDone,
     SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
     SessionID = nil
 }
-
 
 
 Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
@@ -40,6 +41,13 @@ Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
     DiameterDB.LastSessionID = data.SessionID
 end)
 
+Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
+    local data = {
+        SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
+        SessionID = nil
+    }
+    Diameter.EventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
+end)
 
 function Diameter:RefreshUI()
     Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
@@ -75,7 +83,7 @@ end
     end)
 
     -- start the main loop
-    C_Timer.NewTicker(0.5, function() 
+    C_Timer.NewTicker(0.3, function() 
         Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame) 
     end)
 

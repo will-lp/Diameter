@@ -54,6 +54,7 @@ function Diameter.Menu:ShowMenu(anchor)
         
         rootDescription:CreateButton("Reset Data", function() 
             C_DamageMeter.ResetAllCombatSessions()
+            Diameter.EventBus:Fire(EVT.DATA_RESET, anchor)
         end)
     end)
 end
@@ -88,4 +89,3 @@ function Diameter.Menu:ShowSessions(anchor)
         end
     end)
 end
-

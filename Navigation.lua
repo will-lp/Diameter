@@ -74,13 +74,17 @@ function Diameter.Navigation:NavigateDown(data)
         local guid, name = data.sourceGUID, data.name
 
         -- if we click another player during battle, that will throw an error because
-        -- it's a secret value. Can only look at other players' data after combat ends.
+        -- it's a secret value. We can only look at other players' data after combat ends.
         -- Blizzard's own dps meter doesn't seem to have this limitation.
-        if (issecretvalue(guid)) then
-            viewState.secretTargetGUID = guid
-        end
         
         viewState.targetGUID = issecretvalue(guid) and UnitGUID("player") or guid
+
+        if issecretvalue(data.sourceCreatureID) then
+            viewState.sourceCreatureID = nil
+        else
+            viewState.sourceCreatureID = data.sourceCreatureID
+        end
+
         viewState.targetName = name
     end
 

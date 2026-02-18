@@ -62,9 +62,6 @@ end)
 
 
 
-
-
-
 function Diameter.UIHeader:CreateSegmentButton(mainFrame)
 
     -- 1. Create the badge button

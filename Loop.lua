@@ -16,6 +16,8 @@ local viewState = { page = 'GROUP' }
 
 local current = {}
 
+
+
 --[[
     On addon boot we grab values from DiameterDB (sessionID, sessionType and mode)
     and do a single UpdateBars because we are probably not in combat.
@@ -41,6 +43,10 @@ Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
     Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
 end)
 
+Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
+    Diameter.Loop:ClearBars(Diameter.UI.mainFrame)
+end)
+
 --[[
     When a page is changed we store that data and do a 
     single UpdateBars in case we are not in combat.
@@ -51,7 +57,6 @@ Diameter.EventBus:Listen(EVT.PAGE_CHANGED, function(data)
     viewState = data
     Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
 end)
-
 
 
 function Diameter.Loop:UpdateMeter(frame)
@@ -111,7 +116,8 @@ end
 
 function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
     
-    local dataArray = Diameter.Data:GetSpellMeter(Diameter.Navigation.getTargetGUID(), mode, sessionID, sessionType)
+    local dataArray = Diameter.Data:GetSpellMeter(
+            viewState.targetGUID, mode, sessionID, sessionType, viewState.sourceCreatureID)
 
     self:UpdateBarsFromDataArray(frame, dataArray)
 
@@ -124,6 +130,12 @@ function Diameter.Loop:UpdateGroupMeter(frame, sessionID, mode, sessionType)
     self:UpdateBarsFromDataArray(frame, dataArray)
     
 end
+
+
+function Diameter.Loop:ClearBars(frame)
+    self:UpdateBarsFromDataArray(frame, {})
+end
+
 
 function Diameter.Loop:UpdateBarsFromDataArray(frame, dataArray)
 
