@@ -21,7 +21,7 @@ end
 
 local events = createEventTable({
     "PAGE_CHANGED",
-    "CURRENT_CHANGED",
+    "CURRENT_CHANGED", -- this name is awful. it means a combo of session/mode/sessionType
     "MODE_CHANGED",
     "SESSION_TYPE_CHANGED",
     "SESSION_TYPE_ID_CHANGED",

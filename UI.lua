@@ -29,6 +29,7 @@ function Diameter.UI:Boot()
     mainFrame:SetResizable(true)
     mainFrame:SetResizeBounds(150, 50, 600, 800)
     mainFrame:SetClampedToScreen(true)
+    mainFrame:SetFrameStrata("LOW")
 
     -- Background
     mainFrame:SetBackdrop({
@@ -144,6 +145,10 @@ function Diameter.UI:CalculateMaxHeight(frame)
 end
 
 
+--[[
+    Here we listen for changes in the page content and set the vertical
+    scroll accordingly. 
+]]
 Diameter.EventBus:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
     filledBars = #dataArray
 
@@ -257,8 +262,6 @@ function Diameter.UI:CreateBars(scrollChild)
         bar.valueText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         bar.valueText:SetPoint("RIGHT", -5, 0)
 
-        -- some z-index level of debauchery
-        bar:SetFrameLevel(scrollChild:GetFrameLevel() + 5)
 
         bar:Hide() -- Hide them until we have data
         bars[i] = bar
