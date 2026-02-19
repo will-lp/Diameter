@@ -37,4 +37,5 @@ Diameter.Pages = {
     MODES = "MODES",
     GROUP = "GROUP",
     SPELL = "SPELL",
+    PLAYER_SELECTION = "PLAYER_SELECTION"
 }

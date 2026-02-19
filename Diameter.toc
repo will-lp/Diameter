@@ -17,6 +17,7 @@ EventBus.lua
 Util.lua
 Navigation.lua
 Data.lua
+PlayerList.lua
 UIHeader.lua
 UI.lua
 Menu.lua

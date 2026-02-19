@@ -15,6 +15,7 @@ function Diameter.UIHeader:CreateHeader(mainFrame)
 
     self:CreateMenuButton(mainFrame)
     self:CreateSegmentButton(mainFrame)
+    self:CreatePlayerToggle(mainFrame)
     
     mainFrame.HeaderText = mainFrame.Header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     mainFrame.HeaderText:SetPoint("LEFT", mainFrame.MenuBtn, "RIGHT", 5, 0)
@@ -60,6 +61,48 @@ Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
     Diameter.UI.mainFrame.SessionIndicator:SetText(GetIndicatorText(data))
 end)
 
+
+--[[
+    If we are on playerSelectionMode and the page is changed, we disable
+    playerSelectionMode.
+]]
+Diameter.EventBus:Listen(EVT.PAGE_CHANGED, function()
+    local btn = Diameter.UI.mainFrame.PlayerSelectionBtn
+    btn:SetBackdropColor(0, 0, 0, 0.5) -- Back to default
+    btn.isActive = false
+end)
+
+function Diameter.UIHeader:CreatePlayerToggle(mainFrame)
+    mainFrame.PlayerSelectionBtn = CreateFrame("Button", nil, mainFrame.Header, "BackdropTemplate")
+    mainFrame.PlayerSelectionBtn:SetSize(20, 20)
+    mainFrame.PlayerSelectionBtn:SetPoint("RIGHT", mainFrame.SegmentBtn, "LEFT", -5, 0)
+
+    mainFrame.PlayerSelectionBtn.isActive = false
+
+    mainFrame.PlayerSelectionBtn:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1,
+    })
+
+    local tex = mainFrame.PlayerSelectionBtn:CreateTexture(nil, "OVERLAY")
+    tex:SetAllPoints()
+    tex:SetAtlas("socialqueuing-icon-group") -- A nice "group" icon
+
+
+    mainFrame.PlayerSelectionBtn:SetBackdropColor(0, 0, 0, 0.5)
+    mainFrame.PlayerSelectionBtn:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
+    mainFrame.PlayerSelectionBtn:SetScript("OnClick", function(self)
+        if not self.isActive then
+            self:SetBackdropColor(0.8, 0.8, 0.2, 0.8) -- Greenish
+            self.isActive = true
+        else
+            self:SetBackdropColor(0, 0, 0, 0.5) -- Back to default
+            self.isActive = false
+        end
+        Diameter.EventBus:Fire(EVT.PLAYER_SELECTION_MODE, self.isActive)
+    end)
+end
 
 
 function Diameter.UIHeader:CreateSegmentButton(mainFrame)

@@ -21,6 +21,12 @@ Diameter.Current = {
     SessionID = nil
 }
 
+Diameter.UI.mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
+Diameter.UI.mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+
+Diameter.UI.mainFrame:SetScript("OnEvent", function(self, event, ...)
+    Diameter.EventBus:Fire(EVT.GROUP_CHANGED)
+end)
 
 Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
     local label = Diameter.Menu.Labels[mode]

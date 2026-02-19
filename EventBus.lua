@@ -26,7 +26,9 @@ local events = createEventTable({
     "SESSION_TYPE_CHANGED",
     "SESSION_TYPE_ID_CHANGED",
     "PAGE_DATA_LOADED",
-    "DATA_RESET"
+    "DATA_RESET",
+    "GROUP_CHANGED",
+    "PLAYER_SELECTION_MODE"
 })
 
 

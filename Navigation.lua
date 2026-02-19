@@ -34,6 +34,14 @@ Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(value)
     Diameter.Navigation:NavigateToGroup()
 end)
 
+Diameter.EventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
+    if playerSelectionMode == true then 
+        viewState.page = Pages.PLAYER_SELECTION
+    else 
+        viewState.page = Pages.GROUP
+    end
+end)
+
 function Diameter.Navigation:getTargetGUID()
     return viewState.targetGUID
 end
@@ -69,7 +77,7 @@ function Diameter.Navigation:NavigateDown(data)
 
         -- data.mode comes from the list of BlizzardDamageMeter modes
         Diameter.EventBus:Fire(EVT.MODE_CHANGED, data.mode)
-    elseif self:isGroupView() then
+    elseif self:isGroupView() or viewState.page == Pages.PLAYER_SELECTION then
         viewState.page = Pages.SPELL
         local guid, name = data.sourceGUID, data.name
 
@@ -98,7 +106,7 @@ function Diameter.Navigation:NavigateUp(data)
         viewState.page = Pages.GROUP
         viewState.targetGUID = nil
         viewState.targetName = nil
-    elseif self:isGroupView() then
+    elseif self:isGroupView() or viewState.page == Pages.PLAYER_SELECTION then
         viewState.page = Pages.MODES
     end
 

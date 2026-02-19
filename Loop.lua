@@ -11,9 +11,11 @@ Diameter.Loop = {}
 
 local Pages = Diameter.Pages
 local EVT = Diameter.EventBus.Events
-local viewState = { page = 'GROUP' }
+local viewState = { 
+    page = Pages.GROUP
+}
 
-
+local playerList
 local current = {}
 
 
@@ -47,6 +49,19 @@ Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
     Diameter.Loop:ClearBars(Diameter.UI.mainFrame)
 end)
 
+Diameter.EventBus:Listen(EVT.GROUP_CHANGED, function(_)
+    playerList = Diameter.PlayerList:GetPlayerList()
+end)
+
+Diameter.EventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
+    if playerSelectionMode == true then 
+        viewState.page = Pages.PLAYER_SELECTION
+    else 
+        viewState.page = Pages.GROUP
+    end
+    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+end)
+
 --[[
     When a page is changed we store that data and do a 
     single UpdateBars in case we are not in combat.
@@ -75,7 +90,12 @@ function Diameter.Loop:UpdateBars(frame)
         self:PrintModesMenu(frame)
         return
     end
-    
+
+    if viewState.page == Pages.PLAYER_SELECTION then
+        self:PrintPlayerSelection(frame)
+        return
+    end
+
     local sessionID = current.SessionID
     local mode = current.Mode
     local sessionType = current.SessionType
@@ -87,6 +107,10 @@ function Diameter.Loop:UpdateBars(frame)
     elseif viewState.page == Pages.GROUP then
         self:UpdateGroupMeter(frame, sessionID, mode, sessionType)
     end
+end
+
+function Diameter.Loop:PrintPlayerSelection(frame)
+    self:UpdateBarsFromDataArray(frame, playerList)
 end
 
 function Diameter.Loop:PrintEmptyBars(frame)
