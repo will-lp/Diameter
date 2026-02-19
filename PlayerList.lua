@@ -28,26 +28,21 @@ end
 
 function Diameter.PlayerList:LoopThroughPlayers()
     local numMembers = GetNumGroupMembers() -- "0" means solo
-    local isRaid = IsInRaid()
 
     local players = {}
 
-    table.insert(players, self:BuildPlayerData("player"))
-
-    if numMembers <= 1 then 
-        return players
-    end
-    
-    local unitPrefix
-    if isRaid == true then
-        unitPrefix = "raid"
+    if IsInRaid() then
+        for i = 1, numMembers do
+            local unit = "raid" .. i
+            table.insert(players, self:BuildPlayerData(unit))
+        end
     else
-        unitPrefix = "party"
-    end
+        table.insert(players, self:BuildPlayerData("player"))
 
-    for i = 1, numMembers - 1 do
-        local unit = unitPrefix .. i
-        table.insert(players, self:BuildPlayerData(unit))
+        for i = 1, numMembers - 1 do
+            local unit = "party" .. i
+            table.insert(players, self:BuildPlayerData(unit))
+        end
     end
 
     return players
