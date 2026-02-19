@@ -74,7 +74,7 @@ end)
 
 function Diameter.UIHeader:CreatePlayerToggle(mainFrame)
     mainFrame.PlayerSelectionBtn = CreateFrame("Button", nil, mainFrame.Header, "BackdropTemplate")
-    mainFrame.PlayerSelectionBtn:SetSize(20, 20)
+    mainFrame.PlayerSelectionBtn:SetSize(18, 18)
     mainFrame.PlayerSelectionBtn:SetPoint("RIGHT", mainFrame.SegmentBtn, "LEFT", -5, 0)
 
     mainFrame.PlayerSelectionBtn.isActive = false
@@ -94,7 +94,7 @@ function Diameter.UIHeader:CreatePlayerToggle(mainFrame)
     mainFrame.PlayerSelectionBtn:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
     mainFrame.PlayerSelectionBtn:SetScript("OnClick", function(self)
         if not self.isActive then
-            self:SetBackdropColor(0.8, 0.8, 0.2, 0.8) -- Greenish
+            self:SetBackdropColor(0.2, 0.9, 0.2, 0.7)
             self.isActive = true
         else
             self:SetBackdropColor(0, 0, 0, 0.5) -- Back to default
