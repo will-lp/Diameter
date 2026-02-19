@@ -19,6 +19,8 @@ local addonName, Diameter = ...
 
 Diameter.Data = {}
 
+local color = Diameter.Color
+
 local BDM = Diameter.BlizzardDamageMeter
 
 local ModeToField ={
@@ -67,7 +69,7 @@ function Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
                 value = sources[i][ModeToField[Diameter.Current.Mode]],
                 icon = sources[i].specIconID,
                 name = sources[i].name,
-                color = RAID_CLASS_COLORS[sources[i].classFilename] or {r=0.5, g=0.5, b=0.5},
+                color = RAID_CLASS_COLORS[sources[i].classFilename] or color.Gray,
                 sourceGUID = sources[i].sourceGUID,
                 sourceCreatureID = sources[i].sourceCreatureID
             }
@@ -114,7 +116,7 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, s
                 name = C_Spell.GetSpellName(combatSpell.spellID) or "Unknown",
                 value = combatSpell[ModeToField[Diameter.Current.Mode]] or "",
                 icon = C_Spell.GetSpellTexture(combatSpell.spellID),
-                color = {r=0.5, g=0.5, b=0.5},
+                color = color.Gray,
                 sourceGUID = combatSpell.sourceGUID,
             }
             

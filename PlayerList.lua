@@ -4,6 +4,8 @@ local EVT = Diameter.EventBus.Events
 
 Diameter.PlayerList = {}
 
+local color = Diameter.Color
+
 function Diameter.PlayerList:GetPlayerList()
     
     local players = self:LoopThroughPlayers()
@@ -21,7 +23,7 @@ function Diameter.PlayerList:BuildPlayerData(unit)
         classFileName = classFileName,
         value = 1,
         icon = "classicon-" .. string.lower(classFileName),
-        color = RAID_CLASS_COLORS[classFileName] or {r=0.5, g=0.5, b=0.5},
+        color = RAID_CLASS_COLORS[classFileName] or color.Gray,
     }
 end
 

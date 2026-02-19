@@ -29,7 +29,6 @@ Diameter.BlizzardDamageMeter = {
 }
 
 
-
 --[[
     Used in navigation
 ]]
@@ -38,4 +37,13 @@ Diameter.Pages = {
     GROUP = "GROUP",
     SPELL = "SPELL",
     PLAYER_SELECTION = "PLAYER_SELECTION"
+}
+
+
+--[[
+    Colors
+]]
+Diameter.Color = { 
+    Gray = {r=0.5, g=0.5, b=0.5},
+    Blue = {r=0.3, g=0.3, b=0.9}
 }

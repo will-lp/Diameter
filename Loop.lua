@@ -17,7 +17,7 @@ local viewState = {
 
 local playerList
 local current = {}
-
+local color = Diameter.Color
 
 
 --[[
@@ -128,7 +128,7 @@ function Diameter.Loop:PrintModesMenu(frame)
             mode = mode, -- this will be used by Navigation to set the mode
             value = 1, -- this is used to draw a bar according to the top value
             icon = nil,
-            color = {r=0.3, g=0.3, b=0.9},
+            color = color.Blue,
             sourceGUID = nil,
         }
         local bar = frame.ScrollChild.Bars[index]
