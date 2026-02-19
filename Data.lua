@@ -21,6 +21,8 @@ Diameter.Data = {}
 
 local color = Diameter.Color
 
+local Recycler = Diameter.Recycler
+
 local BDM = Diameter.BlizzardDamageMeter
 
 local ModeToField ={
@@ -39,6 +41,7 @@ local ModeToField ={
 
 Diameter.Data.ModeToField = ModeToField
 
+local dataArray = {}
 
 --[[
     Returns the group meter; the data with the player's names and their
@@ -57,22 +60,23 @@ function Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
         container = C_DamageMeter.GetCombatSessionFromID(sessionID, mode)
     end
     
-    local dataArray = {}
+    Recycler:ClearArray(dataArray)
 
     if container and container.combatSources then
         local sources = container.combatSources
         
-        dataArray.topValue = sources[1] and sources[1][ModeToField[Diameter.Current.Mode]]
+        local field = ModeToField[Diameter.Current.Mode]
+        dataArray.topValue = sources[1] and sources[1][field]
 
         for i = 1, #sources do
-            local data = {
-                value = sources[i][ModeToField[Diameter.Current.Mode]],
-                icon = sources[i].specIconID,
-                name = sources[i].name,
-                color = RAID_CLASS_COLORS[sources[i].classFilename] or color.Gray,
-                sourceGUID = sources[i].sourceGUID,
-                sourceCreatureID = sources[i].sourceCreatureID
-            }
+            local data = Recycler:Acquire()
+
+            data.value = sources[i][field]
+            data.icon = sources[i].specIconID
+            data.name = sources[i].name
+            data.color = RAID_CLASS_COLORS[sources[i].classFilename] or color.Gray
+            data.sourceGUID = sources[i].sourceGUID
+            data.sourceCreatureID = sources[i].sourceCreatureID
             
             table.insert(dataArray, data)
         end
@@ -102,7 +106,7 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, s
         details = C_DamageMeter.GetCombatSessionSourceFromID(sessionID, mode, targetGUID, sourceCreatureID)
     end
 
-    local dataArray = {}
+    Recycler:ClearArray(dataArray)
 
     if details and details.combatSpells and #details.combatSpells > 0 then
         -- Transform Blizzard's spell details into a format UpdateBar understands
@@ -112,13 +116,13 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, s
 
         for i, combatSpell in ipairs(details.combatSpells) do
             
-            local data = {
-                name = C_Spell.GetSpellName(combatSpell.spellID) or "Unknown",
-                value = combatSpell[ModeToField[Diameter.Current.Mode]] or "",
-                icon = C_Spell.GetSpellTexture(combatSpell.spellID),
-                color = color.Gray,
-                sourceGUID = combatSpell.sourceGUID,
-            }
+            local data = Recycler:Acquire()
+
+            data.name = C_Spell.GetSpellName(combatSpell.spellID) or "Unknown"
+            data.value = combatSpell[ModeToField[Diameter.Current.Mode]] or ""
+            data.icon = C_Spell.GetSpellTexture(combatSpell.spellID)
+            data.color = color.Gray
+            data.sourceGUID = combatSpell.sourceGUID
             
             table.insert(dataArray, data)
         end

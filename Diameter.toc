@@ -12,6 +12,7 @@
 
 
 Constants.lua
+Recycler.lua
 Debug.lua
 EventBus.lua
 Util.lua

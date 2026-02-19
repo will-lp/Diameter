@@ -80,7 +80,7 @@ function Diameter.Loop:UpdateMeter(frame)
     if not inCombat then
         return
     end
-    
+
     self:UpdateBars(frame)
 end
 
