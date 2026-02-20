@@ -1,8 +1,24 @@
 local addonName, Diameter = ...
 
+--[[
+    This module is responsible for creating the header and its components:
+    - header
+    - title (addon name, which mode I am on)
+    - party selection toggle
+    - segment button
+]]
+
 Diameter.UIHeader = {}
 
 local EVT = Diameter.EventBus.Events
+local mainFrame
+
+--[[
+    We listen for a mainFrame being booted
+]]
+Diameter.EventBus:Listen(EVT.MAINFRAME_BOOTED, function(data)
+    mainFrame = data
+end)
 
 function Diameter.UIHeader:CreateHeader(mainFrame)
     -- 2. Header Bar (Drag this to move)
@@ -50,15 +66,15 @@ local function GetIndicatorText(current)
 end
 
 Diameter.EventBus:Listen(EVT.CURRENT_CHANGED, function(data)
-    Diameter.UI.mainFrame.SessionIndicator:SetText(GetIndicatorText(data))
+    mainFrame.SessionIndicator:SetText(GetIndicatorText(data))
 end)
 
 Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
-    Diameter.UI.mainFrame.SessionIndicator:SetText(GetIndicatorText({ SessionType = data }))
+    mainFrame.SessionIndicator:SetText(GetIndicatorText({ SessionType = data }))
 end)
 
 Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
-    Diameter.UI.mainFrame.SessionIndicator:SetText(GetIndicatorText(data))
+    mainFrame.SessionIndicator:SetText(GetIndicatorText(data))
 end)
 
 
@@ -67,11 +83,18 @@ end)
     playerSelectionMode.
 ]]
 Diameter.EventBus:Listen(EVT.PAGE_CHANGED, function()
-    local btn = Diameter.UI.mainFrame.PlayerSelectionBtn
+    local btn = mainFrame.PlayerSelectionBtn
     btn:SetBackdropColor(0, 0, 0, 0.5) -- Back to default
     btn.isActive = false
 end)
 
+
+--[[
+    Creates an icon for the Player Selection Mode. 
+    Once clicked, it will show a green background.
+    Changing the page (doesn't matter on which directio) must 
+    disable this guy, i.e., background is back to gray-ish.
+]]
 function Diameter.UIHeader:CreatePlayerToggle(mainFrame)
     mainFrame.PlayerSelectionBtn = CreateFrame("Button", nil, mainFrame.Header, "BackdropTemplate")
     mainFrame.PlayerSelectionBtn:SetSize(18, 18)

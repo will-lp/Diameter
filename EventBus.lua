@@ -20,15 +20,36 @@ end
 
 
 local events = createEventTable({
+
+    -- user navigated to a different page
     "PAGE_CHANGED",
-    "CURRENT_CHANGED", -- this name is awful. it means a combo of session/mode/sessionType
+
+    -- a combo of session/mode/sessionType changed. this name is awful.
+    "CURRENT_CHANGED", 
+
+    -- just the mode changed
     "MODE_CHANGED",
+
+    -- just the session type changed (history or current or overall)
     "SESSION_TYPE_CHANGED",
+
+    -- both sessionType and ID changed; user wants to look at an older fight
     "SESSION_TYPE_ID_CHANGED",
+
+    -- When new data was loaded. Loop fires it and UI listens to it.
     "PAGE_DATA_LOADED",
+
+    -- user clicked on data reset
     "DATA_RESET",
+
+    -- new people joined or left the group
     "GROUP_CHANGED",
-    "PLAYER_SELECTION_MODE"
+
+    -- user clicked the "Player Selection" toggle
+    "PLAYER_SELECTION_MODE",
+
+    -- used right at the start of the addon, modules will need to save a reference to mainFrame
+    "MAINFRAME_BOOTED"
 })
 
 

@@ -30,7 +30,7 @@ Diameter.BlizzardDamageMeter = {
 
 
 --[[
-    Used in navigation
+    Pages used in navigation.
 ]]
 Diameter.Pages = {
     MODES = "MODES",
@@ -41,7 +41,8 @@ Diameter.Pages = {
 
 
 --[[
-    Colors
+    A pool of colors so we don't keep creating colors on every loop iteration.
+    I swear the addon has more colors than gray and blue. I think. Not sure.
 ]]
 Diameter.Color = { 
     Gray = {r=0.5, g=0.5, b=0.5},

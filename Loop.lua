@@ -18,7 +18,14 @@ local viewState = {
 local playerList
 local current = {}
 local color = Diameter.Color
+local mainFrame
 
+--[[
+    We listen for a mainFrame being booted
+]]
+Diameter.EventBus:Listen(EVT.MAINFRAME_BOOTED, function(data)
+    mainFrame = data
+end)
 
 --[[
     On addon boot we grab values from DiameterDB (sessionID, sessionType and mode)
@@ -26,27 +33,27 @@ local color = Diameter.Color
 ]]
 Diameter.EventBus:Listen(EVT.CURRENT_CHANGED, function(data)
     current = data
-    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+    Diameter.Loop:UpdateBars(mainFrame)
 end)
 
 Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(data)
     current.Mode = data
-    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+    Diameter.Loop:UpdateBars(mainFrame)
 end)
 
 Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
     current.SessionType = data
-    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+    Diameter.Loop:UpdateBars(mainFrame)
 end)
 
 Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
     current.SessionType = data.SessionType
     current.SessionID = data.SessionID
-    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+    Diameter.Loop:UpdateBars(mainFrame)
 end)
 
 Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
-    Diameter.Loop:ClearBars(Diameter.UI.mainFrame)
+    Diameter.Loop:ClearBars(mainFrame)
 end)
 
 Diameter.EventBus:Listen(EVT.GROUP_CHANGED, function(_)
@@ -59,7 +66,7 @@ Diameter.EventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode
     else 
         viewState.page = Pages.GROUP
     end
-    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+    Diameter.Loop:UpdateBars(mainFrame)
 end)
 
 --[[
@@ -70,10 +77,15 @@ end)
 ]]
 Diameter.EventBus:Listen(EVT.PAGE_CHANGED, function(data)
     viewState = data
-    Diameter.Loop:UpdateBars(Diameter.UI.mainFrame)
+    Diameter.Loop:UpdateBars(mainFrame)
 end)
 
 
+--[[
+    This is the main loop being executed by C_Timer on Diameter.lua.
+    It returns early if not in combat; before this, it used to keep
+    updating the DPS meter while out of combat and lowering your DPS.
+]]
 function Diameter.Loop:UpdateMeter(frame)
 
     local inCombat = UnitAffectingCombat("player")
@@ -83,6 +95,7 @@ function Diameter.Loop:UpdateMeter(frame)
 
     self:UpdateBars(frame)
 end
+
 
 function Diameter.Loop:UpdateBars(frame) 
     
@@ -100,8 +113,6 @@ function Diameter.Loop:UpdateBars(frame)
     local mode = current.Mode
     local sessionType = current.SessionType
 
-    --print("Loop:sessionID", sessionID, "mode", mode, "sessionType", sessionType)
-
     if viewState.page == Pages.SPELL then
         self:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
     elseif viewState.page == Pages.GROUP then
@@ -109,9 +120,11 @@ function Diameter.Loop:UpdateBars(frame)
     end
 end
 
+
 function Diameter.Loop:PrintPlayerSelection(frame)
     self:UpdateBarsFromDataArray(frame, playerList)
 end
+
 
 function Diameter.Loop:PrintEmptyBars(frame)
     for i = 1, Diameter.UI.MaxBars do
@@ -119,6 +132,7 @@ function Diameter.Loop:PrintEmptyBars(frame)
         self:UpdateBar(bar, nil, nil)
     end
 end
+
 
 function Diameter.Loop:PrintModesMenu(frame)
     for index, mode in ipairs(Diameter.Menu.MenuOrder) do
@@ -138,21 +152,19 @@ function Diameter.Loop:PrintModesMenu(frame)
     Diameter.EventBus:Fire(EVT.PAGE_DATA_LOADED, Diameter.Menu.MenuOrder)
 end
 
+
 function Diameter.Loop:UpdatePlayerSpellMeter(frame, sessionID, mode, sessionType)
-    
     local dataArray = Diameter.Data:GetSpellMeter(
             viewState.targetGUID, mode, sessionID, sessionType, viewState.sourceCreatureID)
 
     self:UpdateBarsFromDataArray(frame, dataArray)
-
 end
 
+
 function Diameter.Loop:UpdateGroupMeter(frame, sessionID, mode, sessionType)
-    
     local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
 
     self:UpdateBarsFromDataArray(frame, dataArray)
-    
 end
 
 
@@ -180,8 +192,6 @@ function Diameter.Loop:UpdateBarsFromDataArray(frame, dataArray)
         self:UpdateBar(bar, nil, nil)
     end
 end
-
-
 
 
 --[[

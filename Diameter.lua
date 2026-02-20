@@ -6,8 +6,6 @@ local addonName, Diameter = ...
     modules together.
 ]]--
 
-Diameter.UI.mainFrame = Diameter.UI:Boot()
-
 local EVT = Diameter.EventBus.Events
 
 -- This makes Diameter accessible to the Chat Frame and other files
@@ -21,16 +19,12 @@ Diameter.Current = {
     SessionID = nil
 }
 
-Diameter.UI.mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-Diameter.UI.mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+local mainFrame = Diameter.UI:Boot()
 
-Diameter.UI.mainFrame:SetScript("OnEvent", function(self, event, ...)
-    Diameter.EventBus:Fire(EVT.GROUP_CHANGED)
-end)
 
 Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
     local label = Diameter.Menu.Labels[mode]
-    Diameter.UI.mainFrame.HeaderText:SetText("Diameter: " .. label)
+    mainFrame.HeaderText:SetText(addonName .. ": " .. label)
     Diameter.Current.Mode = mode
     DiameterDB.LastMode = mode
 end)
@@ -56,7 +50,7 @@ Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
 end)
 
 function Diameter:RefreshUI()
-    Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame)
+    Diameter.Loop:UpdateMeter(mainFrame)
     Diameter.UI:ResetScrollPosition()
 end
 
@@ -64,11 +58,21 @@ end
 
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
 (function() 
-    
-    local bootFrame = CreateFrame("Frame")
-    bootFrame:RegisterEvent("ADDON_LOADED")
-    bootFrame:SetScript("OnEvent", function(self, event, loadedAddon)
-        if loadedAddon == addonName then
+
+    --[[
+        Here we broadcast mainFrame to every module interested.
+    ]]
+    Diameter.EventBus:Fire(EVT.MAINFRAME_BOOTED, mainFrame)
+
+
+    mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
+    mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    mainFrame:RegisterEvent("ADDON_LOADED")
+
+    mainFrame:SetScript("OnEvent", function(self, event, loadedAddon)
+        if event == "PLAYER_ENTERING_WORLD" or event == "GROUP_ROSTER_UPDATE" then
+            Diameter.EventBus:Fire(EVT.GROUP_CHANGED)
+        elseif event == "ADDON_LOADED" and loadedAddon == addonName then
             -- 1. Initialize DB if it doesn't exist
             DiameterDB = DiameterDB or {}
 
@@ -87,10 +91,10 @@ end
             self:UnregisterEvent("ADDON_LOADED")
         end
     end)
-
+    
     -- start the main loop
     C_Timer.NewTicker(0.3, function() 
-        Diameter.Loop:UpdateMeter(Diameter.UI.mainFrame) 
+        Diameter.Loop:UpdateMeter(mainFrame) 
     end)
 
     -- this is needed to properly set the scroll child height initially,

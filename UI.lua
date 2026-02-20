@@ -8,7 +8,8 @@ local addonName, Diameter = ...
 ]]
 
 Diameter.UI = {
-    MaxBars = 40,
+    -- Unholy + Riders of apocalypse made 40 Bars go boom. Probably should be dynamic.
+    MaxBars = 60,
     step = 20
 }
 
@@ -19,6 +20,15 @@ local step = Diameter.UI.step
 local spacing = 1
 local filledBars = 0
 local currentScrollPos = 0
+
+local mainFrame
+
+--[[
+    We listen for a mainFrame being booted
+]]
+Diameter.EventBus:Listen(EVT.MAINFRAME_BOOTED, function(data)
+    mainFrame = data
+end)
 
 function Diameter.UI:Boot()
     -- 1. Main Frame
@@ -152,7 +162,7 @@ end
 Diameter.EventBus:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
     filledBars = #dataArray
 
-    local scrollFrame = Diameter.UI.mainFrame.ScrollFrame
+    local scrollFrame = mainFrame.ScrollFrame
 
     local maxHeight = Diameter.UI:CalculateMaxHeight(scrollFrame)
 
@@ -173,7 +183,7 @@ end)
 ]]
 function Diameter.UI:UpdateScrollChildHeight()
 
-    local scrollChild = self.mainFrame.ScrollChild
+    local scrollChild = mainFrame.ScrollChild
 
     -- total content height based on shown bars
     local amountOfShownBars = Diameter.Util.count(scrollChild.Bars, function(bar)
@@ -188,7 +198,7 @@ function Diameter.UI:UpdateScrollChildHeight()
         -- This is needed when the game just started (or after /reload) and there's 
         -- no meter data. Then combat starts, and the UI will stay black forever,
         -- unless there's some interaction like a click or scrolling.
-        contentHeight = self.mainFrame.ScrollFrame:GetHeight()
+        contentHeight = mainFrame.ScrollFrame:GetHeight()
     end
 
     -- update scroll range dynamically
@@ -202,10 +212,10 @@ end
 
 function Diameter.UI:ResetScrollPosition()
 
-    if self.mainFrame and self.mainFrame.ScrollFrame then
+    if mainFrame and mainFrame.ScrollFrame then
         self:UpdateScrollChildHeight()
         --self.mainFrame.ScrollFrame:UpdateScrollChildRect()
-        self.mainFrame.ScrollFrame:SetVerticalScroll(0)
+        mainFrame.ScrollFrame:SetVerticalScroll(0)
     end
 end
 

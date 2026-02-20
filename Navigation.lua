@@ -8,12 +8,12 @@ local addonName, Diameter = ...
     - Modes View: where the user can select the mode (Damage Done, Healing Done, etc.)
     - Group View: where the user can see the group meter for the selected mode.
     - Spell View: where the user can see the spell meter (breakdown) for a selected player.
+    - Player selection mode: this mode is a toggle for the Group View; it allows the user
+    to select a player to watch its breakdown, but it's based off the player list, and not
+    the combat data from Blizzard.
 
     Due to Blizzard restrictions spell meter seems to only work on the player while in combat. 
 
-    Future improvements may include:
-    - Remembering the last selected mode between sessions.
-    - Detailed data of spell breakdown
 ]]
 
 local Pages = Diameter.Pages
@@ -84,6 +84,7 @@ function Diameter.Navigation:NavigateDown(data)
         -- if we click another player during battle, that will throw an error because
         -- it's a secret value. We can only look at other players' data after combat ends.
         -- Blizzard's own dps meter doesn't seem to have this limitation.
+        -- The current "workaround" is using PlayerList -> a player selection mode.
         
         viewState.targetGUID = issecretvalue(guid) and UnitGUID("player") or guid
 

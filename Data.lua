@@ -6,7 +6,7 @@ local addonName, Diameter = ...
 
     It provides functions to retrieve group and spell meter data based on the current mode and session.
 
-    There are the functions available on C_DamageMeter:
+    These are the functions available on C_DamageMeter:
 
     GetCombatSessionFromType
     ResetAllCombatSessions
