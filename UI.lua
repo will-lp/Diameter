@@ -73,7 +73,7 @@ function Diameter.UI:Boot()
     mainFrame:SetBackdropColor(0, 0, 0, 0.8)
 
     -- 2. Header Bar and button
-    Diameter.UIHeader:CreateHeader(mainFrame)
+    Diameter.UIHeader:New(mainFrame)
 
     local scrollFrame, scrollChild = self:CreateScrollEngine(mainFrame)
 

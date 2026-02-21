@@ -23,8 +23,6 @@ local uiInstance = Diameter.UI:New(1)
 
 
 Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
-    local label = Diameter.Menu.Labels[mode]
-    uiInstance.mainFrame.HeaderText:SetText(addonName .. ": " .. label)
     Diameter.Current.Mode = mode
     DiameterDB.LastMode = mode
 end)
