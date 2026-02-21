@@ -7,32 +7,54 @@ local addonName, Diameter = ...
     Ideally it should only handle UI-related tasks and not data manipulation.
 ]]
 
+local EVT = Diameter.EventBus.Events
+
 Diameter.UI = {
     -- Unholy + Riders of apocalypse made 40 Bars go boom. Probably should be dynamic.
     MaxBars = 60,
-    step = 20
+    step = 20,
+    spacing = 1
 }
 
-local EVT = Diameter.EventBus.Events
+Diameter.UI.__index = Diameter.UI
 
--- the height of each bar, used to calculate scroll height
-local step = Diameter.UI.step
-local spacing = 1
-local filledBars = 0
-local currentScrollPos = 0
+function Diameter.UI:New(id)
+    local obj = setmetatable({}, self)
 
-local mainFrame
+    obj.id = id
+    obj.filledBars = 0
+    obj.currentScrollPos = 0
+    obj.mainFrame = obj:Boot()
+
+
+    --[[
+        Here we listen for changes in the page content and set the vertical
+        scroll accordingly. 
+    ]]
+    Diameter.EventBus:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
+        obj.filledBars = #dataArray
+
+        local scrollFrame = obj.mainFrame.ScrollFrame
+
+        local maxHeight = obj:CalculateMaxHeight(scrollFrame)
+
+        if obj.currentScrollPos > maxHeight then obj.currentScrollPos = maxHeight end
+
+        scrollFrame:SetVerticalScroll(obj.currentScrollPos)
+    end)
+
+    return obj
+end
+
 
 --[[
-    We listen for a mainFrame being booted
-]]
-Diameter.EventBus:Listen(EVT.MAINFRAME_BOOTED, function(data)
-    mainFrame = data
-end)
+    Creates the mainFrame.
 
+    @returns mainFrame
+]]
 function Diameter.UI:Boot()
     -- 1. Main Frame
-    local mainFrame = CreateFrame("Frame", "DiameterMainFrame", UIParent, "BackdropTemplate")
+    local mainFrame = CreateFrame("Frame", "DiameterMainFrame" .. self.id, UIParent, "BackdropTemplate")
     mainFrame:SetSize(300, 150)
     mainFrame:SetPoint("BOTTOMRIGHT")
     mainFrame:SetMovable(true)
@@ -101,27 +123,28 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
     scrollChild:SetHeight(1) -- updated dynamically by UpdateScrollChildHeight()
     scrollFrame:SetScrollChild(scrollChild)
 
-    
-    scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+    local uiInstance = self
+
+    scrollFrame:SetScript("OnMouseWheel", function(frame, delta)
         
         -- 1. calculate the max height based on dataArray
-        local manualMax = Diameter.UI:CalculateMaxHeight(self)
+        local manualMax = uiInstance:CalculateMaxHeight(frame)
 
         -- 2. modify a local variable and not a "Secret" value
         if delta > 0 then
-            currentScrollPos = currentScrollPos - step
+            uiInstance.currentScrollPos = uiInstance.currentScrollPos - uiInstance.step
         else
-            currentScrollPos = currentScrollPos + step
+            uiInstance.currentScrollPos = uiInstance.currentScrollPos + uiInstance.step
         end
 
         -- 3. upper and lower limits
-        if currentScrollPos < 0 then currentScrollPos = 0 end
-        if currentScrollPos > manualMax then currentScrollPos = manualMax end
+        if uiInstance.currentScrollPos < 0 then uiInstance.currentScrollPos = 0 end
+        if uiInstance.currentScrollPos > manualMax then uiInstance.currentScrollPos = manualMax end
         
         -- 4. set the height with our own variable
         -- Blizzard allows SetVerticalScroll with a tainted number, 
         -- they just won't let you perform math ON a secret value.
-        self:SetVerticalScroll(currentScrollPos)
+        frame:SetVerticalScroll(uiInstance.currentScrollPos)
     end)
 
     mainFrame.ScrollFrame = scrollFrame
@@ -134,9 +157,9 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
     scrollChild.Bars = self:CreateBars(scrollChild)
 
     -- So we can go back up the navigation stack clicking anywhere in the scroll area
-    scrollFrame:SetScript("OnMouseDown", function(self, button)
+    scrollFrame:SetScript("OnMouseDown", function(frame, button)
         if button == "RightButton" then
-            Diameter.Navigation:NavigateUp(self.data)
+            Diameter.Navigation:NavigateUp(frame.data)
         end
     end)
 
@@ -147,29 +170,12 @@ end
 
 
 function Diameter.UI:CalculateMaxHeight(frame) 
-    local contentHeight = filledBars * (step + spacing)
+    local contentHeight = self.filledBars * (self.step + self.spacing)
     local windowHeight = frame:GetHeight()
     local manualMax = math.max(0, contentHeight - windowHeight)
     
     return manualMax
 end
-
-
---[[
-    Here we listen for changes in the page content and set the vertical
-    scroll accordingly. 
-]]
-Diameter.EventBus:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
-    filledBars = #dataArray
-
-    local scrollFrame = mainFrame.ScrollFrame
-
-    local maxHeight = Diameter.UI:CalculateMaxHeight(scrollFrame)
-
-    if currentScrollPos > maxHeight then currentScrollPos = maxHeight end
-
-    scrollFrame:SetVerticalScroll(currentScrollPos)
-end)
 
 
 
@@ -183,7 +189,7 @@ end)
 ]]
 function Diameter.UI:UpdateScrollChildHeight()
 
-    local scrollChild = mainFrame.ScrollChild
+    local scrollChild = self.mainFrame.ScrollChild
 
     -- total content height based on shown bars
     local amountOfShownBars = Diameter.Util.count(scrollChild.Bars, function(bar)
@@ -191,14 +197,14 @@ function Diameter.UI:UpdateScrollChildHeight()
     end)
 
     -- account for spacing between bars so the calculated range matches GetVerticalScrollRange()
-    local contentHeight = amountOfShownBars * step + math.max(0, amountOfShownBars - 1) * spacing
+    local contentHeight = amountOfShownBars * self.step + math.max(0, amountOfShownBars - 1) * self.spacing
 
 
     if not contentHeight or contentHeight == 0 then
         -- This is needed when the game just started (or after /reload) and there's 
         -- no meter data. Then combat starts, and the UI will stay black forever,
         -- unless there's some interaction like a click or scrolling.
-        contentHeight = mainFrame.ScrollFrame:GetHeight()
+        contentHeight = self.mainFrame.ScrollFrame:GetHeight()
     end
 
     -- update scroll range dynamically
@@ -212,14 +218,12 @@ end
 
 function Diameter.UI:ResetScrollPosition()
 
-    if mainFrame and mainFrame.ScrollFrame then
+    if self.mainFrame and self.mainFrame.ScrollFrame then
         self:UpdateScrollChildHeight()
         --self.mainFrame.ScrollFrame:UpdateScrollChildRect()
-        mainFrame.ScrollFrame:SetVerticalScroll(0)
+        self.mainFrame.ScrollFrame:SetVerticalScroll(0)
     end
 end
-
-
 
 
 
@@ -229,7 +233,7 @@ function Diameter.UI:CreateBars(scrollChild)
     -- Creating bars
     for i = 1, Diameter.UI.MaxBars do
         local bar = CreateFrame("StatusBar", nil, scrollChild)
-        bar:SetHeight(step)
+        bar:SetHeight(self.step)
 
         -- Handling breakdown on click and coming back
         bar:EnableMouse(true)
@@ -257,8 +261,8 @@ function Diameter.UI:CreateBars(scrollChild)
             bar:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, 0)
             bar:SetPoint("TOPRIGHT", scrollChild, "TOPRIGHT", 0, 0)
         else
-            bar:SetPoint("TOPLEFT", bars[i-1], "BOTTOMLEFT", 0, -spacing)
-            bar:SetPoint("TOPRIGHT", bars[i-1], "BOTTOMRIGHT", 0, -spacing)
+            bar:SetPoint("TOPLEFT", bars[i-1], "BOTTOMLEFT", 0, -self.spacing)
+            bar:SetPoint("TOPRIGHT", bars[i-1], "BOTTOMRIGHT", 0, -self.spacing)
         end
         
         bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
@@ -278,7 +282,7 @@ function Diameter.UI:CreateBars(scrollChild)
     end
 
     -- set a sensible initial height (MaxBars * step + (MaxBars - 1) * spacing)
-    scrollChild:SetHeight(Diameter.UI.MaxBars * step + math.max(0, Diameter.UI.MaxBars - 1) * spacing)
+    scrollChild:SetHeight(Diameter.UI.MaxBars * self.step + math.max(0, Diameter.UI.MaxBars - 1) * self.spacing)
 
     return bars
 end

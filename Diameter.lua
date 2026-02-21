@@ -19,12 +19,12 @@ Diameter.Current = {
     SessionID = nil
 }
 
-local mainFrame = Diameter.UI:Boot()
+local uiInstance = Diameter.UI:New(1)
 
 
 Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
     local label = Diameter.Menu.Labels[mode]
-    mainFrame.HeaderText:SetText(addonName .. ": " .. label)
+    uiInstance.mainFrame.HeaderText:SetText(addonName .. ": " .. label)
     Diameter.Current.Mode = mode
     DiameterDB.LastMode = mode
 end)
@@ -50,7 +50,7 @@ Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
 end)
 
 function Diameter:RefreshUI()
-    Diameter.Loop:UpdateMeter(mainFrame)
+    Diameter.Loop:UpdateMeter(uiInstance.mainFrame)
     Diameter.UI:ResetScrollPosition()
 end
 
@@ -62,14 +62,14 @@ end
     --[[
         Here we broadcast mainFrame to every module interested.
     ]]
-    Diameter.EventBus:Fire(EVT.MAINFRAME_BOOTED, mainFrame)
+    Diameter.EventBus:Fire(EVT.MAINFRAME_BOOTED, uiInstance.mainFrame)
 
 
-    mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-    mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    mainFrame:RegisterEvent("ADDON_LOADED")
+    uiInstance.mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
+    uiInstance.mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    uiInstance.mainFrame:RegisterEvent("ADDON_LOADED")
 
-    mainFrame:SetScript("OnEvent", function(self, event, loadedAddon)
+    uiInstance.mainFrame:SetScript("OnEvent", function(self, event, loadedAddon)
         if event == "PLAYER_ENTERING_WORLD" or event == "GROUP_ROSTER_UPDATE" then
             Diameter.EventBus:Fire(EVT.GROUP_CHANGED)
         elseif event == "ADDON_LOADED" and loadedAddon == addonName then
@@ -94,12 +94,12 @@ end
     
     -- start the main loop
     C_Timer.NewTicker(0.3, function() 
-        Diameter.Loop:UpdateMeter(mainFrame) 
+        Diameter.Loop:UpdateMeter(uiInstance.mainFrame) 
     end)
 
     -- this is needed to properly set the scroll child height initially,
     -- otherwise we can scroll the child frame while it has no content.
-    Diameter.UI:UpdateScrollChildHeight()
+    uiInstance:UpdateScrollChildHeight()
 
     -- this is needed to boot the UI, or sometimes it will show a black frame, 
     -- even though there is data in blizzard's dps meter.
