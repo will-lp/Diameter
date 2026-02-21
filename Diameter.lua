@@ -51,7 +51,7 @@ end)
 
 function Diameter:RefreshUI()
     Diameter.Loop:UpdateMeter(uiInstance.mainFrame)
-    Diameter.UI:ResetScrollPosition()
+    uiInstance:ResetScrollPosition()
 end
 
 
@@ -86,23 +86,21 @@ end
             Diameter.EventBus:Fire(EVT.CURRENT_CHANGED, Diameter.Current)
             Diameter.EventBus:Fire(EVT.MODE_CHANGED, Diameter.Current.Mode)
             
-            -- Now that data is loaded, refresh everything
-            Diameter:RefreshUI()
             self:UnregisterEvent("ADDON_LOADED")
+
+            -- start the main loop
+            C_Timer.NewTicker(0.3, function() 
+                Diameter.Loop:UpdateMeter(uiInstance.mainFrame) 
+            end)
+
+            -- this is needed to properly set the scroll child height initially,
+            -- otherwise we can scroll the child frame while it has no content.
+            uiInstance:UpdateScrollChildHeight()
+
+            -- this is needed to boot the UI, or sometimes it will show a black frame, 
+            -- even though there is data in blizzard's dps meter.
+            Diameter:RefreshUI()
         end
     end)
-    
-    -- start the main loop
-    C_Timer.NewTicker(0.3, function() 
-        Diameter.Loop:UpdateMeter(uiInstance.mainFrame) 
-    end)
-
-    -- this is needed to properly set the scroll child height initially,
-    -- otherwise we can scroll the child frame while it has no content.
-    uiInstance:UpdateScrollChildHeight()
-
-    -- this is needed to boot the UI, or sometimes it will show a black frame, 
-    -- even though there is data in blizzard's dps meter.
-    Diameter:RefreshUI()
 
 end)()
