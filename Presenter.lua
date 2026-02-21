@@ -2,7 +2,7 @@
 local addonName, Diameter = ...
 
 --[[
-    This module provides the main loop functionality for Diameter.
+    This module provides the main loop-able functionality for Diameter.
     It updates the meter display based on the current view (modes, group, or spell).
     It binds together UI components with Data and Navigation modules.
 ]]
@@ -14,46 +14,61 @@ local color = Diameter.Color
 Diameter.Presenter = {}
 Diameter.Presenter.__index = Diameter.Presenter
 
-function Diameter.Presenter:New(uiInstance) 
+function Diameter.Presenter:New(id)
     local obj = setmetatable({}, self)
+
     obj.viewState = { 
         page = Pages.GROUP
     }
 
+    local uiInstance = Diameter.UI:New(id)
     local mainFrame = uiInstance.mainFrame
+    DiameterDB[id] = DiameterDB[id] or {}
 
+    obj.id = id
     obj.playerList = nil
-    obj.current = {}
     obj.mainFrame = mainFrame
     obj.uiInstance = uiInstance
 
+    -- these are the options loaded when the addon is booted on the very first time
+    -- or a new window is created.
+    obj.current = {
+        Mode = DiameterDB[id].Mode or Diameter.BlizzardDamageMeter.Mode.DamageDone,
+        SessionType = DiameterDB[id].SessionType or Diameter.BlizzardDamageMeter.SessionType.Current,
+        SessionID = DiameterDB[id].SessionID or nil
+    }
 
-    --[[
-        On addon boot we grab values from DiameterDB (sessionID, sessionType and mode)
-        and do a single UpdateBars because we are probably not in combat.
-    ]]
-    Diameter.EventBus:Listen(EVT.CURRENT_CHANGED, function(data)
-        obj.current = data
-        obj:UpdateBars()
-    end)
+    Diameter.EventBus:Fire(EVT.CURRENT_CHANGED, obj.current)
+    Diameter.EventBus:Fire(EVT.MODE_CHANGED, obj.current.Mode)
+    obj:UpdateBars()
+
 
     Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(data)
+        DiameterDB[obj.id].Mode = data
         obj.current.Mode = data
         obj:UpdateBars()
     end)
 
     Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
+        DiameterDB[obj.id].SessionType = data
         obj.current.SessionType = data
         obj:UpdateBars()
     end)
 
     Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
+        DiameterDB[obj.id].SessionType = data.SessionType
+        DiameterDB[obj.id].SessionID = data.SessionID
         obj.current.SessionType = data.SessionType
         obj.current.SessionID = data.SessionID
         obj:UpdateBars()
     end)
 
     Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
+        local data = {
+            SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
+            SessionID = nil
+        }
+        Diameter.EventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
         obj:ClearBars()
     end)
 

@@ -65,7 +65,7 @@ function Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
     if container and container.combatSources then
         local sources = container.combatSources
         
-        local field = ModeToField[Diameter.Current.Mode]
+        local field = ModeToField[mode]
         dataArray.topValue = sources[1] and sources[1][field]
 
         for i = 1, #sources do
@@ -110,7 +110,7 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, s
 
     if details and details.combatSpells and #details.combatSpells > 0 then
         -- Transform Blizzard's spell details into a format UpdateBar understands
-        local fieldName = ModeToField[Diameter.Current.Mode]
+        local fieldName = ModeToField[mode]
         
         dataArray.topValue = details.combatSpells[1][fieldName]
 
@@ -119,7 +119,7 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, s
             local data = Recycler:Acquire()
 
             data.name = C_Spell.GetSpellName(combatSpell.spellID) or "Unknown"
-            data.value = combatSpell[ModeToField[Diameter.Current.Mode]] or ""
+            data.value = combatSpell[ModeToField[mode]] or ""
             data.icon = C_Spell.GetSpellTexture(combatSpell.spellID)
             data.color = color.Gray
             data.sourceGUID = combatSpell.sourceGUID

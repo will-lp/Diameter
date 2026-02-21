@@ -41,7 +41,7 @@ function Diameter.UI:New(id)
         scrollFrame:SetVerticalScroll(obj.currentScrollPos)
     end)
 
-    Diameter.EventBus:Listen(EVT.MAINFRAME_BOOTED, function()
+    Diameter.EventBus:Listen(EVT.ADDON_BOOTED, function()
         obj:UpdateScrollChildHeight()
         obj:ResetScrollPosition()
 

@@ -12,75 +12,43 @@ local EVT = Diameter.EventBus.Events
 _G["Diameter"] = Diameter
 
 
--- this is the options loaded when the addon is loaded on the very first time.
-Diameter.Current = {
-    Mode = Diameter.BlizzardDamageMeter.Mode.DamageDone,
-    SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
-    SessionID = nil
-}
-
-local uiInstance1 = Diameter.UI:New(1)
-local presenter1 = Diameter.Presenter:New(uiInstance1)
-
-
-Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
-    Diameter.Current.Mode = mode
-    DiameterDB.LastMode = mode
-end)
-
-Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(sessionType)
-    Diameter.Current.SessionType = sessionType
-    DiameterDB.LastSessionType = sessionType
-end)
-
-Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
-    Diameter.Current.SessionType = data.SessionType
-    Diameter.Current.SessionID = data.SessionID
-    DiameterDB.LastSessionType = data.SessionType
-    DiameterDB.LastSessionID = data.SessionID
-end)
-
-Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
-    local data = {
-        SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
-        SessionID = nil
-    }
-    Diameter.EventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
-end)
-
-
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
-do
 
-    uiInstance1.mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-    uiInstance1.mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    uiInstance1.mainFrame:RegisterEvent("ADDON_LOADED")
+-- we use this Frame just to listen to events
+Diameter.Anchor = CreateFrame("Frame")
+Diameter.Anchor:RegisterEvent("GROUP_ROSTER_UPDATE")
+Diameter.Anchor:RegisterEvent("PLAYER_ENTERING_WORLD")
+Diameter.Anchor:RegisterEvent("ADDON_LOADED")
 
-    uiInstance1.mainFrame:SetScript("OnEvent", function(self, event, loadedAddon)
-        if event == "PLAYER_ENTERING_WORLD" or event == "GROUP_ROSTER_UPDATE" then
-            Diameter.EventBus:Fire(EVT.GROUP_CHANGED)
-        elseif event == "ADDON_LOADED" and loadedAddon == addonName then
-            -- 1. Initialize DB if it doesn't exist
-            DiameterDB = DiameterDB or {}
+Diameter.Anchor:SetScript("OnEvent", function(self, event, loadedAddon)
+    if event == "PLAYER_ENTERING_WORLD" or event == "GROUP_ROSTER_UPDATE" then
+        Diameter.EventBus:Fire(EVT.GROUP_CHANGED)
+    elseif event == "ADDON_LOADED" and loadedAddon == addonName then
 
-            -- 2. Load saved Mode (default to DamageDone if nil)
-            Diameter.Current = {
-                Mode = DiameterDB.LastMode or Diameter.BlizzardDamageMeter.Mode.DamageDone,
-                SessionType = DiameterDB.LastSessionType or Diameter.BlizzardDamageMeter.SessionType.Current,
-                SessionID = DiameterDB.LastSessionID
-            }
+        -- 1. Initialize DB if it doesn't exist
+        -- to inspec the database in game:
+        -- /run DevTools_Dump(DiameterDB)
+        DiameterDB = DiameterDB or {}
 
-            Diameter.EventBus:Fire(EVT.CURRENT_CHANGED, Diameter.Current)
-            Diameter.EventBus:Fire(EVT.MODE_CHANGED, Diameter.Current.Mode)
-            
-            self:UnregisterEvent("ADDON_LOADED")
+        local presenters = {}
 
-            -- start the main loop
-            C_Timer.NewTicker(0.3, function() 
-                presenter1:UpdateMeter()
-            end)
-
+        if #DiameterDB == 0 then
+            table.insert(presenters, Diameter.Presenter:New(1))
+        else
+            for id, _ in ipairs(DiameterDB) do
+                table.insert(presenters, Diameter.Presenter:New(id))
+            end
         end
-    end)
 
-end
+        
+        self:UnregisterEvent("ADDON_LOADED")
+
+        -- start the main loop
+        C_Timer.NewTicker(0.3, function() 
+            for _, presenter in ipairs(presenters) do
+                presenter:UpdateMeter()
+            end
+        end)
+
+    end
+end)

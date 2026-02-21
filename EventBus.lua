@@ -49,7 +49,7 @@ local events = createEventTable({
     "PLAYER_SELECTION_MODE",
 
     -- used right at the start of the addon, modules will need to save a reference to mainFrame
-    "MAINFRAME_BOOTED"
+    "ADDON_BOOTED"
 })
 
 
