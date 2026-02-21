@@ -42,7 +42,9 @@ function Diameter.UI:New(id)
     end)
 
     Diameter.EventBus:Listen(EVT.MAINFRAME_BOOTED, function()
+        obj:UpdateScrollChildHeight()
         obj:ResetScrollPosition()
+
     end)
 
     return obj

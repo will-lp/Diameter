@@ -19,7 +19,8 @@ Diameter.Current = {
     SessionID = nil
 }
 
-local uiInstance = Diameter.UI:New(1)
+local uiInstance1 = Diameter.UI:New(1)
+local presenter1 = Diameter.Presenter:New(uiInstance1)
 
 
 Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
@@ -51,11 +52,11 @@ end)
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
 do
 
-    uiInstance.mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-    uiInstance.mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    uiInstance.mainFrame:RegisterEvent("ADDON_LOADED")
+    uiInstance1.mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
+    uiInstance1.mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    uiInstance1.mainFrame:RegisterEvent("ADDON_LOADED")
 
-    uiInstance.mainFrame:SetScript("OnEvent", function(self, event, loadedAddon)
+    uiInstance1.mainFrame:SetScript("OnEvent", function(self, event, loadedAddon)
         if event == "PLAYER_ENTERING_WORLD" or event == "GROUP_ROSTER_UPDATE" then
             Diameter.EventBus:Fire(EVT.GROUP_CHANGED)
         elseif event == "ADDON_LOADED" and loadedAddon == addonName then
@@ -69,7 +70,6 @@ do
                 SessionID = DiameterDB.LastSessionID
             }
 
-            Diameter.EventBus:Fire(EVT.MAINFRAME_BOOTED, uiInstance.mainFrame)
             Diameter.EventBus:Fire(EVT.CURRENT_CHANGED, Diameter.Current)
             Diameter.EventBus:Fire(EVT.MODE_CHANGED, Diameter.Current.Mode)
             
@@ -77,12 +77,8 @@ do
 
             -- start the main loop
             C_Timer.NewTicker(0.3, function() 
-                Diameter.Loop:UpdateMeter(uiInstance.mainFrame) 
+                presenter1:UpdateMeter()
             end)
-
-            -- this is needed to properly set the scroll child height initially,
-            -- otherwise we can scroll the child frame while it has no content.
-            uiInstance:UpdateScrollChildHeight()
 
         end
     end)
