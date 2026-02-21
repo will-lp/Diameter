@@ -16,68 +16,75 @@ local addonName, Diameter = ...
 
 ]]
 
+local EVT = Diameter.EventBus.Events
 local Pages = Diameter.Pages
 
-local viewState = {
-    page = Pages.GROUP,
-    targetGUID = nil,
-    targetName = nil,
-    targetIndex = nil,
-    secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for now, though :-(
-}
 
-local EVT = Diameter.EventBus.Events
 
 Diameter.Navigation = {}
+Diameter.Navigation.__index = Diameter.Navigation
 
-Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(value)
-    Diameter.Navigation:NavigateToGroup()
-end)
+function Diameter.Navigation:New()
+    local obj = setmetatable({}, self)
 
-Diameter.EventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
-    if playerSelectionMode == true then 
-        viewState.page = Pages.PLAYER_SELECTION
-    else 
-        viewState.page = Pages.GROUP
-    end
-end)
+    obj.viewState = {
+        page = Pages.GROUP,
+        targetGUID = nil,
+        targetName = nil,
+        targetIndex = nil,
+        secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for now, though :-(
+    }
 
-function Diameter.Navigation:getTargetGUID()
-    return viewState.targetGUID
+
+    Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(value)
+        obj:NavigateToGroup()
+    end)
+
+    Diameter.EventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
+        if playerSelectionMode == true then 
+            obj.viewState.page = Pages.PLAYER_SELECTION
+        else 
+            obj.viewState.page = Pages.GROUP
+        end
+    end)
+
+    return obj
 end
 
-function Diameter.Navigation:getTargetIndex()
-    return viewState.targetIndex
+
+
+function Diameter.Navigation:isSpellView()
+    return self.viewState.page == Pages.SPELL
 end
 
-function Diameter.Navigation.isSpellView()
-    return viewState.page == Pages.SPELL
+function Diameter.Navigation:isGroupView()
+    return self.viewState.page == Pages.GROUP
 end
 
-function Diameter.Navigation.isGroupView()
-    return viewState.page == Pages.GROUP
+function Diameter.Navigation:isModesView()
+    return self.viewState.page == Pages.MODES
 end
 
-function Diameter.Navigation.isModesView()
-    return viewState.page == Pages.MODES
+function Diameter.Navigation:isPlayerSelectionMode()
+    return self.viewState.page == Pages.PLAYER_SELECTION
 end
 
 function Diameter.Navigation:NavigateToGroup()
-    viewState.page = Pages.GROUP
-    viewState.targetGUID = nil
-    viewState.targetName = nil
+    self.viewState.page = Pages.GROUP
+    self.viewState.targetGUID = nil
+    self.viewState.targetName = nil
 
-    Diameter:RefreshUI()
-    Diameter.EventBus:Fire(EVT.PAGE_CHANGED, viewState)
+    Diameter.EventBus:Fire(EVT.PAGE_CHANGED, self.viewState)
 end
 
 function Diameter.Navigation:NavigateDown(data)
+    local viewState = self.viewState
     if self:isModesView() then 
         viewState.page = Pages.GROUP
 
         -- data.mode comes from the list of BlizzardDamageMeter modes
         Diameter.EventBus:Fire(EVT.MODE_CHANGED, data.mode)
-    elseif self:isGroupView() or viewState.page == Pages.PLAYER_SELECTION then
+    elseif self:isGroupView() or self:isPlayerSelectionMode() then
         viewState.page = Pages.SPELL
         local guid, name = data.sourceGUID, data.name
 
@@ -99,10 +106,10 @@ function Diameter.Navigation:NavigateDown(data)
 
     -- Force a UI refresh
     Diameter.EventBus:Fire(EVT.PAGE_CHANGED, viewState)
-    Diameter:RefreshUI()
 end
 
 function Diameter.Navigation:NavigateUp(data)
+    local viewState = self.viewState
     if self:isSpellView() then
         viewState.page = Pages.GROUP
         viewState.targetGUID = nil
@@ -112,5 +119,4 @@ function Diameter.Navigation:NavigateUp(data)
     end
 
     Diameter.EventBus:Fire(EVT.PAGE_CHANGED, viewState)
-    Diameter:RefreshUI()
 end

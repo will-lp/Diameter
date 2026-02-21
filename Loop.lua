@@ -69,6 +69,8 @@ Diameter.EventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode
     Diameter.Loop:UpdateBars(mainFrame)
 end)
 
+
+
 --[[
     When a page is changed we store that data and do a 
     single UpdateBars in case we are not in combat.

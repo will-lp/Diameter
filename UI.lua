@@ -24,6 +24,7 @@ function Diameter.UI:New(id)
     obj.id = id
     obj.filledBars = 0
     obj.currentScrollPos = 0
+    obj.navigation = Diameter.Navigation:New()
     obj.mainFrame = obj:Boot()
 
 
@@ -33,14 +34,15 @@ function Diameter.UI:New(id)
     ]]
     Diameter.EventBus:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
         obj.filledBars = #dataArray
-
         local scrollFrame = obj.mainFrame.ScrollFrame
-
         local maxHeight = obj:CalculateMaxHeight(scrollFrame)
-
         if obj.currentScrollPos > maxHeight then obj.currentScrollPos = maxHeight end
 
         scrollFrame:SetVerticalScroll(obj.currentScrollPos)
+    end)
+
+    Diameter.EventBus:Listen(EVT.MAINFRAME_BOOTED, function()
+        obj:ResetScrollPosition()
     end)
 
     return obj
@@ -159,7 +161,7 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
     -- So we can go back up the navigation stack clicking anywhere in the scroll area
     scrollFrame:SetScript("OnMouseDown", function(frame, button)
         if button == "RightButton" then
-            Diameter.Navigation:NavigateUp(frame.data)
+            uiInstance.navigation:NavigateUp(frame.data)
         end
     end)
 
@@ -235,15 +237,16 @@ function Diameter.UI:CreateBars(scrollChild)
         local bar = CreateFrame("StatusBar", nil, scrollChild)
         bar:SetHeight(self.step)
 
+        local uiInstance = self
         -- Handling breakdown on click and coming back
         bar:EnableMouse(true)
         bar:SetScript("OnMouseDown", function(self, button)
             if button == "LeftButton" then
                 -- Tell the meter to navigate down into group data or details of the player
-                Diameter.Navigation:NavigateDown(self.data)
+                uiInstance.navigation:NavigateDown(self.data)
             elseif button == "RightButton" then
                 -- Right click goes "Back" to the group data or modes list
-                Diameter.Navigation:NavigateUp(self.data)
+                uiInstance.navigation:NavigateUp(self.data)
             end
         end)
 

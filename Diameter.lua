@@ -47,21 +47,9 @@ Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
     Diameter.EventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
 end)
 
-function Diameter:RefreshUI()
-    Diameter.Loop:UpdateMeter(uiInstance.mainFrame)
-    uiInstance:ResetScrollPosition()
-end
-
-
 
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
-(function() 
-
-    --[[
-        Here we broadcast mainFrame to every module interested.
-    ]]
-    Diameter.EventBus:Fire(EVT.MAINFRAME_BOOTED, uiInstance.mainFrame)
-
+do
 
     uiInstance.mainFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
     uiInstance.mainFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -81,6 +69,7 @@ end
                 SessionID = DiameterDB.LastSessionID
             }
 
+            Diameter.EventBus:Fire(EVT.MAINFRAME_BOOTED, uiInstance.mainFrame)
             Diameter.EventBus:Fire(EVT.CURRENT_CHANGED, Diameter.Current)
             Diameter.EventBus:Fire(EVT.MODE_CHANGED, Diameter.Current.Mode)
             
@@ -95,10 +84,7 @@ end
             -- otherwise we can scroll the child frame while it has no content.
             uiInstance:UpdateScrollChildHeight()
 
-            -- this is needed to boot the UI, or sometimes it will show a black frame, 
-            -- even though there is data in blizzard's dps meter.
-            Diameter:RefreshUI()
         end
     end)
 
-end)()
+end
