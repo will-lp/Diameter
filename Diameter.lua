@@ -14,19 +14,20 @@ _G["Diameter"] = Diameter
 
 local presenters = {}
 
-local function createNewPresenter(id)
+
+Diameter.EventBus:Listen(EVT.NEW_WINDOW, function(id)
     id = id or GetTime()
     local newPresenter = Diameter.Presenter:New(id)
     presenters[id] = newPresenter
-end
-
-Diameter.EventBus:Listen(EVT.NEW_WINDOW, function()
-    createNewPresenter()
 end)
 
 Diameter.EventBus:Listen(EVT.CLOSE_WINDOW, function(id)
-    presenters[id]:TearDown()
-    presenters[id] = nil
+    local numPresenters = Diameter.Util.count(presenters)
+    
+    if numPresenters > 1 then
+        presenters[id]:TearDown()
+        presenters[id] = nil
+    end
 end)
 
 
@@ -46,10 +47,10 @@ Diameter.Anchor:SetScript("OnEvent", function(self, event, loadedAddon)
         Diameter.Database:Initialize()
 
         if Diameter.Database:IsEmpty() then
-            createNewPresenter()
+            Diameter.EventBus:Fire(EVT.NEW_WINDOW)
         else
             for id, _ in pairs(Diameter.Database:GetPresenters()) do
-                createNewPresenter(id)
+                Diameter.EventBus:Fire(EVT.NEW_WINDOW, id)
             end
         end
 

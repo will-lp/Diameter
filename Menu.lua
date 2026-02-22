@@ -39,11 +39,23 @@ local Menu = {
 Menu.__index = Menu
 
 
+local numberOfWindows = 0
+
+Diameter.EventBus:Listen(EVT.NEW_WINDOW, function()
+    numberOfWindows = numberOfWindows + 1
+end)
+
+Diameter.EventBus:Listen(EVT.CLOSE_WINDOW, function()
+    numberOfWindows = numberOfWindows - 1
+end)
+
+
 function Menu:New(eventBus) 
     local obj = setmetatable({}, self)
     obj.eventBus = eventBus
     return obj
 end
+
 
 function Menu:ShowMenu(anchor, id)
     
@@ -72,9 +84,13 @@ function Menu:ShowMenu(anchor, id)
 
         rootDescription:CreateDivider()
 
-        rootDescription:CreateButton("Close Window", function() 
+        local closeWindowBtn = rootDescription:CreateButton("Close Window", function() 
             Diameter.EventBus:Fire(EVT.CLOSE_WINDOW, id)
         end)
+
+        if numberOfWindows == 1 then
+            closeWindowBtn:SetEnabled(false)
+        end
 
     end)
 end

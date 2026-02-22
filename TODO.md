@@ -5,7 +5,7 @@ Stuff to do:
 - [ ] check memory usage after destroying windows; is EventBus holding references?
 - [ ] EventBus:Unregister is doing nothing
 - [ ] test if reset data is global and acting upon all windows
-- [ ] validate DiameterDB and make sure there's no stray data
+- [x] validate DiameterDB and make sure there's no stray data
 - [x] DiameterDB migration: we need to clear the database for people still in v1.x.x
 - [ ] ponder: is GetTime() a good identifier for windows?
 - [ ] do not allow to close window if only one window remain
@@ -37,3 +37,4 @@ Stuff to do:
 - [ ] EventBus has now Diameter.EventBus for global and Diameter.EventBusClass to create instances. I don't like it :-(
 - [ ] change all the "Diameter.Module" into only "Module."
 - [ ] UI improvements: it is a bit ugly now, specially the bar colors
+- [ ] i18n; if English was good enough for Jesus then it's good enough for me, too

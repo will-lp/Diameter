@@ -1,5 +1,5 @@
 
-local addonName, Diameter = ...
+local _, Diameter = ...
 
 Diameter.Util = {
 
@@ -25,7 +25,8 @@ Diameter.Util = {
     count = function (t, predicate)
         local count = 0
         for _, v in pairs(t) do
-            if predicate(v) then
+
+            if not predicate or predicate(v) then
                 count = count + 1
             end
         end
