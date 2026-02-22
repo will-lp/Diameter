@@ -48,9 +48,6 @@ local events = createEventTable({
     -- user clicked the "Player Selection" toggle
     "PLAYER_SELECTION_MODE",
 
-    -- used right at the start of the addon, modules will need to save a reference to mainFrame
-    "ADDON_BOOTED",
-
     -- I am not explaining those two, c'mon >:(
     "NEW_WINDOW",
     "CLOSE_WINDOW"
@@ -75,16 +72,20 @@ function EventBus:New()
 end
 
 
-function EventBus:Listen(evt, fn)
+function EventBus:Listen(evt, fn, owner)
     validateEventExists(evt)
     self.listeners[evt] = self.listeners[evt] or {}
-    table.insert(self.listeners[evt], fn)
+    if owner then
+        self.listeners[evt][owner] = fn
+    else
+        table.insert(self.listeners[evt], fn)
+
+    end
 end
 
 
 function EventBus:Fire(evt, data)
     validateEventExists(evt)
-
     if not self.listeners[evt] then return end
 
     for _, fn in pairs(self.listeners[evt]) do
@@ -93,8 +94,12 @@ function EventBus:Fire(evt, data)
 end
 
 
-function EventBus:Unregister(id)
-    -- NOT YET IMPLEMENTED. instances need to be removed from global EventBus
+function EventBus:Unregister(owner)
+    for evt, _ in pairs(events) do
+        if self.listeners[evt] then
+            self.listeners[evt][owner] = nil
+        end
+    end
 end
 
 Diameter.EventBusClass = EventBus

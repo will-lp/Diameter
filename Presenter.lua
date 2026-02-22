@@ -84,11 +84,11 @@ function Diameter.Presenter:New(id)
         }
         obj.eventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
         obj:ClearBars()
-    end)
+    end, obj)
 
     Diameter.EventBus:Listen(EVT.GROUP_CHANGED, function(_)
         obj.playerList = Diameter.PlayerList:GetPlayerList()
-    end)
+    end, obj)
 
     return obj
 end
@@ -112,7 +112,7 @@ end
 function Diameter.Presenter:TearDown() 
     self.uiInstance.mainFrame:Hide() -- Make it invisible
     self.uiInstance.mainFrame:UnregisterAllEvents()
-    Diameter.EventBus:Unregister(self.id)
+    Diameter.EventBus:Unregister(self)
     Diameter.Database:Remove(self.id)
 end
 
