@@ -31,6 +31,7 @@ Stuff to do:
 - [ ] in Presenter, obj.playerList is instanced, but it maybe could be class-wide OR it could consider the data without secrets
 - [ ] disable Player Selection toggle when looking at historical data
 - [ ] more viewState data could be persisted into the DB. this might cause problems on Reset Data or Addon Boot
+- [ ] Diameter.lua is starting to do a lot of window management that could move into its own module
 
 ## low priority
 - [ ] a few tooltips would be nice
