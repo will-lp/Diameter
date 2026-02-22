@@ -18,13 +18,14 @@ Diameter.UI = {
 
 Diameter.UI.__index = Diameter.UI
 
-function Diameter.UI:New(id)
+function Diameter.UI:New(id, eventChannel)
     local obj = setmetatable({}, self)
 
     obj.id = id
     obj.filledBars = 0
     obj.currentScrollPos = 0
-    obj.navigation = Diameter.Navigation:New()
+    obj.eventChannel = eventChannel
+    obj.navigation = Diameter.Navigation:New(eventChannel)
     obj.mainFrame = obj:Boot()
 
 
@@ -32,19 +33,19 @@ function Diameter.UI:New(id)
         Here we listen for changes in the page content and set the vertical
         scroll accordingly. 
     ]]
-    Diameter.EventBus:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
+    obj.eventChannel:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
         obj.filledBars = #dataArray
         local scrollFrame = obj.mainFrame.ScrollFrame
         local maxHeight = obj:CalculateMaxHeight(scrollFrame)
         if obj.currentScrollPos > maxHeight then obj.currentScrollPos = maxHeight end
 
         scrollFrame:SetVerticalScroll(obj.currentScrollPos)
+
     end)
 
     Diameter.EventBus:Listen(EVT.ADDON_BOOTED, function()
         obj:UpdateScrollChildHeight()
         obj:ResetScrollPosition()
-
     end)
 
     return obj
@@ -59,7 +60,7 @@ end
 function Diameter.UI:Boot()
     -- 1. Main Frame
     local mainFrame = CreateFrame("Frame", "DiameterMainFrame" .. self.id, UIParent, "BackdropTemplate")
-    mainFrame:SetSize(300, 150)
+    mainFrame:SetSize(280, 180)
     mainFrame:SetPoint("BOTTOMRIGHT")
     mainFrame:SetMovable(true)
     mainFrame:SetResizable(true)
@@ -77,7 +78,7 @@ function Diameter.UI:Boot()
     mainFrame:SetBackdropColor(0, 0, 0, 0.8)
 
     -- 2. Header Bar and button
-    self.Header = Diameter.UIHeader:New(mainFrame)
+    self.Header = Diameter.UIHeader:New(mainFrame, self.id, self.eventChannel)
 
     local scrollFrame, scrollChild = self:CreateScrollEngine(mainFrame)
 
@@ -98,14 +99,15 @@ function Diameter.UI:Boot()
     mainFrame.Resizer:SetScript("OnMouseUp", function() mainFrame:StopMovingOrSizing() end)
     
     mainFrame:SetScript("OnSizeChanged", function(self, width, height)
-        -- 1. Update the ScrollFrame width (minus room for the scrollbar)
-        scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -25, 10) 
+        -- 1. Update the ScrollFrame width
+        scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -5, 10) 
         
-        -- 2. CRITICAL: Force the ScrollChild to match the new width
-        -- This is what will pull your bars wider
+        -- 2. Force the ScrollChild to match the new width.
+        -- Will pull bars wider
         scrollChild:SetWidth(scrollFrame:GetWidth())
         
-        -- 3. Optional: Trigger a refresh of the scroll logic
+        -- 3. Trigger a refresh of the scroll logic
+        -- I kinda wanna ditch this one
         scrollFrame:UpdateScrollChildRect()
     end)
     
@@ -117,14 +119,15 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
     -- We use a template to get a standard WoW scrollbar for free
     local scrollFrame = CreateFrame("ScrollFrame", "$parentScrollFrame", mainFrame)
     scrollFrame:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 10, -30) -- -30 to stay below header
-    scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -25, 10) -- -25 to leave room for the bar
+    scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -5, 10) -- -25 to leave room for the bar
 
     -- This is the 'Long Paper' that holds the bars
     local scrollChild = CreateFrame("Frame", "$parentScrollChild", scrollFrame, "BackdropTemplate")
+
     -- Anchor the child flush to the scroll frame so there are no secret insets
     scrollChild:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
     scrollChild:SetPoint("TOPRIGHT", scrollFrame, "TOPRIGHT", 0, 0)
-    scrollChild:SetHeight(1) -- updated dynamically by UpdateScrollChildHeight()
+    scrollChild:SetSize(scrollFrame:GetWidth() or 170, 1) -- updated dynamically by UpdateScrollChildHeight()
     scrollFrame:SetScrollChild(scrollChild)
 
     local uiInstance = self

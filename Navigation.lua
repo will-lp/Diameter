@@ -24,23 +24,23 @@ local Pages = Diameter.Pages
 Diameter.Navigation = {}
 Diameter.Navigation.__index = Diameter.Navigation
 
-function Diameter.Navigation:New()
+function Diameter.Navigation:New(eventBus)
     local obj = setmetatable({}, self)
 
+    obj.eventBus = eventBus
     obj.viewState = {
         page = Pages.GROUP,
         targetGUID = nil,
         targetName = nil,
         targetIndex = nil,
-        secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for now, though :-(
+        secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for it now, though :-(
     }
 
-
-    Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(value)
+    obj.eventBus:Listen(EVT.MODE_CHANGED, function(value)
         obj:NavigateToGroup()
     end)
 
-    Diameter.EventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
+    obj.eventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
         if playerSelectionMode == true then 
             obj.viewState.page = Pages.PLAYER_SELECTION
         else 
@@ -74,7 +74,7 @@ function Diameter.Navigation:NavigateToGroup()
     self.viewState.targetGUID = nil
     self.viewState.targetName = nil
 
-    Diameter.EventBus:Fire(EVT.PAGE_CHANGED, self.viewState)
+    self.eventBus:Fire(EVT.PAGE_CHANGED, self.viewState)
 end
 
 function Diameter.Navigation:NavigateDown(data)
@@ -83,7 +83,7 @@ function Diameter.Navigation:NavigateDown(data)
         viewState.page = Pages.GROUP
 
         -- data.mode comes from the list of BlizzardDamageMeter modes
-        Diameter.EventBus:Fire(EVT.MODE_CHANGED, data.mode)
+        self.eventBus:Fire(EVT.MODE_CHANGED, data.mode)
     elseif self:isGroupView() or self:isPlayerSelectionMode() then
         viewState.page = Pages.SPELL
         local guid, name = data.sourceGUID, data.name
@@ -105,7 +105,7 @@ function Diameter.Navigation:NavigateDown(data)
     end
 
     -- Force a UI refresh
-    Diameter.EventBus:Fire(EVT.PAGE_CHANGED, viewState)
+    self.eventBus:Fire(EVT.PAGE_CHANGED, viewState)
 end
 
 function Diameter.Navigation:NavigateUp(data)
@@ -118,5 +118,5 @@ function Diameter.Navigation:NavigateUp(data)
         viewState.page = Pages.MODES
     end
 
-    Diameter.EventBus:Fire(EVT.PAGE_CHANGED, viewState)
+    self.eventBus:Fire(EVT.PAGE_CHANGED, viewState)
 end

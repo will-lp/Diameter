@@ -13,29 +13,33 @@ local EVT = Diameter.EventBus.Events
 Diameter.UIHeader = {}
 Diameter.UIHeader.__index = Diameter.UIHeader
 
-function Diameter.UIHeader:New(mainFrame)
+function Diameter.UIHeader:New(mainFrame, id, eventBus)
     local obj = setmetatable({}, Diameter.UIHeader)
 
+    obj.id = id
     obj.mainFrame = mainFrame
+    obj.eventBus = eventBus
+    obj.menu = Diameter.Menu:New(eventBus)
+
     obj.Header = obj:CreateHeader(mainFrame)
     obj.MenuBtn = obj:CreateMenuButton(obj.Header)
     obj.SegmentBtn = obj:CreateSegmentButton(obj.Header)
     obj.PlayerSelectionBtn = obj:CreatePlayerToggle(obj.Header)
     obj.HeaderText = obj:CreateHeaderText(obj.Header)
 
-    Diameter.EventBus:Listen(EVT.CURRENT_CHANGED, function(data)
+    obj.eventBus:Listen(EVT.CURRENT_CHANGED, function(data)
         obj.SegmentBtn:SetText(obj:GetIndicatorText(data))
     end)
 
-    Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
+    obj.eventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
         obj.SegmentBtn:SetText(obj:GetIndicatorText({ SessionType = data }))
     end)
 
-    Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
+    obj.eventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
         obj.SegmentBtn:SetText(obj:GetIndicatorText(data))
     end)
 
-    Diameter.EventBus:Listen(EVT.MODE_CHANGED, function (mode)
+    obj.eventBus:Listen(EVT.MODE_CHANGED, function (mode)
         local label = Diameter.Menu.Labels[mode]
         obj.HeaderText:SetText(addonName .. ": " .. label)
     end)
@@ -44,7 +48,7 @@ function Diameter.UIHeader:New(mainFrame)
         If we are on playerSelectionMode and the page is changed, we disable
         playerSelectionMode.
     ]]
-    Diameter.EventBus:Listen(EVT.PAGE_CHANGED, function()
+    obj.eventBus:Listen(EVT.PAGE_CHANGED, function()
         obj.PlayerSelectionBtn:SetBackdropColor(0, 0, 0, 0.5) -- Back to default
         obj.PlayerSelectionBtn.isActive = false
     end)
@@ -80,8 +84,9 @@ function Diameter.UIHeader:CreateMenuButton(Header)
     MenuBtn:SetPoint("LEFT", 2, 0)
     MenuBtn:SetNormalTexture("Interface\\Icons\\INV_Misc_Gear_01") -- Cogwheel icon
 
+    local obj = self
     MenuBtn:SetScript("OnClick", function(self)
-        Diameter.Menu:ShowMenu(self)
+        obj.menu:ShowMenu(self, obj.id)
     end)
 
     return MenuBtn
@@ -127,6 +132,7 @@ function Diameter.UIHeader:CreatePlayerToggle(Header)
     tex:SetAtlas("socialqueuing-icon-group") -- A nice "group" icon
 
 
+    local obj = self
     PlayerSelectionBtn:SetBackdropColor(0, 0, 0, 0.5)
     PlayerSelectionBtn:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
     PlayerSelectionBtn:SetScript("OnClick", function(self)
@@ -137,7 +143,7 @@ function Diameter.UIHeader:CreatePlayerToggle(Header)
             self:SetBackdropColor(0, 0, 0, 0.5) -- Back to default
             self.isActive = false
         end
-        Diameter.EventBus:Fire(EVT.PLAYER_SELECTION_MODE, self.isActive)
+        obj.eventBus:Fire(EVT.PLAYER_SELECTION_MODE, self.isActive)
     end)
 
     return PlayerSelectionBtn
@@ -174,8 +180,9 @@ function Diameter.UIHeader:CreateSegmentButton(Header)
     sessionIndicator:SetText("C")
 
     -- Attach your existing menu logic
+    local obj = self
     segmentBtn:SetScript("OnClick", function(self)
-        Diameter.Menu:ShowSessions(self)
+        obj.menu:ShowSessions(self)
     end)
 
     function segmentBtn:SetText(text)

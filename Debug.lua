@@ -37,3 +37,21 @@ function Diameter.Debug:dump(val, indent)
         end
     end
 end
+
+function Diameter.Debug:Frame(frame, color)
+    
+    local r, g, b = unpack(color or {1, 0, 0}) -- Default Red
+    
+    local line = frame:CreateTexture(nil, "OVERLAY")
+    line:SetAllPoints(frame)
+    line:SetColorTexture(r, g, b, 0.3) -- 30% alpha so you can see through it
+    
+    -- Add a bright border
+    local border = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+    border:SetAllPoints(frame)
+    border:SetBackdrop({
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 2,
+    })
+    border:SetBackdropBorderColor(r, g, b, 1)
+end

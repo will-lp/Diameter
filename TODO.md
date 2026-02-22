@@ -1,0 +1,22 @@
+Stuff to do:
+
+- [ ] check memory usage with the new windows
+- [ ] check memory usage after destroying windows; is EventBus holding references?
+- [ ] EventBus:Unregister is doing nothing
+- [ ] refactor Presenter, it is:
+  - managing state
+  - managing database
+  - handling events
+  - printing bars
+- [ ] refactor UI, I think ScrollFrame could move into its own module
+- [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
+- [ ] validate DiameterDB and make sure there's no stray data
+- [ ] DiameterDB migration: we need to clear the database for people still in v1.x.x
+- [ ] EventBus has now Diameter.EventBus for global and Diameter.EventBusClass to create instances. I don't like it :-(
+- [ ] change all the "Diameter.Module" into only "Module."
+- [ ] ponder: is GetTime() a good identifier for windows?
+- [ ] ponder: unit testing. Do we even have those in wow lua addon development?
+- [ ] UI improvements: it is a bit ugly now, specially the bar colors
+- [ ] customization: for starters, allow users to set bar height
+- [ ] in Presenter obj.playerList is instanced but it maybe could be class-wide OR it could consider the data without secrets
+- [ ] Menu.lua has a weird parameter being passed, I think it's ID and it's not being used. Ponder removal

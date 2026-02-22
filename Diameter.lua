@@ -6,11 +6,29 @@ local addonName, Diameter = ...
     modules together.
 ]]--
 
+
 local EVT = Diameter.EventBus.Events
 
 -- This makes Diameter accessible to the Chat Frame and other files
 _G["Diameter"] = Diameter
 
+local presenters = {}
+
+local function createNewPresenter(id)
+    id = id or GetTime()
+    local newPresenter = Diameter.Presenter:New(id)
+    presenters[id] = newPresenter
+end
+
+Diameter.EventBus:Listen(EVT.NEW_WINDOW, function()
+    createNewPresenter()
+end)
+
+Diameter.EventBus:Listen(EVT.CLOSE_WINDOW, function(id)
+    presenters[id]:TearDown()
+    presenters[id] = nil
+    DiameterDB[id] = nil
+end)
 
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
 
@@ -28,15 +46,15 @@ Diameter.Anchor:SetScript("OnEvent", function(self, event, loadedAddon)
         -- 1. Initialize DB if it doesn't exist
         -- to inspec the database in game:
         -- /run DevTools_Dump(DiameterDB)
+        -- to clear the DB in game
+        -- /run DiameterDB = {}; ReloadUI()
         DiameterDB = DiameterDB or {}
 
-        local presenters = {}
-
-        if #DiameterDB == 0 then
-            table.insert(presenters, Diameter.Presenter:New(1))
+        if next(DiameterDB) == nil then
+            createNewPresenter()
         else
-            for id, _ in ipairs(DiameterDB) do
-                table.insert(presenters, Diameter.Presenter:New(id))
+            for id, _ in pairs(DiameterDB) do
+                createNewPresenter(id)
             end
         end
 
@@ -45,7 +63,7 @@ Diameter.Anchor:SetScript("OnEvent", function(self, event, loadedAddon)
 
         -- start the main loop
         C_Timer.NewTicker(0.3, function() 
-            for _, presenter in ipairs(presenters) do
+            for _, presenter in pairs(presenters) do
                 presenter:UpdateMeter()
             end
         end)

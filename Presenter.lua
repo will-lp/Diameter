@@ -1,5 +1,5 @@
 
-local addonName, Diameter = ...
+local _, Diameter = ...
 
 --[[
     This module provides the main loop-able functionality for Diameter.
@@ -21,14 +21,13 @@ function Diameter.Presenter:New(id)
         page = Pages.GROUP
     }
 
-    local uiInstance = Diameter.UI:New(id)
-    local mainFrame = uiInstance.mainFrame
+    obj.eventBus = Diameter.EventBusClass:New()
+    obj.uiInstance = Diameter.UI:New(id, obj.eventBus)
+    obj.mainFrame = obj.uiInstance.mainFrame
     DiameterDB[id] = DiameterDB[id] or {}
 
     obj.id = id
-    obj.playerList = nil
-    obj.mainFrame = mainFrame
-    obj.uiInstance = uiInstance
+    obj.playerList = Diameter.PlayerList:GetPlayerList()
 
     -- these are the options loaded when the addon is booted on the very first time
     -- or a new window is created.
@@ -37,25 +36,28 @@ function Diameter.Presenter:New(id)
         SessionType = DiameterDB[id].SessionType or Diameter.BlizzardDamageMeter.SessionType.Current,
         SessionID = DiameterDB[id].SessionID or nil
     }
+    DiameterDB[obj.id] = obj.current
 
-    Diameter.EventBus:Fire(EVT.CURRENT_CHANGED, obj.current)
-    Diameter.EventBus:Fire(EVT.MODE_CHANGED, obj.current.Mode)
     obj:UpdateBars()
+    obj.eventBus:Fire(EVT.CURRENT_CHANGED, obj.current)
+    obj.eventBus:Fire(EVT.MODE_CHANGED, obj.current.Mode)
 
-
-    Diameter.EventBus:Listen(EVT.MODE_CHANGED, function(data)
+    obj.uiInstance:UpdateScrollChildHeight()
+    obj.uiInstance:ResetScrollPosition()
+    
+    obj.eventBus:Listen(EVT.MODE_CHANGED, function(data)
         DiameterDB[obj.id].Mode = data
         obj.current.Mode = data
         obj:UpdateBars()
     end)
 
-    Diameter.EventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
+    obj.eventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
         DiameterDB[obj.id].SessionType = data
         obj.current.SessionType = data
         obj:UpdateBars()
     end)
 
-    Diameter.EventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
+    obj.eventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
         DiameterDB[obj.id].SessionType = data.SessionType
         DiameterDB[obj.id].SessionID = data.SessionID
         obj.current.SessionType = data.SessionType
@@ -63,20 +65,7 @@ function Diameter.Presenter:New(id)
         obj:UpdateBars()
     end)
 
-    Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
-        local data = {
-            SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
-            SessionID = nil
-        }
-        Diameter.EventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
-        obj:ClearBars()
-    end)
-
-    Diameter.EventBus:Listen(EVT.GROUP_CHANGED, function(_)
-        obj.playerList = Diameter.PlayerList:GetPlayerList()
-    end)
-
-    Diameter.EventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
+    obj.eventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
         if playerSelectionMode == true then 
             obj.viewState.page = Pages.PLAYER_SELECTION
         else 
@@ -91,9 +80,22 @@ function Diameter.Presenter:New(id)
 
         @type data { page, targetGUID, targetName, targetIndex }
     ]]
-    Diameter.EventBus:Listen(EVT.PAGE_CHANGED, function(data)
+    obj.eventBus:Listen(EVT.PAGE_CHANGED, function(data)
         obj.viewState = data
         obj:UpdateBars()
+    end)
+
+    Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
+        local data = {
+            SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
+            SessionID = nil
+        }
+        self.eventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
+        obj:ClearBars()
+    end)
+
+    Diameter.EventBus:Listen(EVT.GROUP_CHANGED, function(_)
+        obj.playerList = Diameter.PlayerList:GetPlayerList()
     end)
 
     return obj
@@ -112,6 +114,13 @@ function Diameter.Presenter:UpdateMeter()
     end
 
     self:UpdateBars()
+end
+
+
+function Diameter.Presenter:TearDown() 
+    self.uiInstance.mainFrame:Hide() -- Make it invisible
+    self.uiInstance.mainFrame:UnregisterAllEvents()
+    Diameter.EventBus:Unregister(self.id)
 end
 
 
@@ -168,7 +177,7 @@ function Diameter.Presenter:PrintModesMenu()
         self:UpdateBar(bar, data, 1)
     end
 
-    Diameter.EventBus:Fire(EVT.PAGE_DATA_LOADED, Diameter.Menu.MenuOrder)
+    self.eventBus:Fire(EVT.PAGE_DATA_LOADED, Diameter.Menu.MenuOrder)
 end
 
 
@@ -208,7 +217,7 @@ function Diameter.Presenter:UpdateBarsFromDataArray(dataArray)
     end
 
 
-    Diameter.EventBus:Fire(EVT.PAGE_DATA_LOADED, dataArray)
+    self.eventBus:Fire(EVT.PAGE_DATA_LOADED, dataArray)
     
 
     -- To hide the bars we don't have data for

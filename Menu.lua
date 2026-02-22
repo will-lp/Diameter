@@ -12,7 +12,7 @@ local M = Diameter.BlizzardDamageMeter.Mode
 
 local EVT = Diameter.EventBus.Events
 
-Diameter.Menu = {
+local Menu = {
     Labels = {
         [M.DamageDone] = "Damage Done",
         [M.Dps] = "DPS",
@@ -36,8 +36,16 @@ Diameter.Menu = {
         M.AvoidableDamageTaken,
     }
 }
+Menu.__index = Menu
 
-function Diameter.Menu:ShowMenu(anchor)
+
+function Menu:New(eventBus) 
+    local obj = setmetatable({}, self)
+    obj.eventBus = eventBus
+    return obj
+end
+
+function Menu:ShowMenu(anchor, id)
     
     MenuUtil.CreateContextMenu(anchor, function(owner, rootDescription)
         rootDescription:CreateTitle("Select Mode")
@@ -45,22 +53,34 @@ function Diameter.Menu:ShowMenu(anchor)
         for _, value in ipairs(Diameter.Menu.MenuOrder) do
             local label = Diameter.Menu.Labels[value]
             rootDescription:CreateButton(label, function() 
-                Diameter.EventBus:Fire(EVT.MODE_CHANGED, value)
+                self.eventBus:Fire(EVT.MODE_CHANGED, value)
             end)
         end
 
-        
         rootDescription:CreateDivider()
         
         rootDescription:CreateButton("Reset Data", function() 
             C_DamageMeter.ResetAllCombatSessions()
             Diameter.EventBus:Fire(EVT.DATA_RESET, anchor)
         end)
+
+        rootDescription:CreateDivider()
+
+        rootDescription:CreateButton("New Window", function() 
+            Diameter.EventBus:Fire(EVT.NEW_WINDOW)
+        end)
+
+        rootDescription:CreateDivider()
+
+        rootDescription:CreateButton("Close Window", function() 
+            Diameter.EventBus:Fire(EVT.CLOSE_WINDOW, id)
+        end)
+
     end)
 end
 
 
-function Diameter.Menu:ShowSessions(anchor)
+function Menu:ShowSessions(anchor)
     MenuUtil.CreateContextMenu(anchor, function(owner, rootDescription)
 
         local sessions = Diameter.Data:GetSessions()
@@ -68,11 +88,11 @@ function Diameter.Menu:ShowSessions(anchor)
         rootDescription:CreateTitle("Segments")
 
         rootDescription:CreateButton("Current", function() 
-            Diameter.EventBus:Fire(EVT.SESSION_TYPE_CHANGED, Diameter.BlizzardDamageMeter.SessionType.Current)
+            self.eventBus:Fire(EVT.SESSION_TYPE_CHANGED, Diameter.BlizzardDamageMeter.SessionType.Current)
         end)
 
         rootDescription:CreateButton("Overall", function() 
-            Diameter.EventBus:Fire(EVT.SESSION_TYPE_CHANGED, Diameter.BlizzardDamageMeter.SessionType.Overall)
+            self.eventBus:Fire(EVT.SESSION_TYPE_CHANGED, Diameter.BlizzardDamageMeter.SessionType.Overall)
         end)
 
         rootDescription:CreateDivider()
@@ -81,7 +101,7 @@ function Diameter.Menu:ShowSessions(anchor)
         for _, value in ipairs(sessions) do
             local label = value.sessionID .. ": " .. value.name
             rootDescription:CreateButton(label, function() 
-                Diameter.EventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, {
+                self.eventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, {
                     SessionType = Diameter.BlizzardDamageMeter.SessionType.Expired,
                     SessionID = value.sessionID
                 })
@@ -89,3 +109,6 @@ function Diameter.Menu:ShowSessions(anchor)
         end
     end)
 end
+
+
+Diameter.Menu = Menu

@@ -1,10 +1,10 @@
-local addonName, Diameter = ...
+local _, Diameter = ...
 
 --[[
     EventBus is a pub/sub pattern to decouple modules. 
-]]
-
-Diameter.EventBus = {}
+    It is instance based just so we can create channels for instances
+    to talk.
+]]--
 
 
 local createEventTable = function (eventsNames)
@@ -49,18 +49,12 @@ local events = createEventTable({
     "PLAYER_SELECTION_MODE",
 
     -- used right at the start of the addon, modules will need to save a reference to mainFrame
-    "ADDON_BOOTED"
+    "ADDON_BOOTED",
+
+    -- I am not explaining those two, c'mon >:(
+    "NEW_WINDOW",
+    "CLOSE_WINDOW"
 })
-
-
-Diameter.EventBus.Events = events
-
-
-local listeners = {}
-
-for evt, _ in pairs(events) do
-    listeners[evt] = {}
-end
 
 
 local function validateEventExists(evt) 
@@ -70,17 +64,38 @@ local function validateEventExists(evt)
 end
 
 
-function Diameter.EventBus:Listen(evt, fn)
-    validateEventExists(evt)
-    table.insert(listeners[evt], fn)
+local EventBus = { Events = events }
+EventBus.__index = EventBus
+
+
+function EventBus:New()
+    local obj = setmetatable({}, self)
+    obj.listeners = {}
+    return obj
 end
 
 
-function Diameter.EventBus:Fire(evt, data)
+function EventBus:Listen(evt, fn)
+    validateEventExists(evt)
+    self.listeners[evt] = self.listeners[evt] or {}
+    table.insert(self.listeners[evt], fn)
+end
+
+
+function EventBus:Fire(evt, data)
     validateEventExists(evt)
 
-    local fireTo = listeners[evt]
-    for _, fn in pairs(fireTo) do
+    if not self.listeners[evt] then return end
+
+    for _, fn in pairs(self.listeners[evt]) do
         fn(data)
     end
 end
+
+
+function EventBus:Unregister(id)
+    -- NOT YET IMPLEMENTED. instances need to be removed from global EventBus
+end
+
+Diameter.EventBusClass = EventBus
+Diameter.EventBus = EventBus:New()
