@@ -43,6 +43,10 @@ function Database:Get(id)
 end
 
 
+function Database:GetMaxId()
+    return Diameter.Util.max(self:GetPresenters(), function(key, _) return key end) or 0
+end
+
 function Database:Remove(id)
     DiameterDB.Windows[id] = nil
 end
