@@ -41,7 +41,6 @@ local ModeToField ={
 
 Diameter.Data.ModeToField = ModeToField
 
-local dataArray = {}
 
 --[[
     Returns the group meter; the data with the player's names and their
@@ -51,6 +50,7 @@ local dataArray = {}
 ]]--
 function Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
 
+    local dataArray = {}
     local SessionType = Diameter.BlizzardDamageMeter.SessionType
     local container
 
@@ -97,6 +97,7 @@ end
 ]]--
 function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, sourceCreatureID)
     
+    local dataArray = {}
     local SessionType = Diameter.BlizzardDamageMeter.SessionType
     local details
 

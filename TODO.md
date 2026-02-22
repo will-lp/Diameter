@@ -6,10 +6,10 @@ Stuff to do:
 - [ ] EventBus:Unregister is doing nothing
 - [ ] test if reset data is global and acting upon all windows
 - [ ] validate DiameterDB and make sure there's no stray data
-- [ ] DiameterDB migration: we need to clear the database for people still in v1.x.x
+- [x] DiameterDB migration: we need to clear the database for people still in v1.x.x
 - [ ] ponder: is GetTime() a good identifier for windows?
 - [ ] do not allow to close window if only one window remain
-- [ ] I don't think DiameterDB should straight up have indexes for windows because it might have settings in the future
+- [x] I don't think DiameterDB should straight up have indexes for windows because it might have settings in the future
   - DiameterDB.Windows
 
 ## high priority

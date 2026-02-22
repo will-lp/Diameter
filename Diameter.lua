@@ -27,8 +27,8 @@ end)
 Diameter.EventBus:Listen(EVT.CLOSE_WINDOW, function(id)
     presenters[id]:TearDown()
     presenters[id] = nil
-    DiameterDB[id] = nil
 end)
+
 
 -- Diameter's "Main()": Initial operations needed for the addon to run properly.
 
@@ -43,22 +43,16 @@ Diameter.Anchor:SetScript("OnEvent", function(self, event, loadedAddon)
         Diameter.EventBus:Fire(EVT.GROUP_CHANGED)
     elseif event == "ADDON_LOADED" and loadedAddon == addonName then
 
-        -- 1. Initialize DB if it doesn't exist
-        -- to inspec the database in game:
-        -- /run DevTools_Dump(DiameterDB)
-        -- to clear the DB in game
-        -- /run DiameterDB = {}; ReloadUI()
-        DiameterDB = DiameterDB or {}
+        Diameter.Database:Initialize()
 
-        if next(DiameterDB) == nil then
+        if Diameter.Database:IsEmpty() then
             createNewPresenter()
         else
-            for id, _ in pairs(DiameterDB) do
+            for id, _ in pairs(Diameter.Database:GetPresenters()) do
                 createNewPresenter(id)
             end
         end
 
-        
         self:UnregisterEvent("ADDON_LOADED")
 
         -- start the main loop

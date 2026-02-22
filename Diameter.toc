@@ -10,15 +10,16 @@
 ## X-Curse-Project-ID: 1460194
 
 
-
 Constants.lua
 Recycler.lua
 Debug.lua
 EventBus.lua
 Util.lua
-Navigation.lua
 Data.lua
 PlayerList.lua
+Database.lua
+
+Navigation.lua
 UIHeader.lua
 UI.lua
 Menu.lua

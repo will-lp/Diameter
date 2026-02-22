@@ -79,6 +79,7 @@ end
 
 function Diameter.Navigation:NavigateDown(data)
     local viewState = self.viewState
+    
     if self:isModesView() then 
         viewState.page = Pages.GROUP
 

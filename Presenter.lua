@@ -21,22 +21,18 @@ function Diameter.Presenter:New(id)
         page = Pages.GROUP
     }
 
+    obj.id = id
     obj.eventBus = Diameter.EventBusClass:New()
     obj.uiInstance = Diameter.UI:New(id, obj.eventBus)
     obj.mainFrame = obj.uiInstance.mainFrame
-    DiameterDB[id] = DiameterDB[id] or {}
-
-    obj.id = id
     obj.playerList = Diameter.PlayerList:GetPlayerList()
 
     -- these are the options loaded when the addon is booted on the very first time
     -- or a new window is created.
-    obj.current = {
-        Mode = DiameterDB[id].Mode or Diameter.BlizzardDamageMeter.Mode.DamageDone,
-        SessionType = DiameterDB[id].SessionType or Diameter.BlizzardDamageMeter.SessionType.Current,
-        SessionID = DiameterDB[id].SessionID or nil
-    }
-    DiameterDB[obj.id] = obj.current
+    obj.current = Diameter.Database:Get(obj.id)
+    obj.current.Mode = obj.current.Mode or Diameter.BlizzardDamageMeter.Mode.DamageDone
+    obj.current.SessionType = obj.current.SessionType or Diameter.BlizzardDamageMeter.SessionType.Current
+    obj.current.SessionID = obj.current.SessionID or nil
 
     obj:UpdateBars()
     obj.eventBus:Fire(EVT.CURRENT_CHANGED, obj.current)
@@ -46,20 +42,16 @@ function Diameter.Presenter:New(id)
     obj.uiInstance:ResetScrollPosition()
     
     obj.eventBus:Listen(EVT.MODE_CHANGED, function(data)
-        DiameterDB[obj.id].Mode = data
         obj.current.Mode = data
         obj:UpdateBars()
     end)
 
     obj.eventBus:Listen(EVT.SESSION_TYPE_CHANGED, function(data)
-        DiameterDB[obj.id].SessionType = data
         obj.current.SessionType = data
         obj:UpdateBars()
     end)
 
     obj.eventBus:Listen(EVT.SESSION_TYPE_ID_CHANGED, function(data)
-        DiameterDB[obj.id].SessionType = data.SessionType
-        DiameterDB[obj.id].SessionID = data.SessionID
         obj.current.SessionType = data.SessionType
         obj.current.SessionID = data.SessionID
         obj:UpdateBars()
@@ -90,7 +82,7 @@ function Diameter.Presenter:New(id)
             SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
             SessionID = nil
         }
-        self.eventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
+        obj.eventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
         obj:ClearBars()
     end)
 
@@ -121,6 +113,7 @@ function Diameter.Presenter:TearDown()
     self.uiInstance.mainFrame:Hide() -- Make it invisible
     self.uiInstance.mainFrame:UnregisterAllEvents()
     Diameter.EventBus:Unregister(self.id)
+    Diameter.Database:Remove(self.id)
 end
 
 

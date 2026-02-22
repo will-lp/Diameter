@@ -11,12 +11,12 @@ local EVT = Diameter.EventBus.Events
 
 Diameter.UI = {
     -- Unholy + Riders of apocalypse made 40 Bars go boom. Probably should be dynamic.
-    MaxBars = 60,
+    MaxBars = 50,
     step = 20,
     spacing = 1
 }
-
 Diameter.UI.__index = Diameter.UI
+
 
 function Diameter.UI:New(id, eventChannel)
     local obj = setmetatable({}, self)
@@ -27,7 +27,6 @@ function Diameter.UI:New(id, eventChannel)
     obj.eventChannel = eventChannel
     obj.navigation = Diameter.Navigation:New(eventChannel)
     obj.mainFrame = obj:Boot()
-
 
     --[[
         Here we listen for changes in the page content and set the vertical
