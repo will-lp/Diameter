@@ -19,18 +19,17 @@ Stuff to do:
 - [ ] Z-index shenanigans when Diameter windows are hovering each other.
 
 ## medium priority
-- [ ] refactor Presenter, it is:
-  - managing state
-  - managing database
-  - handling events
-  - printing bars
+- [ ] refactor Presenter, it is managing state, managing database, handling events and printing bars. Want it to brew coffee too? soft-serve ice cream?
+  - [x] remove Database handling responsibility from Presenter
+  - [ ] remove Bar updating from Presenter, this is almost a View concern
 - [ ] refactor UI, I think ScrollFrame could move into its own module
 - [ ] ponder the orb: unit testing. Do we even have those in wow lua addon development?
 - [ ] customization: for starters, allow users to set bar height
-- [ ] in Presenter, obj.playerList is instanced, but it maybe could be class-wide OR it could consider the data without secrets
+- [ ] in Presenter, obj.playerList is instanced, but maybe it could be class-wide OR it could consider the data without secrets
 - [ ] disable Player Selection toggle when looking at historical data
 - [ ] more viewState data could be persisted into the DB. this might cause problems on Reset Data or Addon Boot
 - [ ] Diameter.lua is starting to do a lot of window management that could move into its own module
+- [ ] spell tooltip
 
 ## low priority
 - [ ] a few tooltips would be nice
