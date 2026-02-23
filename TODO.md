@@ -33,6 +33,7 @@ Stuff to do:
 
 ## low priority
 - [ ] a few tooltips would be nice
+- [ ] paint bars different color per mode; we healing? maybe green bars. absorbs? cyan. damage taken? red/yellow.
 - [ ] EventBus has now Diameter.EventBus for global and Diameter.EventBusClass to create instances. I don't like it :-(
 - [ ] change all the "Diameter.Module" into only "Module."
 - [ ] UI improvements: it is a bit ugly now, specially the bar colors
