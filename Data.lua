@@ -138,9 +138,9 @@ end
 
 function Diameter.Data:GetColor(mode, classColor)
     if mode == BDM.Mode.DamageTaken then
-        return color.BlackCherry
-    elseif mode == BDM.Mode.AvoidableDamageTaken then
         return color.ShadowViolet
+    elseif mode == BDM.Mode.AvoidableDamageTaken then
+        return color.BlackCherry
     elseif mode == BDM.Mode.Absorbs then
         return color.LightSteelBlue
     elseif mode == BDM.Mode.Interrupts then
