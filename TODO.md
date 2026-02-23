@@ -12,15 +12,6 @@ Stuff to do:
   - DiameterDB.Windows
 
 ## high priority
-- [ ] check memory usage with the new windows
-  - profiling:
-    /run collectgarbage("collect") UpdateAddOnMemoryUsage() print(GetAddOnMemoryUsage("Diameter"))
-  - count frames:
-    /run local count = 0 for i=1, 1000 do if _G["DiameterWindow"..i] then count = count + 1 end end print("Frames in memory: " .. count)
-  - this one is much nastier than I thought. I had no clue Frames are not GC'd. I'll have to monitor this one closely.
-    so far opening and closing 5 windows 3 times bumped memory usage to 320 kb. Could pool frames with Recycler, but
-    feels like over-engineering it. I'll monitor with a dungeon run. Probably players won't open 97 windows. Probably.
-    Gotta remember Bars are pooled already.
 - [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
   - the class color can be obtained with UnitClass and RAID_CLASS_COLOR
 - [ ] Menu.lua has a weird parameter being passed, I think it's ID and it's not being used. Ponder removal
@@ -47,3 +38,6 @@ Stuff to do:
 - [ ] change all the "Diameter.Module" into only "Module."
 - [ ] UI improvements: it is a bit ugly now, specially the bar colors
 - [ ] i18n; if English was good enough for Jesus then it's good enough for me, too
+- [x] check memory usage with the new windows
+  - check memory_2026-02-22_v2.0.0.md report
+
