@@ -33,6 +33,7 @@ function Diameter.Navigation:New(eventBus)
         targetGUID = nil,
         targetName = nil,
         targetIndex = nil,
+        targetClass = nil,
         secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for it now, though :-(
     }
 
@@ -103,6 +104,7 @@ function Diameter.Navigation:NavigateDown(data)
         end
 
         viewState.targetName = name
+        viewState.targetClass = data.color
     end
 
     -- Force a UI refresh
@@ -115,6 +117,7 @@ function Diameter.Navigation:NavigateUp(data)
         viewState.page = Pages.GROUP
         viewState.targetGUID = nil
         viewState.targetName = nil
+        viewState.targetClass = nil
     elseif self:isGroupView() or viewState.page == Pages.PLAYER_SELECTION then
         viewState.page = Pages.MODES
     end

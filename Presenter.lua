@@ -176,11 +176,10 @@ end
 
 function Diameter.Presenter:UpdatePlayerSpellMeter(sessionID, mode, sessionType)
     local dataArray = Diameter.Data:GetSpellMeter(
-            self.viewState.targetGUID, 
+            self.viewState, 
             mode, 
             sessionID, 
-            sessionType, 
-            self.viewState.sourceCreatureID)
+            sessionType)
 
     self:UpdateBarsFromDataArray(dataArray)
 end

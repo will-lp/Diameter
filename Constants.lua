@@ -1,4 +1,4 @@
-local addonName, Diameter = ...
+local _, Diameter = ...
 
 
 --[[
@@ -42,9 +42,12 @@ Diameter.Pages = {
 
 --[[
     A pool of colors so we don't keep creating colors on every loop iteration.
-    I swear the addon has more colors than gray and blue. I think. Not sure.
 ]]
 Diameter.Color = { 
     Gray = {r=0.5, g=0.5, b=0.5},
-    Blue = {r=0.3, g=0.3, b=0.9}
+    Blue = {r=0.3, g=0.3, b=0.9},
+    ShadowViolet = {r=0.3, g=0.0, b=0.5},
+    BlackCherry = {r=0.5, g=0.2, b=0.3},
+    LightSteelBlue = {r=0.65, g=0.85, b=0.85},
+    SteelBlue = {r=0.5, g=0.7, b=0.7},
 }

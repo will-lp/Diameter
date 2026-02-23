@@ -95,8 +95,10 @@ end
     @param sessionID The ID of the combat session.
     @return A table containing spell meter data formatted for the UI.
 ]]--
-function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, sourceCreatureID)
+function Diameter.Data:GetSpellMeter(viewState, mode, sessionID, sessionType)
     
+    local targetGUID = viewState.targetGUID
+    local sourceCreatureID = viewState.sourceCreatureID
     local dataArray = {}
     local SessionType = Diameter.BlizzardDamageMeter.SessionType
     local details
@@ -124,6 +126,7 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, s
             data.icon = C_Spell.GetSpellTexture(combatSpell.spellID)
             data.color = color.Gray
             data.sourceGUID = combatSpell.sourceGUID
+            data.color = self:GetColor(mode, viewState.targetClass)
             
             table.insert(dataArray, data)
         end
@@ -132,6 +135,20 @@ function Diameter.Data:GetSpellMeter(targetGUID, mode, sessionID, sessionType, s
     return dataArray
 end
 
+
+function Diameter.Data:GetColor(mode, classColor)
+    if mode == BDM.Mode.DamageTaken then
+        return color.BlackCherry
+    elseif mode == BDM.Mode.AvoidableDamageTaken then
+        return color.ShadowViolet
+    elseif mode == BDM.Mode.Absorbs then
+        return color.LightSteelBlue
+    elseif mode == BDM.Mode.Interrupts then
+        return color.SteelBlue
+    else 
+        return classColor
+    end
+end
 
 --[[
     Returns the available combat sessions.

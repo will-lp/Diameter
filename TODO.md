@@ -1,6 +1,7 @@
 Stuff to do:
 
 ## highest priority
+- [ ] windows must be persisted into database per toon
 - [x] check memory usage after destroying windows; is EventBus holding references?
 - [x] EventBus:Unregister is doing nothing
 - [x] test if reset data is global and acting upon all windows
@@ -37,6 +38,8 @@ Stuff to do:
 - [ ] EventBus has now Diameter.EventBus for global and Diameter.EventBusClass to create instances. I don't like it :-(
 - [ ] change all the "Diameter.Module" into only "Module."
 - [ ] UI improvements: it is a bit ugly now, specially the bar colors
+
+## unprioritized
 - [ ] i18n; if English was good enough for Jesus then it's good enough for me, too
 - [x] check memory usage with the new windows
   - check memory_2026-02-22_v2.0.0.md report
