@@ -8,6 +8,7 @@
 ## X-Category: Combat
 ## X-Curse-Project-Name: Diameter
 ## X-Curse-Project-ID: 1460194
+## X-WoWI-ID: 27064
 
 
 Constants.lua
