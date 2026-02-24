@@ -1,4 +1,5 @@
 .gitignore export-ignore
 .gitattributes export-ignore
 .github/ export-ignore
-.docs/ export-ignore
+docs/ export-ignore
+TODO.md export-ignore
