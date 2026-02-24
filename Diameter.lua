@@ -14,18 +14,10 @@ _G["Diameter"] = Diameter
 
 local presenters = {}
 
-local maxId
+
 
 Diameter.EventBus:Listen(EVT.NEW_WINDOW, function(id)
-    if not maxId then
-        maxId = Diameter.Database:GetMaxId()
-    end
-
-    if not id then
-        maxId = maxId + 1
-        id = maxId
-    end 
-
+    id = id or Diameter.Database:GetMaxId()
     local newPresenter = Diameter.Presenter:New(id)
     presenters[id] = newPresenter
 end)

@@ -17,38 +17,67 @@ Database.__index = Database
 
 function Database:Initialize()
     DiameterDB = DiameterDB or {}
-    
+
     -- wiping legacy v1.x data
     if DiameterDB.Mode or DiameterDB.SessionType then
-        DiameterDB = { Windows = {} }
+        DiameterDB = {}
     end
+
+    -- wiping legacy v2.0 data with account-wide keys
+    if DiameterDB.Windows then
+        DiameterDB.Windows = nil
+    end
+
+    if not DiameterDB.Profiles then
+        DiameterDB.Profiles = {}
+    end
+
+    DiameterDB.DBVersion = 3
     
-    DiameterDB.Windows = DiameterDB.Windows or {}
 end
 
 
+function Database:GetProfile()
+    local guid = UnitGUID("player")
+    if not DiameterDB.Profiles[guid] then
+        DiameterDB.Profiles[guid] = { Windows = {} }
+    end
+
+    return DiameterDB.Profiles[guid]
+end
+
 function Database:GetPresenters()
-    return DiameterDB.Windows
+    return self:GetProfile().Windows
 end
 
 
 function Database:IsEmpty()
-    return next(DiameterDB.Windows) == nil
+    return next(self:GetProfile().Windows) == nil
 end
 
 
 function Database:Get(id)
-    DiameterDB.Windows[id] = DiameterDB.Windows[id] or {}
-    return DiameterDB.Windows[id]
+    self:GetProfile().Windows[id] = self:GetProfile().Windows[id] or {}
+    return self:GetProfile().Windows[id]
 end
 
 
+local maxId
+
 function Database:GetMaxId()
-    return Diameter.Util.max(self:GetPresenters(), function(key, _) return key end) or 0
+
+    if not maxId then
+        maxId = Diameter.Util.max(self:GetPresenters(), function(key, _) 
+            return key end
+        ) or 0
+    end
+
+    maxId = maxId + 1
+    return maxId
 end
 
 function Database:Remove(id)
-    DiameterDB.Windows[id] = nil
+    self:GetProfile().Windows[id] = nil
 end
 
 
