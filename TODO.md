@@ -13,7 +13,7 @@ Stuff to do:
   - DiameterDB.Windows
 
 ## high priority
-- [ ] deploying Diameter into WowInterface and Wago.io
+- [x] deploying Diameter into WowInterface 
 - [ ] adding a "Releases" folder on git for people who like to do it manually
 - [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
   - the class color can be obtained with UnitClass and RAID_CLASS_COLOR
@@ -22,6 +22,7 @@ Stuff to do:
 - [ ] Z-index shenanigans when Diameter windows are hovering each other.
 
 ## medium priority
+- [ ] deploy into Wago.io
 - [ ] refactor Presenter, it is managing state, managing database, handling events and printing bars. Want it to brew coffee too? soft-serve ice cream?
   - [x] remove Database handling responsibility from Presenter
   - [ ] remove Bar updating from Presenter, this is almost a View concern
