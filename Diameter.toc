@@ -2,7 +2,7 @@
 ## Title: Diameter
 ## Notes: A simple damage meter for the Midnight API. Features navigation through right and left clicks.
 ## Author: testforecho
-## Version: 2.1.0
+## Version: 2.1.1
 ## IconTexture: Interface\Icons\inv_misc_gear_02
 ## SavedVariables: DiameterDB
 ## X-Category: Combat
