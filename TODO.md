@@ -1,7 +1,7 @@
 Stuff to do:
 
 ## highest priority
-- [ ] windows must be persisted into database per toon
+- [x] windows must be persisted into database per toon
 - [x] check memory usage after destroying windows; is EventBus holding references?
 - [x] EventBus:Unregister is doing nothing
 - [x] test if reset data is global and acting upon all windows
@@ -13,6 +13,8 @@ Stuff to do:
   - DiameterDB.Windows
 
 ## high priority
+- [ ] deploying Diameter into WowInterface and Wago.io
+- [ ] adding a "Releases" folder on git for people who like to do it manually
 - [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
   - the class color can be obtained with UnitClass and RAID_CLASS_COLOR
 - [ ] Menu.lua has a weird parameter being passed, I think it's ID and it's not being used. Ponder removal
