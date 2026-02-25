@@ -21,8 +21,10 @@ PlayerList.lua
 Database.lua
 
 Navigation.lua
-UIHeader.lua
 UI.lua
+UIHeader.lua
+UIBars.lua
+UIScrollFrame.lua
 Menu.lua
 Presenter.lua
 Diameter.lua

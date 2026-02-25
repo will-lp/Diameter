@@ -1,4 +1,3 @@
-
 local _, Diameter = ...
 
 --[[
@@ -153,7 +152,7 @@ function Diameter.Presenter:PrintEmptyBars()
     local frame = self.mainFrame
     for i = 1, Diameter.UI.MaxBars do
         local bar = frame.ScrollChild.Bars[i]
-        self:UpdateBar(bar, nil, nil)
+        self.uiInstance:UpdateBar(bar, nil, nil)
     end
 end
 
@@ -171,7 +170,7 @@ function Diameter.Presenter:PrintModesMenu()
             sourceGUID = nil,
         }
         local bar = frame.ScrollChild.Bars[index]
-        self:UpdateBar(bar, data, 1)
+        self.uiInstance:UpdateBar(bar, data, 1)
     end
 
     self.eventBus:Fire(EVT.PAGE_DATA_LOADED, Diameter.Menu.MenuOrder)
@@ -209,7 +208,7 @@ function Diameter.Presenter:UpdateBarsFromDataArray(dataArray)
     for i, _ in ipairs(dataArray) do
         local data = dataArray[i]
         local bar = frame.ScrollChild.Bars[i]
-        self:UpdateBar(bar, data, dataArray.topValue)
+        self.uiInstance:UpdateBar(bar, data, dataArray.topValue)
     end
 
 
@@ -219,49 +218,8 @@ function Diameter.Presenter:UpdateBarsFromDataArray(dataArray)
     -- To hide the bars we don't have data for
     for i = #dataArray + 1, Diameter.UI.MaxBars do
         local bar = frame.ScrollChild.Bars[i]
-        self:UpdateBar(bar, nil, nil)
+        self.uiInstance:UpdateBar(bar, nil, nil)
     end
 end
 
 
---[[
-    Update a single bar in the meter.
-
-    @param bar = the StatusBar object itself
-    @param data = table { name=string, value=number, icon=textureID, color={r,g,b} }
-    @param topValue = number used as a reference to 100% fill
-]]--
-function Diameter.Presenter:UpdateBar(bar, data, topValue)
-    
-    if data and topValue then
-
-        local displayValue = data.value or 0
-
-        -- Update bar labels
-        bar.nameText:SetText(data.name)
-
-        bar.data = data
-        
-        bar.valueText:SetText(AbbreviateLargeNumbers(displayValue))
-
-        if data.icon then
-            bar.icon:SetTexture(data.icon)
-            bar.icon:Show()
-        else
-            -- If no spec data, hide it
-            bar.icon:Hide()
-        end
-        
-        -- Set the bar color
-        bar:SetStatusBarColor(data.color.r, data.color.g, data.color.b)
-
-        -- Update bar fill relative to the top player
-        bar:SetMinMaxValues(0, topValue)
-        bar:SetValue(displayValue)
-        
-        bar:Show()
-    else
-        -- Hide bars if there's no player data for this slot
-        bar:Hide()
-    end
-end
