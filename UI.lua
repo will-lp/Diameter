@@ -234,7 +234,6 @@ function Diameter.UI:ResetScrollPosition()
 end
 
 
-
 function Diameter.UI:CreateBars(scrollChild)
     local bars = {}
     

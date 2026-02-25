@@ -24,7 +24,6 @@ function Diameter.UIHeader:New(mainFrame, id, eventBus)
     obj.Header = obj:CreateHeader(mainFrame)
     obj.MenuBtn = obj:CreateMenuButton(obj.Header)
     obj.SegmentBtn = obj:CreateSegmentButton(obj.Header)
-    obj.PlayerSelectionBtn = obj:CreatePlayerToggle(obj.Header)
     obj.HeaderText = obj:CreateHeaderText(obj.Header)
 
     obj.eventBus:Listen(EVT.CURRENT_CHANGED, function(data)
@@ -42,15 +41,6 @@ function Diameter.UIHeader:New(mainFrame, id, eventBus)
     obj.eventBus:Listen(EVT.MODE_CHANGED, function (mode)
         local label = Diameter.Menu.Labels[mode]
         obj.HeaderText:SetText(addonName .. ": " .. label)
-    end)
-
-    --[[
-        If we are on playerSelectionMode and the page is changed, we disable
-        playerSelectionMode.
-    ]]
-    obj.eventBus:Listen(EVT.PAGE_CHANGED, function()
-        obj.PlayerSelectionBtn:SetBackdropColor(0, 0, 0, 0.5) -- Back to default
-        obj.PlayerSelectionBtn.isActive = false
     end)
 
     return obj
@@ -129,51 +119,6 @@ function Diameter.UIHeader:GetIndicatorText(current)
     end
     
     return current.SessionID
-end
-
-
---[[
-    Creates an icon for the Player Selection Mode. 
-    Once clicked, it will show a green background.
-    Changing the page (doesn't matter on which directio) must 
-    disable this guy, i.e., background is back to gray-ish.
-]]
-function Diameter.UIHeader:CreatePlayerToggle(Header)
-    local PlayerSelectionBtn = CreateFrame("Button", nil, Header, "BackdropTemplate")
-    PlayerSelectionBtn:SetSize(18, 18)
-    PlayerSelectionBtn:SetPoint("RIGHT", Header, "RIGHT", -40, 0)
-
-    PlayerSelectionBtn.isActive = false
-
-    PlayerSelectionBtn:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8X8",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        edgeSize = 1,
-    })
-
-    local tex = PlayerSelectionBtn:CreateTexture(nil, "OVERLAY")
-    tex:SetAllPoints()
-    tex:SetAtlas("socialqueuing-icon-group") -- A nice "group" icon
-
-
-    local obj = self
-    PlayerSelectionBtn:SetBackdropColor(0, 0, 0, 0.5)
-    PlayerSelectionBtn:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
-    PlayerSelectionBtn:SetScript("OnClick", function(self)
-        if not self.isActive then
-            self:SetBackdropColor(0.2, 0.9, 0.2, 0.7)
-            self.isActive = true
-        else
-            self:SetBackdropColor(0, 0, 0, 0.5) -- Back to default
-            self.isActive = false
-        end
-        obj.eventBus:Fire(EVT.PLAYER_SELECTION_MODE, self.isActive)
-    end)
-
-    PlayerSelectionBtn:SetScript("OnEnter", highlightBorder)
-    PlayerSelectionBtn:SetScript("OnLeave", restoreBorder)
-
-    return PlayerSelectionBtn
 end
 
 
