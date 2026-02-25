@@ -28,12 +28,12 @@ Stuff to do:
 
 ## medium priority
 - [ ] deploy into Wago.io
-- [ ] refactor Presenter, it is managing state, managing database, handling events and printing bars. Want it to brew coffee too? soft-serve ice cream?
+- [x] refactor Presenter, it is managing state, managing database, handling events and printing bars. Want it to brew coffee too? soft-serve ice cream?
   - [x] remove Database handling responsibility from Presenter
-  - [ ] remove Bar updating from Presenter, this is almost a View concern
-- [ ] refactor UI:
-  - [ ] ScrollFrame could move into its own module
-  - [ ] Bar creation could move
+  - [x] remove Bar updating from Presenter
+- [x] refactor UI:
+  - [x] ScrollFrame could move into its own module
+  - [x] Bar creation could move
 - [ ] ponder the orb: unit testing. Do we even have those in wow lua addon development?
 - [ ] customization: for starters, allow users to set bar height
 - [ ] in Presenter, obj.playerList is instanced, but maybe it could be class-wide OR it could consider the data without secrets
