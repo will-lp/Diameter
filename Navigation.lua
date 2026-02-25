@@ -97,44 +97,29 @@ function Diameter.Navigation:NavigateDown(data)
         -- Blizzard's own dps meter doesn't seem to have this limitation.
         -- The current "workaround" is using Player Selection Mode.
 
-        if InCombatLockdown() then
+        if issecretvalue(data.sourceGUID) then
             self.eventBus:Fire(EVT.PLAYER_SELECTION_MODE, true)
             return
         end
 
-
-        viewState.page = Pages.SPELL
-        local guid, name = data.sourceGUID, data.name
+        self:FillViewStateWithDataForSpellPage(data)
         
-        if issecretvalue(guid) then
-            viewState.secretTargetGUID = guid
-            viewState.targetGUID = UnitGUID("player")
-        else 
-            viewState.secretTargetGUID = nil
-            viewState.targetGUID = guid
-        end
-
-        if issecretvalue(data.sourceCreatureID) then
-            viewState.sourceCreatureID = nil
-        else
-            viewState.sourceCreatureID = data.sourceCreatureID
-        end
-
-        viewState.targetName = name
-        viewState.targetClass = data.color
-
     elseif self:isPlayerSelectionMode() then
-        viewState.page = Pages.SPELL
-        viewState.targetGUID = data.sourceGUID
-        viewState.sourceCreatureID = data.sourceCreatureID
-        viewState.targetName = data.name
-        viewState.targetClass = data.color
+        self:FillViewStateWithDataForSpellPage(data)
     end
 
     -- Force a UI refresh
     self.eventBus:Fire(EVT.PAGE_CHANGED, viewState)
 end
 
+function Diameter.Navigation:FillViewStateWithDataForSpellPage(data)
+    local viewState = self.viewState
+    viewState.page = Pages.SPELL
+    viewState.targetGUID = data.sourceGUID
+    viewState.sourceCreatureID = data.sourceCreatureID
+    viewState.targetName = data.name
+    viewState.targetClass = data.color
+end
 
 --[[
     NavigateUp can do two different flows depending if we are in combat:
