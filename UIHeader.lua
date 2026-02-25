@@ -56,9 +56,12 @@ function Diameter.UIHeader:CreateHeader(mainFrame)
     Header:SetHeight(Diameter.UI.step + 3)
     Header:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1,
         insets = { left = 0, right = 0, top = 0, bottom = 1 }
     })
-    Header:SetBackdropColor(0.3, 0.3, 0.3, 0.8)
+    Header:SetBackdropBorderColor(0, 0, 0, 1)
+    Header:SetBackdropColor(0.2, 0.2, 0.2, 0.8)
 
     return Header
 end
