@@ -40,6 +40,8 @@ function Diameter.Presenter:New(id)
 
     obj.uiInstance:UpdateScrollChildHeight()
     obj.uiInstance:ResetScrollPosition()
+
+    obj.secretCleanupDone = true
     
     obj.eventBus:Listen(EVT.MODE_CHANGED, function(data)
         obj.current.Mode = data
@@ -96,16 +98,18 @@ end
 
 --[[
     This is the main loop being executed by C_Timer on Diameter.lua.
-    It returns early if not in combat; before this, it used to keep
-    updating the DPS meter while out of combat and lowering your DPS.
+
+    If we are not in combat, we have to pull data one more time to 
+    clear the secrets from the data, hence the flag 'secretCleanupDone'.
 ]]
 function Diameter.Presenter:UpdateMeter()
-    local inCombat = UnitAffectingCombat("player")
-    if not inCombat then
-        return
+    if InCombatLockdown() then
+        self.secretCleanupDone = false
+        self:UpdateBars()
+    elseif self.secretCleanupDone == false then
+        self:UpdateBars()
+        self.secretCleanupDone = true
     end
-
-    self:UpdateBars()
 end
 
 

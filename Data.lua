@@ -136,6 +136,7 @@ function Diameter.Data:GetSpellMeter(viewState, mode, sessionID, sessionType)
 end
 
 
+
 function Diameter.Data:GetColor(mode, classColor)
     if mode == BDM.Mode.DamageTaken then
         return color.ShadowViolet

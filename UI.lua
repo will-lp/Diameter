@@ -248,7 +248,8 @@ function Diameter.UI:CreateBars(scrollChild)
         bar:EnableMouse(true)
         bar:SetScript("OnMouseDown", function(self, button)
             if button == "LeftButton" then
-                -- Tell the meter to navigate down into group data or details of the player
+                -- Tell the meter to navigate down into group data or breakdown of the player.
+                -- will navigate into Player Selection Mode if is in combat lockdown
                 uiInstance.navigation:NavigateDown(self.data)
             elseif button == "RightButton" then
                 -- Right click goes "Back" to the group data or modes list

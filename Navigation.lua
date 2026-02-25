@@ -18,7 +18,7 @@ local addonName, Diameter = ...
 
 local EVT = Diameter.EventBus.Events
 local Pages = Diameter.Pages
-
+local BDM = Diameter.BlizzardDamageMeter
 
 
 Diameter.Navigation = {}
@@ -37,10 +37,6 @@ function Diameter.Navigation:New(eventBus)
         secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for it now, though :-(
     }
 
-    obj.eventBus:Listen(EVT.MODE_CHANGED, function(value)
-        obj:NavigateToGroup()
-    end)
-
     obj.eventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
         if playerSelectionMode == true then 
             obj.viewState.page = Pages.PLAYER_SELECTION
@@ -51,7 +47,6 @@ function Diameter.Navigation:New(eventBus)
 
     return obj
 end
-
 
 
 function Diameter.Navigation:isSpellView()
@@ -71,6 +66,7 @@ function Diameter.Navigation:isPlayerSelectionMode()
 end
 
 function Diameter.Navigation:NavigateToGroup()
+    
     self.viewState.page = Pages.GROUP
     self.viewState.targetGUID = nil
     self.viewState.targetName = nil
@@ -78,6 +74,13 @@ function Diameter.Navigation:NavigateToGroup()
     self.eventBus:Fire(EVT.PAGE_CHANGED, self.viewState)
 end
 
+
+--[[
+    Will navigate into the pages of Diameter.
+    If we are on modes page, we go to group page.
+    If we are on group page AND in combat, we go to player selection mode
+    If we are on group page AND NOT in combat, we go to breakdown page
+]]--
 function Diameter.Navigation:NavigateDown(data)
     local viewState = self.viewState
     
@@ -86,16 +89,30 @@ function Diameter.Navigation:NavigateDown(data)
 
         -- data.mode comes from the list of BlizzardDamageMeter modes
         self.eventBus:Fire(EVT.MODE_CHANGED, data.mode)
-    elseif self:isGroupView() or self:isPlayerSelectionMode() then
+    elseif self:isGroupView() then
+
+        -- if we click another player during battle, it will throw an error because
+        -- it's a secret value. We can only look at other players' data after combat 
+        -- ends and another round of data was pulled from the API.
+        -- Blizzard's own dps meter doesn't seem to have this limitation.
+        -- The current "workaround" is using Player Selection Mode.
+
+        if InCombatLockdown() then
+            self.eventBus:Fire(EVT.PLAYER_SELECTION_MODE, true)
+            return
+        end
+
+
         viewState.page = Pages.SPELL
         local guid, name = data.sourceGUID, data.name
-
-        -- if we click another player during battle, that will throw an error because
-        -- it's a secret value. We can only look at other players' data after combat ends.
-        -- Blizzard's own dps meter doesn't seem to have this limitation.
-        -- The current "workaround" is using PlayerList -> a player selection mode.
         
-        viewState.targetGUID = issecretvalue(guid) and UnitGUID("player") or guid
+        if issecretvalue(guid) then
+            viewState.secretTargetGUID = guid
+            viewState.targetGUID = UnitGUID("player")
+        else 
+            viewState.secretTargetGUID = nil
+            viewState.targetGUID = guid
+        end
 
         if issecretvalue(data.sourceCreatureID) then
             viewState.sourceCreatureID = nil
@@ -105,20 +122,47 @@ function Diameter.Navigation:NavigateDown(data)
 
         viewState.targetName = name
         viewState.targetClass = data.color
+
+    elseif self:isPlayerSelectionMode() then
+        viewState.page = Pages.SPELL
+        viewState.targetGUID = data.sourceGUID
+        viewState.sourceCreatureID = data.sourceCreatureID
+        viewState.targetName = data.name
+        viewState.targetClass = data.color
     end
 
     -- Force a UI refresh
     self.eventBus:Fire(EVT.PAGE_CHANGED, viewState)
 end
 
+
+--[[
+    NavigateUp can do two different flows depending if we are in combat:
+    
+    From SPELL we navigate up to PLAYER_SELECTION when in combat.
+    From SPELL we navigate up to GROUP when not in combat.
+
+    From PLAYER_SELECTION we move up to GROUP.
+    From GROUP we move up to MODES.
+]]--
 function Diameter.Navigation:NavigateUp(data)
     local viewState = self.viewState
     if self:isSpellView() then
-        viewState.page = Pages.GROUP
+        
         viewState.targetGUID = nil
         viewState.targetName = nil
         viewState.targetClass = nil
-    elseif self:isGroupView() or viewState.page == Pages.PLAYER_SELECTION then
+        viewState.targetIndex = nil
+        viewState.secretTargetGUID = nil
+
+        if InCombatLockdown() then
+            viewState.page = Pages.PLAYER_SELECTION
+        else
+            viewState.page = Pages.GROUP
+        end
+    elseif self:isPlayerSelectionMode() then
+        viewState.page = Pages.GROUP
+    elseif self:isGroupView()  then
         viewState.page = Pages.MODES
     end
 

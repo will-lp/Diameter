@@ -15,13 +15,16 @@ Stuff to do:
 ## high priority
 - [x] deploying Diameter into WowInterface 
 - [x] adding a "Releases" folder on git for people who like to do it manually
+- [ ] there's still something off about the borders of header's buttons.
 - [ ] new prints for the new version, let's get over with the bottle texture for bars
-- [ ] Bar pool needs to be dynamic; I already bugged it with a tank's Damage Taken
+- [ ] Bar pool needs to be dynamic; I already bugged it with a tank's Damage Taken after a dungeon run
 - [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
   - the class color can be obtained with UnitClass and RAID_CLASS_COLOR
 - [ ] Menu.lua has a weird parameter being passed, I think it's ID and it's not being used. Ponder removal
-- [ ] when clicking to see a dps breakdown of a secret GUID, fill a bar saying Player Selection Mode should be selected
+- [x] when clicking to see a dps breakdown of a secret GUID, fill a bar saying Player Selection Mode should be selected
+  - better yet: automatic navigation into Player Selection Mode.
 - [ ] Z-index shenanigans when Diameter windows are hovering each other.
+
 
 ## medium priority
 - [ ] deploy into Wago.io
