@@ -61,11 +61,14 @@ function Diameter.UIHeader:CreateHeader(mainFrame)
     
     -- Draggable Header Bar
     local Header = CreateFrame("Frame", nil, mainFrame, "BackdropTemplate")
-    Header:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 4, -4)
-    Header:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", -4, -4)
-    Header:SetHeight(Diameter.UI.step)
-    Header:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8X8"})
-    Header:SetBackdropColor(0.2, 0.2, 0.2, 0.9)
+    Header:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 0, 0)
+    Header:SetPoint("TOPRIGHT", mainFrame, "TOPRIGHT", 0, 0)
+    Header:SetHeight(Diameter.UI.step + 3)
+    Header:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        insets = { left = 0, right = 0, top = 0, bottom = 1 }
+    })
+    Header:SetBackdropColor(0.3, 0.3, 0.3, 0.8)
 
     return Header
 end
@@ -78,11 +81,32 @@ function Diameter.UIHeader:CreateHeaderText(Header)
 end
 
 
+local highlightBorder = function(self) self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1) end
+local restoreBorder = function(self) self:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8) end
+
+
 function Diameter.UIHeader:CreateMenuButton(Header)
-    local MenuBtn = CreateFrame("Button", nil, Header)
-    MenuBtn:SetSize(16, 16)
-    MenuBtn:SetPoint("LEFT", 2, 0)
-    MenuBtn:SetNormalTexture("Interface\\Icons\\INV_Misc_Gear_01") -- Cogwheel icon
+    local MenuBtn = CreateFrame("Button", nil, Header, "BackdropTemplate")
+    MenuBtn:SetSize(18, 18)
+    MenuBtn:SetPoint("LEFT", Header, "LEFT", 2, 0)
+
+    MenuBtn:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    })
+    MenuBtn:SetBackdropColor(0, 0, 0, 0.5)
+    MenuBtn:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
+
+    local icon = MenuBtn:CreateTexture(nil, "OVERLAY")
+    icon:SetSize(14, 14) -- Slightly smaller to fit inside the border
+    icon:SetTexture("Interface\\Icons\\INV_Misc_Gear_01")
+    icon:SetPoint("CENTER", MenuBtn, "CENTER", 0, 0)
+    icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+
+    MenuBtn:SetScript("OnEnter", highlightBorder)
+    MenuBtn:SetScript("OnLeave", restoreBorder)
 
     local obj = self
     MenuBtn:SetScript("OnClick", function(self)
@@ -146,6 +170,9 @@ function Diameter.UIHeader:CreatePlayerToggle(Header)
         obj.eventBus:Fire(EVT.PLAYER_SELECTION_MODE, self.isActive)
     end)
 
+    PlayerSelectionBtn:SetScript("OnEnter", highlightBorder)
+    PlayerSelectionBtn:SetScript("OnLeave", restoreBorder)
+
     return PlayerSelectionBtn
 end
 
@@ -155,7 +182,7 @@ function Diameter.UIHeader:CreateSegmentButton(Header)
     -- 1. Create the badge button
     local segmentBtn = CreateFrame("Button", nil, Header, "BackdropTemplate")
     segmentBtn:SetSize(35, 18)
-    segmentBtn:SetPoint("RIGHT", Header, "RIGHT", -1, 0)
+    segmentBtn:SetPoint("RIGHT", Header, "RIGHT", -2, 0)
 
     segmentBtn:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
@@ -165,6 +192,9 @@ function Diameter.UIHeader:CreateSegmentButton(Header)
     })
     segmentBtn:SetBackdropColor(0, 0, 0, 0.5)
     segmentBtn:SetBackdropBorderColor(0.4, 0.4, 0.4, 0.8)
+
+    segmentBtn:SetScript("OnEnter", highlightBorder)
+    segmentBtn:SetScript("OnLeave", restoreBorder)
 
     -- 2. The Chevron (Now anchored to the LEFT of the button)
     local chevron = segmentBtn:CreateTexture(nil, "OVERLAY")

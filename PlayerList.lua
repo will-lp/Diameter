@@ -33,14 +33,18 @@ end
 ]]
 function Diameter.PlayerList:BuildPlayerData(unit)
     local _, classFileName = UnitClass(unit)
+
+    local safeClass = classFileName or "UNKNOWN"
+    local name = UnitName(unit) or "Unknown"
+
     return {
         unit = unit,
         sourceGUID = UnitGUID(unit),
         name = UnitName(unit),
-        classFileName = classFileName,
+        classFileName = safeClass,
         value = 1,
-        icon = "classicon-" .. string.lower(classFileName),
-        color = RAID_CLASS_COLORS[classFileName] or color.Gray,
+        icon = "classicon-" .. string.lower(safeClass),
+        color = Diameter.ClassColors[safeClass] or color.Gray,
     }
 end
 

@@ -74,7 +74,7 @@ function Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
             data.value = sources[i][field]
             data.icon = sources[i].specIconID
             data.name = sources[i].name
-            data.color = RAID_CLASS_COLORS[sources[i].classFilename] or color.Gray
+            data.color = Diameter.ClassColors[sources[i].classFilename] or color.Gray
             data.sourceGUID = sources[i].sourceGUID
             data.sourceCreatureID = sources[i].sourceCreatureID
             

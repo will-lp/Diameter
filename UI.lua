@@ -11,8 +11,8 @@ local EVT = Diameter.EventBus.Events
 
 Diameter.UI = {
     -- Unholy + Riders of apocalypse made 40 Bars go boom. Probably should be dynamic.
-    MaxBars = 50,
-    step = 20,
+    MaxBars = 60,
+    step = 19,
     spacing = 1
 }
 Diameter.UI.__index = Diameter.UI
@@ -65,11 +65,14 @@ function Diameter.UI:Boot()
     -- Background
     mainFrame:SetBackdrop({
         bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 4, right = 4, top = 4, bottom = 4 }
+        edgeFile = nil,
+        tile = true, 
+        tileSize = 16, 
+        edgeSize = 16,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 }
     })
-    mainFrame:SetBackdropColor(0, 0, 0, 0.8)
+    
+    mainFrame:SetBackdropColor(0, 0, 0, 0.7)
 
     -- 2. Header Bar and button
     self.Header = Diameter.UIHeader:New(mainFrame, self.id, self.eventChannel)
@@ -84,8 +87,9 @@ function Diameter.UI:Boot()
     
     -- 4. Resize Handle (Bottom Right)
     mainFrame.Resizer = CreateFrame("Button", nil, mainFrame)
-    mainFrame.Resizer:SetSize(16, 16)
-    mainFrame.Resizer:SetPoint("BOTTOMRIGHT")
+    mainFrame.Resizer:SetSize(12, 12)
+    mainFrame.Resizer:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", 0, 0) -- Inset it slightly
+    mainFrame.Resizer:SetFrameLevel(scrollFrame:GetFrameLevel() + 5) 
     mainFrame.Resizer:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
     mainFrame.Resizer:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
     
@@ -94,7 +98,7 @@ function Diameter.UI:Boot()
     
     mainFrame:SetScript("OnSizeChanged", function(self, width, height)
         -- 1. Update the ScrollFrame width
-        scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -5, 10) 
+        scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -4, 4)
         
         -- 2. Force the ScrollChild to match the new width.
         -- Will pull bars wider
@@ -104,7 +108,7 @@ function Diameter.UI:Boot()
         -- I kinda wanna ditch this one
         scrollFrame:UpdateScrollChildRect()
     end)
-    
+
     return mainFrame
 end
 
@@ -112,11 +116,14 @@ end
 function Diameter.UI:CreateScrollEngine(mainFrame)
     -- We use a template to get a standard WoW scrollbar for free
     local scrollFrame = CreateFrame("ScrollFrame", "$parentScrollFrame", mainFrame)
-    scrollFrame:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 10, -30) -- -30 to stay below header
-    scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -5, 10) -- -25 to leave room for the bar
+    --Diameter.Debug:Frame(scrollFrame)
+    scrollFrame:SetPoint("TOPLEFT", mainFrame, "TOPLEFT", 3, -24) -- to stay below header
+    scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -4, 0)
 
     -- This is the 'Long Paper' that holds the bars
     local scrollChild = CreateFrame("Frame", "$parentScrollChild", scrollFrame, "BackdropTemplate")
+
+    
 
     -- Anchor the child flush to the scroll frame so there are no secret insets
     scrollChild:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
@@ -251,8 +258,8 @@ function Diameter.UI:CreateBars(scrollChild)
 
         -- Create the Icon Texture
         bar.icon = bar:CreateTexture(nil, "OVERLAY")
-        bar.icon:SetSize(18, 18) -- Slightly smaller than the bar height
-        bar.icon:SetPoint("LEFT", bar, "LEFT", 2, 0)
+        bar.icon:SetSize(self.step-2, self.step-2) -- Slightly smaller than the bar height
+        bar.icon:SetPoint("LEFT", bar, "LEFT", 1, 0)
 
         -- This crops the outer 7% of the icon to remove the built-in border
         bar.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
@@ -267,7 +274,18 @@ function Diameter.UI:CreateBars(scrollChild)
             bar:SetPoint("TOPRIGHT", bars[i-1], "BOTTOMRIGHT", 0, -self.spacing)
         end
         
-        bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+        bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+
+        -- this is the starting point, the "bottle with a top light". I don't love it
+        -- Diameter.UI:AddStatusBarGlow(bar)
+
+        -- this adds a very sweet gradient
+        Diameter.UI:AddVerticalGradient(bar)
+
+        -- this adds a white line at the right edge. I don't hate it.
+        Diameter.UI:AddSparkLine(bar)
+
+
         bar:SetStatusBarColor(0.8, 0.2, 0.2)
         
         bar.nameText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -287,4 +305,37 @@ function Diameter.UI:CreateBars(scrollChild)
     scrollChild:SetHeight(Diameter.UI.MaxBars * self.step + math.max(0, Diameter.UI.MaxBars - 1) * self.spacing)
 
     return bars
+end
+
+
+function Diameter.UI:AddVerticalGradient(bar)
+    local barTexture = bar:GetStatusBarTexture()
+
+    bar.overlay = bar:CreateTexture(nil, "ARTWORK")
+    -- Anchor the gradient specifically to the moving colored bar
+    bar.overlay:SetPoint("TOPLEFT", barTexture, "TOPLEFT")
+    bar.overlay:SetPoint("BOTTOMRIGHT", barTexture, "BOTTOMRIGHT")
+
+    bar.overlay:SetTexture("Interface\\Buttons\\WHITE8X8")
+    -- This makes the gradient only exist where the color is!
+    bar.overlay:SetGradient("VERTICAL", CreateColor(1, 1, 1, 0.15), CreateColor(0, 0, 0, 0.15))
+end
+
+
+function Diameter.UI:AddSparkLine(bar)
+    -- Create the Leading Edge (The "Spark")
+    bar.spark = bar:CreateTexture(nil, "OVERLAY")
+    bar.spark:SetWidth(1) -- The 1-pixel magic
+    bar.spark:SetTexture("Interface\\Buttons\\WHITE8X8")
+    bar.spark:SetVertexColor(1, 1, 1, 0.5) -- Semi-transparent white
+
+    -- Anchor it to the leading edge of the bar
+    bar.spark:SetPoint("TOP", barTexture, "TOPRIGHT", 0, 0)
+    bar.spark:SetPoint("BOTTOM", barTexture, "BOTTOMRIGHT", 0, 0)
+
+end
+
+
+function Diameter.UI:AddStatusBarGlow(bar)
+    bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar-Glow")
 end

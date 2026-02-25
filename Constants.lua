@@ -40,6 +40,8 @@ Diameter.Pages = {
 }
 
 
+local muteColor = 0.6
+
 --[[
     A pool of colors so we don't keep creating colors on every loop iteration.
 ]]
@@ -51,3 +53,21 @@ Diameter.Color = {
     LightSteelBlue = {r=0.65, g=0.85, b=0.85},
     SteelBlue = {r=0.5, g=0.7, b=0.7},
 }
+
+-- here we apply the muteColor to dim the colors a bit
+for colorName, color in pairs(Diameter.Color) do
+    for key, value in pairs(color) do
+        color[key] = value * muteColor
+    end
+end
+
+
+Diameter.ClassColors = {}
+
+for class, color in pairs(RAID_CLASS_COLORS) do
+    Diameter.ClassColors[class] = {
+        r = color.r * muteColor,
+        g = color.g * muteColor,
+        b = color.b * muteColor
+    }
+end

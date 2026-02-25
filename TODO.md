@@ -14,7 +14,9 @@ Stuff to do:
 
 ## high priority
 - [x] deploying Diameter into WowInterface 
-- [ ] adding a "Releases" folder on git for people who like to do it manually
+- [x] adding a "Releases" folder on git for people who like to do it manually
+- [ ] new prints for the new version, let's get over with the bottle texture for bars
+- [ ] Bar pool needs to be dynamic; I already bugged it with a tank's Damage Taken
 - [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
   - the class color can be obtained with UnitClass and RAID_CLASS_COLOR
 - [ ] Menu.lua has a weird parameter being passed, I think it's ID and it's not being used. Ponder removal
@@ -26,7 +28,9 @@ Stuff to do:
 - [ ] refactor Presenter, it is managing state, managing database, handling events and printing bars. Want it to brew coffee too? soft-serve ice cream?
   - [x] remove Database handling responsibility from Presenter
   - [ ] remove Bar updating from Presenter, this is almost a View concern
-- [ ] refactor UI, I think ScrollFrame could move into its own module
+- [ ] refactor UI:
+  - [ ] ScrollFrame could move into its own module
+  - [ ] Bar creation could move
 - [ ] ponder the orb: unit testing. Do we even have those in wow lua addon development?
 - [ ] customization: for starters, allow users to set bar height
 - [ ] in Presenter, obj.playerList is instanced, but maybe it could be class-wide OR it could consider the data without secrets
@@ -37,10 +41,11 @@ Stuff to do:
 
 ## low priority
 - [ ] a few tooltips would be nice
-- [ ] paint bars different color per mode; we healing? maybe green bars. absorbs? cyan. damage taken? red/yellow.
+- [x] paint bars different color per mode; we healing? maybe green bars. absorbs? cyan. damage taken? red/yellow.
 - [ ] EventBus has now Diameter.EventBus for global and Diameter.EventBusClass to create instances. I don't like it :-(
 - [ ] change all the "Diameter.Module" into only "Module."
-- [ ] UI improvements: it is a bit ugly now, specially the bar colors
+- [x] UI improvements: it is a bit ugly now, specially the bar colors
+  - the gradient is cute! it's not perfect, but hey! At some point we could look at some presets, maybe
 
 ## unprioritized
 - [ ] i18n; if English was good enough for Jesus then it's good enough for me, too
