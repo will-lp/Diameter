@@ -4,6 +4,12 @@ local _, Diameter = ...
 Diameter.UI = Diameter.UI or {}
 
 
+-- TODO: use a bar pool instead of creating a bunch bars already.
+--Diameter.UI.BarPool = CreateFramePool("Frame", Diameter.UI.ScrollChild, "BackdropTemplate", function(pool, frame)
+    --Diameter.UI:InitializeBar(frame) 
+--end)
+
+
 function Diameter.UI:CreateBars(scrollChild)
     local bars = {}
     
