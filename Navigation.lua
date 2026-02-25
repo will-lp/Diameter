@@ -76,10 +76,12 @@ end
 
 
 --[[
-    Will navigate into the pages of Diameter.
-    If we are on modes page, we go to group page.
-    If we are on group page AND in combat, we go to player selection mode
-    If we are on group page AND NOT in combat, we go to breakdown page
+    Navigate into the pages of Diameter.
+
+    From MODES we go to GROUP.
+    From GROUP, if there are secret values, we go to PLAYER_SELECTION
+    From GROUP, if there are no secret values, we go to SPELL
+    From PLAYER_SELECTION we go to SPELL.
 ]]--
 function Diameter.Navigation:NavigateDown(data)
     local viewState = self.viewState
@@ -103,7 +105,7 @@ function Diameter.Navigation:NavigateDown(data)
         end
 
         self:FillViewStateWithDataForSpellPage(data)
-        
+
     elseif self:isPlayerSelectionMode() then
         self:FillViewStateWithDataForSpellPage(data)
     end
@@ -122,29 +124,21 @@ function Diameter.Navigation:FillViewStateWithDataForSpellPage(data)
 end
 
 --[[
-    NavigateUp can do two different flows depending if we are in combat:
+    NavigateUp flow:
     
-    From SPELL we navigate up to PLAYER_SELECTION when in combat.
-    From SPELL we navigate up to GROUP when not in combat.
-
+    From SPELL we navigate up to GROUP.
     From PLAYER_SELECTION we move up to GROUP.
     From GROUP we move up to MODES.
 ]]--
 function Diameter.Navigation:NavigateUp(data)
     local viewState = self.viewState
     if self:isSpellView() then
-        
+        viewState.page = Pages.GROUP
         viewState.targetGUID = nil
         viewState.targetName = nil
         viewState.targetClass = nil
         viewState.targetIndex = nil
         viewState.secretTargetGUID = nil
-
-        if InCombatLockdown() then
-            viewState.page = Pages.PLAYER_SELECTION
-        else
-            viewState.page = Pages.GROUP
-        end
     elseif self:isPlayerSelectionMode() then
         viewState.page = Pages.GROUP
     elseif self:isGroupView()  then
