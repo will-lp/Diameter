@@ -45,6 +45,7 @@ Stuff to do:
 - [ ] spell tooltip
 - [ ] group data has two values that should be shown, like blizz addon meter does: totalAmount and amountPerSecond.
 - [ ] dialog positioning sometimes reset. We might have to persist those in the DB
+- [ ] there's a bug with the gradients. Sometimes, some bars don't get the gradient or it is stuck at width 0
 
 ## low priority
 - [ ] a few tooltips would be nice
