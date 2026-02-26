@@ -92,7 +92,6 @@ function Diameter.BarPool:Acquire(uiInstance)
 end
 
 
-
 function Diameter.BarPool:AddVerticalGradient(bar)
     if not bar.overlay then
         local barTexture = bar:GetStatusBarTexture()
@@ -105,6 +104,15 @@ function Diameter.BarPool:AddVerticalGradient(bar)
         bar.overlay:SetTexture("Interface\\Buttons\\WHITE8X8")
         bar.overlay:SetGradient("VERTICAL", CreateColor(1, 1, 1, 0.15), CreateColor(0, 0, 0, 0.15))
     end
+end
+
+
+function Diameter.BarPool:SetGradientPoints(bar)
+    local barTexture = bar:GetStatusBarTexture()
+    bar.overlay:ClearAllPoints() -- wipe the "broken" state
+    bar.overlay:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
+    bar.overlay:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, 0)
+    bar.overlay:SetPoint("RIGHT", barTexture, "RIGHT", 0, 0)
 end
 
 
