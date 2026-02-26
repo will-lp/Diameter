@@ -5,11 +5,20 @@ Diameter.BarPool = {}
 
 
 -- use a bar pool instead of creating a bunch of bars.
-Diameter.BarPool.pool = CreateFramePool("StatusBar", nil, "BackdropTemplate", function(pool, bar)
-    Diameter.BarPool:InitializeBar(bar)
-end)
+Diameter.BarPool.pool = CreateFramePool(
+    "StatusBar", 
+    nil, 
+    "BackdropTemplate", 
+    function(pool, bar) Diameter.BarPool:InitializeBar(bar) end
+)
 
 
+--[[
+    Initialize a fresh bar harvested from the pool.
+
+    If any weird behaviours comes up, this can debug the source of calls:
+    print ("InitializeBar", bar, debugstack(1, 10, 10))
+]]--
 function Diameter.BarPool:InitializeBar(bar)
     local step = Diameter.UI.step
 
@@ -39,13 +48,12 @@ function Diameter.BarPool:InitializeBar(bar)
     bar.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 
     bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-    Diameter.BarPool:AddVerticalGradient(bar)
-
-    -- this adds a white line at the right edge. I don't hate it.
-    Diameter.BarPool:AddSparkLine(bar)
 
     bar:SetStatusBarColor(0.8, 0.2, 0.2)
-    
+
+    self:AddVerticalGradient(bar)
+    self:AddSparkLine(bar)
+
     bar.nameText = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     -- Adjust the Name Text so it doesn't overlap the icon
     bar.nameText:ClearAllPoints()
@@ -56,67 +64,33 @@ function Diameter.BarPool:InitializeBar(bar)
 end
 
 
+function Diameter.BarPool:ReleaseBar(bar)
+    bar.nameText:SetText(nil)
+    bar.valueText:SetText(nil)
+    bar.icon:SetTexture(nil)
+    bar:Hide()
+    bar:ClearAllPoints()
+    bar:SetParent(nil)
+    bar.data = nil
+    bar.uiInstance = nil
+end
+
+
 --[[
     Clears every bar of their content and puts them back in the pool.
 ]]--
 function Diameter.BarPool:ReleaseAll(bars)
     for _, bar in pairs(bars) do
-        bar.nameText:SetText(nil)
-        bar.valueText:SetText(nil)
-        bar.icon:SetTexture(nil)
-        bar:Hide()
-        bar:ClearAllPoints()
-        bar:SetParent(nil)
-        bar.data = nil
-        bar.uiInstance = nil
+        self:ReleaseBar(bar)
         self.pool:Release(bar)
     end
 end
 
 
---[[
-    Acquires a bunch of bars from the pool. One per table in the dataArray.
-    The uiInstance is required to grab some stuff:
-     - mainFrame
-     - mainFrame.ScrollChild
-     - setting up the uiInstance field for the mouseDown event
-
-     @returns a table with the bars created
-]]--
-function Diameter.BarPool:AcquireAll(uiInstance, dataArray)
-
-    local spacing = Diameter.UI.spacing
-    local bars = {}
-
-    local scrollChild = uiInstance.mainFrame.ScrollChild
-    
-    for i, _ in ipairs(dataArray) do
-
-        local bar = self.pool:Acquire()
-
-        -- not sure this is needed as it happens on ReleaseAll already.
-        bar:ClearAllPoints()
-
-        bar.uiInstance = uiInstance
-        bar:SetParent(scrollChild)
-
-        -- Stack them vertically
-        if i == 1 then
-            -- Note: Using TOPLEFT/TOPRIGHT ensures the bar stretches to the width of the scrollChild
-            bar:SetPoint("TOPLEFT", scrollChild, "TOPLEFT", 0, 0)
-            bar:SetPoint("TOPRIGHT", scrollChild, "TOPRIGHT", 0, 0)
-        else
-            bar:SetPoint("TOPLEFT", bars[i-1], "BOTTOMLEFT", 0, -spacing)
-            bar:SetPoint("TOPRIGHT", bars[i-1], "BOTTOMRIGHT", 0, -spacing)
-        end
-        
-        bar:SetStatusBarColor(0.8, 0.2, 0.2)
-        
-        table.insert(bars, bar)
-    end
-
-    return bars
+function Diameter.BarPool:Acquire(uiInstance)
+    return self.pool:Acquire()
 end
+
 
 
 function Diameter.BarPool:AddVerticalGradient(bar)
@@ -124,12 +98,11 @@ function Diameter.BarPool:AddVerticalGradient(bar)
         local barTexture = bar:GetStatusBarTexture()
 
         bar.overlay = bar:CreateTexture(nil, "ARTWORK")
-        -- Anchor the gradient specifically to the moving colored bar
-        bar.overlay:SetPoint("TOPLEFT", barTexture, "TOPLEFT")
-        bar.overlay:SetPoint("BOTTOMRIGHT", barTexture, "BOTTOMRIGHT")
+        bar.overlay:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
+        bar.overlay:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, 0)
+        bar.overlay:SetPoint("RIGHT", barTexture, "RIGHT", 0, 0)
 
         bar.overlay:SetTexture("Interface\\Buttons\\WHITE8X8")
-        -- This makes the gradient only exist where the color is!
         bar.overlay:SetGradient("VERTICAL", CreateColor(1, 1, 1, 0.15), CreateColor(0, 0, 0, 0.15))
     end
 end
@@ -138,7 +111,7 @@ end
 function Diameter.BarPool:AddSparkLine(bar)
     if not bar.spark then
         local barTexture = bar:GetStatusBarTexture()
-        -- Create the Leading Edge (The "Spark")
+        -- Create the Leading Edge ("Spark")
         bar.spark = bar:CreateTexture(nil, "OVERLAY")
         bar.spark:SetWidth(1) -- The 1-pixel magic
         bar.spark:SetTexture("Interface\\Buttons\\WHITE8X8")

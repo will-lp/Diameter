@@ -113,8 +113,7 @@ end
 
 
 function Diameter.Presenter:TearDown() 
-    self.uiInstance.mainFrame:Hide() -- Make it invisible
-    self.uiInstance.mainFrame:UnregisterAllEvents()
+    self.uiInstance:TearDown()
     Diameter.EventBus:Unregister(self)
     Diameter.Database:Remove(self.id)
 end

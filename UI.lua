@@ -39,7 +39,6 @@ function Diameter.UI:New(id, eventBus)
         if obj.currentScrollPos > maxHeight then obj.currentScrollPos = maxHeight end
 
         scrollFrame:SetVerticalScroll(obj.currentScrollPos)
-
     end)
 
     return obj
@@ -134,3 +133,8 @@ function Diameter.UI:CalculateMaxHeight(frame)
 end
 
 
+function Diameter.UI:TearDown()
+    self.mainFrame:Hide() -- Make it invisible
+    self.mainFrame:UnregisterAllEvents()
+    self:ReleaseBars()
+end
