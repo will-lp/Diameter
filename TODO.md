@@ -15,7 +15,8 @@ Stuff to do:
 ## high priority
 - [x] deploying Diameter into WowInterface 
 - [x] adding a "Releases" folder on git for people who like to do it manually
-- [ ] there's still something off about the borders of header's buttons.
+- [x] there's still something off about the borders of header's buttons.
+  - replaced with some neat glow-ups
 - [x] new prints for the new version, let's get over with the bottle texture for bars
 - [x] Bar pool needs to be dynamic; I already bugged it with a tank's Damage Taken after a dungeon run
 - [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
