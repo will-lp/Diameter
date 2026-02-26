@@ -74,11 +74,21 @@ function Diameter.UIHeader:CreateHeaderText(Header)
 end
 
 
+local HeaderIconColor = {
+    GLOW = CreateColor(0.6, 0.6, 1, 0.8),
+    ACTIVE = CreateColor(1, 1, 1, 1),
+    DIM = CreateColor(1, 1, 1, 0.8),
+    BLUE_ACTIVE = CreateColor(0.5, 0.5, 0.8, 0.2),
+    DARK_BG = CreateColor(0, 0, 0, 0.5),
+    DARK_BORDER = CreateColor(0, 0, 0, 0.7)
+}
+
+
 function Diameter.UIHeader:ApplyHighlight(component)
     component:SetHighlightTexture("Interface\\Buttons\\WHITE8X8")
     
     local highlight = component:GetHighlightTexture()
-    highlight:SetVertexColor(0.5, 0.5, 0.8, 0.2)
+    highlight:SetVertexColor(HeaderIconColor.BLUE_ACTIVE:GetRGBA())
     highlight:SetPoint("TOPLEFT", component, "TOPLEFT", 1, -1)
     highlight:SetPoint("BOTTOMRIGHT", component, "BOTTOMRIGHT", -1, 1)
 end
@@ -97,8 +107,8 @@ function Diameter.UIHeader:CreateMenuButton(Header)
         edgeSize = pixel,
         insets = { left = pixel, right = pixel, top = pixel, bottom = pixel }
     })
-    menuBtn:SetBackdropColor(0, 0, 0, 0.5)
-    menuBtn:SetBackdropBorderColor(0, 0, 0, 0.7)
+    menuBtn:SetBackdropColor(HeaderIconColor.DARK_BG:GetRGBA())
+    menuBtn:SetBackdropBorderColor(HeaderIconColor.DARK_BORDER:GetRGBA())
 
     self:ApplyHighlight(menuBtn)
 
@@ -129,8 +139,8 @@ function Diameter.UIHeader:CreateSegmentButton(Header)
         edgeSize = 1,
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
-    segmentBtn:SetBackdropColor(0, 0, 0, 0.5)
-    segmentBtn:SetBackdropBorderColor(0, 0, 0, 0.7)
+    segmentBtn:SetBackdropColor(HeaderIconColor.DARK_BG:GetRGBA())
+    segmentBtn:SetBackdropBorderColor(HeaderIconColor.DARK_BORDER:GetRGBA())
 
     local chevron = self:CreateChevron(segmentBtn)
 
@@ -154,14 +164,12 @@ end
 
 function Diameter.UIHeader:CreateChevron(segmentBtn)
 
-    local GLOW_COLOR = CreateColor(0.6, 0.6, 1, 0.8)
-    local ACTIVE_COLOR = CreateColor(1, 1, 1, 1)
-    local DIM_COLOR = CreateColor(1, 1, 1, 0.8)
+    
 
     local chevronGlow = segmentBtn:CreateTexture(nil, "ARTWORK")
     chevronGlow:SetSize(16, 16) -- 4px larger than the actual chevron
     chevronGlow:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
-    chevronGlow:SetVertexColor(GLOW_COLOR:GetRGBA())
+    chevronGlow:SetVertexColor(HeaderIconColor.GLOW:GetRGBA())
     chevronGlow:SetBlendMode("ADD")
     chevronGlow:Hide() -- Hide it by default
 
@@ -169,17 +177,17 @@ function Diameter.UIHeader:CreateChevron(segmentBtn)
     chevron:SetSize(12, 12)
     chevron:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
     chevron:SetPoint("LEFT", segmentBtn, "LEFT", 3, 0) -- 4px padding from left edge
-    chevron:SetVertexColor(DIM_COLOR:GetRGBA())
+    chevron:SetVertexColor(HeaderIconColor.DIM:GetRGBA())
     chevronGlow:SetPoint("CENTER", chevron, "CENTER", 0, 0)
 
     segmentBtn:SetScript("OnEnter", function(self)
         chevronGlow:Show()
-        chevron:SetVertexColor(ACTIVE_COLOR:GetRGBA()) 
+        chevron:SetVertexColor(HeaderIconColor.ACTIVE:GetRGBA()) 
     end)
 
     segmentBtn:SetScript("OnLeave", function(self)
         chevronGlow:Hide()
-        chevron:SetVertexColor(DIM_COLOR:GetRGBA())
+        chevron:SetVertexColor(HeaderIconColor.DIM:GetRGBA())
     end)
     return chevron
 end
