@@ -16,11 +16,12 @@ Stuff to do:
 - [x] deploying Diameter into WowInterface 
 - [x] adding a "Releases" folder on git for people who like to do it manually
 - [ ] there's still something off about the borders of header's buttons.
-- [ ] new prints for the new version, let's get over with the bottle texture for bars
-- [ ] Bar pool needs to be dynamic; I already bugged it with a tank's Damage Taken after a dungeon run
+- [x] new prints for the new version, let's get over with the bottle texture for bars
+- [x] Bar pool needs to be dynamic; I already bugged it with a tank's Damage Taken after a dungeon run
 - [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
   - the class color can be obtained with UnitClass and RAID_CLASS_COLOR
-- [ ] Menu.lua has a weird parameter being passed, I think it's ID and it's not being used. Ponder removal
+- [x] Menu.lua has a weird parameter being passed, I think it's ID and it's not being used. Ponder removal
+  - it is needed.
 - [x] when clicking to see a dps breakdown of a secret GUID, fill a bar saying Player Selection Mode should be selected
   - better yet: automatic navigation into Player Selection Mode.
 - [ ] Z-index shenanigans when Diameter windows are hovering each other.
@@ -42,6 +43,7 @@ Stuff to do:
 - [ ] Diameter.lua is starting to do a lot of window management that could move into its own module
 - [ ] spell tooltip
 - [ ] group data has two values that should be shown, like blizz addon meter does: totalAmount and amountPerSecond.
+- [ ] dialog positioning sometimes reset. We might have to persist those in the DB
 
 ## low priority
 - [ ] a few tooltips would be nice

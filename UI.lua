@@ -86,15 +86,7 @@ function Diameter.UI:Boot()
     mainFrame:SetScript("OnMouseUp", mainFrame.StopMovingOrSizing)
     
     -- 4. Resize Handle (Bottom Right)
-    mainFrame.Resizer = CreateFrame("Button", nil, mainFrame)
-    mainFrame.Resizer:SetSize(12, 12)
-    mainFrame.Resizer:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", 0, 0) -- Inset it slightly
-    mainFrame.Resizer:SetFrameLevel(scrollFrame:GetFrameLevel() + 5) 
-    mainFrame.Resizer:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-    mainFrame.Resizer:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
-    
-    mainFrame.Resizer:SetScript("OnMouseDown", function() mainFrame:StartSizing("BOTTOMRIGHT") end)
-    mainFrame.Resizer:SetScript("OnMouseUp", function() mainFrame:StopMovingOrSizing() end)
+    mainFrame.Resizer = self:CreateResizer(mainFrame, scrollFrame)
     
     mainFrame:SetScript("OnSizeChanged", function(self, width, height)
         -- 1. Update the ScrollFrame width
@@ -110,6 +102,26 @@ function Diameter.UI:Boot()
     end)
 
     return mainFrame
+end
+
+
+function Diameter.UI:CreateResizer(mainFrame, scrollFrame)
+    local resizer = CreateFrame("Button", nil, mainFrame)
+    resizer:SetSize(12, 12)
+    resizer:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", 0, 0) -- Inset it slightly
+    resizer:SetFrameLevel(scrollFrame:GetFrameLevel() + 5) 
+    self:ApplyHighlightTexture(resizer)
+    
+    resizer:SetScript("OnMouseDown", function() mainFrame:StartSizing("BOTTOMRIGHT") end)
+    resizer:SetScript("OnMouseUp", function() mainFrame:StopMovingOrSizing() end)
+
+    return resizer
+end
+
+
+function Diameter.UI:ApplyHighlightTexture(component)
+    component:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+    component:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
 end
 
 
