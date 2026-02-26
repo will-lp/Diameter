@@ -19,6 +19,7 @@ Util.lua
 Data.lua
 PlayerList.lua
 Database.lua
+BarPool.lua
 
 Navigation.lua
 UI.lua

@@ -12,12 +12,7 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
     scrollFrame:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", -4, 0)
 
     -- This is the 'Long Paper' that holds the bars
-    local scrollChild = CreateFrame("Frame", "$parentScrollChild", scrollFrame, "BackdropTemplate")
-
-    -- Anchor the child flush to the scroll frame so there are no secret insets
-    scrollChild:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
-    scrollChild:SetPoint("TOPRIGHT", scrollFrame, "TOPRIGHT", 0, 0)
-    scrollChild:SetSize(scrollFrame:GetWidth() or 170, 1) -- updated dynamically by UpdateScrollChildHeight()
+    local scrollChild = self:CreateScrollChild(scrollFrame)
     scrollFrame:SetScrollChild(scrollChild)
 
     local uiInstance = self
@@ -50,9 +45,6 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
     -- 4. Mouse Wheel Support
     scrollFrame:EnableMouseWheel(true)
 
-    -- 5. Data Bars
-    scrollChild.Bars = self:CreateBars(scrollChild)
-
     -- So we can go back up the navigation stack clicking anywhere in the scroll area
     scrollFrame:SetScript("OnMouseDown", function(frame, button)
         if button == "RightButton" then
@@ -60,9 +52,23 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
         end
     end)
 
+    return scrollFrame, scrollChild
+end
+
+
+function Diameter.UI:CreateScrollChild(scrollFrame)
+
+    local scrollChild = CreateFrame("Frame", "$parentScrollChild", scrollFrame, "BackdropTemplate")
+
+    -- Anchor the child flush to the scroll frame so there are no secret insets
+    scrollChild:SetPoint("TOPLEFT", scrollFrame, "TOPLEFT", 0, 0)
+    scrollChild:SetPoint("TOPRIGHT", scrollFrame, "TOPRIGHT", 0, 0)
+    scrollChild:SetSize(scrollFrame:GetWidth() or 170, 1) -- updated dynamically by UpdateScrollChildHeight()
     scrollChild:SetBackdropColor(0, 0, 0, 0)
 
-    return scrollFrame, scrollChild
+    scrollChild.Bars = {}
+
+    return scrollChild
 end
 
 
@@ -74,7 +80,6 @@ function Diameter.UI:ResetScrollPosition()
         self.mainFrame.ScrollFrame:SetVerticalScroll(0)
     end
 end
-
 
 
 --[[

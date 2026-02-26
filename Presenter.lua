@@ -148,30 +148,23 @@ function Diameter.Presenter:PrintPlayerSelection()
 end
 
 
-function Diameter.Presenter:PrintEmptyBars()
-    local frame = self.mainFrame
-    for i = 1, Diameter.UI.MaxBars do
-        local bar = frame.ScrollChild.Bars[i]
-        self.uiInstance:UpdateBar(bar, nil, nil)
-    end
-end
-
-
 function Diameter.Presenter:PrintModesMenu()
-    local frame = self.mainFrame
-    for index, mode in ipairs(Diameter.Menu.MenuOrder) do
+    local modes = { topValue = "1" }
+
+    for _, mode in ipairs(Diameter.Menu.MenuOrder) do
         local label = Diameter.Menu.Labels[mode]
         local data = {
             name = label,
             mode = mode, -- this will be used by Navigation to set the mode
-            value = 1, -- this is used to draw a bar according to the top value
+            value = 1, -- used to draw a bar according to the top value, but it's actually a visual bug.
             icon = nil,
             color = color.Blue,
             sourceGUID = nil,
         }
-        local bar = frame.ScrollChild.Bars[index]
-        self.uiInstance:UpdateBar(bar, data, 1)
+        table.insert(modes, data)
     end
+
+    self:UpdateBarsFromDataArray(modes)
 
     self.eventBus:Fire(EVT.PAGE_DATA_LOADED, Diameter.Menu.MenuOrder)
 end
@@ -201,25 +194,7 @@ end
 
 
 function Diameter.Presenter:UpdateBarsFromDataArray(dataArray)
-
-    local frame = self.mainFrame
-
-    -- fill the bars with data
-    for i, _ in ipairs(dataArray) do
-        local data = dataArray[i]
-        local bar = frame.ScrollChild.Bars[i]
-        self.uiInstance:UpdateBar(bar, data, dataArray.topValue)
-    end
-
-
-    self.eventBus:Fire(EVT.PAGE_DATA_LOADED, dataArray)
-    
-
-    -- To hide the bars we don't have data for
-    for i = #dataArray + 1, Diameter.UI.MaxBars do
-        local bar = frame.ScrollChild.Bars[i]
-        self.uiInstance:UpdateBar(bar, nil, nil)
-    end
+    self.uiInstance:UpdateBars(dataArray)
 end
 
 

@@ -18,21 +18,21 @@ Diameter.UI = {
 Diameter.UI.__index = Diameter.UI
 
 
-function Diameter.UI:New(id, eventChannel)
+function Diameter.UI:New(id, eventBus)
     local obj = setmetatable({}, self)
 
     obj.id = id
     obj.filledBars = 0
     obj.currentScrollPos = 0
-    obj.eventChannel = eventChannel
-    obj.navigation = Diameter.Navigation:New(eventChannel)
+    obj.eventBus = eventBus
+    obj.navigation = Diameter.Navigation:New(eventBus)
     obj.mainFrame = obj:Boot()
 
     --[[
         Here we listen for changes in the page content and set the vertical
         scroll accordingly. 
     ]]
-    obj.eventChannel:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
+    obj.eventBus:Listen(EVT.PAGE_DATA_LOADED, function(dataArray)
         obj.filledBars = #dataArray
         local scrollFrame = obj.mainFrame.ScrollFrame
         local maxHeight = obj:CalculateMaxHeight(scrollFrame)
@@ -75,7 +75,7 @@ function Diameter.UI:Boot()
     mainFrame:SetBackdropColor(0, 0, 0, 0.7)
 
     -- 2. Header Bar and button
-    self.Header = Diameter.UIHeader:New(mainFrame, self.id, self.eventChannel)
+    self.Header = Diameter.UIHeader:New(mainFrame, self.id, self.eventBus)
 
     local scrollFrame, scrollChild = self:CreateScrollEngine(mainFrame)
 
