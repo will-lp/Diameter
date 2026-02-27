@@ -1,4 +1,4 @@
-local addonName, Diameter = ...
+local _, Diameter = ...
 
 --[[
     This module provides the building of the User Interface for Diameter.
@@ -9,16 +9,17 @@ local addonName, Diameter = ...
 
 local EVT = Diameter.EventBus.Events
 
-Diameter.UI = {
+local UI = {
     -- Unholy + Riders of apocalypse made 40 Bars go boom. Probably should be dynamic.
     MaxBars = 60,
     step = 19,
     spacing = 1
 }
-Diameter.UI.__index = Diameter.UI
+
+UI.__index = UI
 
 
-function Diameter.UI:New(id, eventBus)
+function UI:New(id, eventBus)
     local obj = setmetatable({}, self)
 
     obj.id = id
@@ -50,7 +51,7 @@ end
 
     @returns mainFrame
 ]]
-function Diameter.UI:Boot()
+function UI:Boot()
     -- 1. Main Frame
     local mainFrame = CreateFrame("Frame", "DiameterMainFrame" .. self.id, UIParent, "BackdropTemplate")
     mainFrame:SetSize(280, 180)
@@ -104,7 +105,7 @@ function Diameter.UI:Boot()
 end
 
 
-function Diameter.UI:CreateResizer(mainFrame, scrollFrame)
+function UI:CreateResizer(mainFrame, scrollFrame)
     local resizer = CreateFrame("Button", nil, mainFrame)
     resizer:SetSize(12, 12)
     resizer:SetPoint("BOTTOMRIGHT", mainFrame, "BOTTOMRIGHT", 0, 0) -- Inset it slightly
@@ -118,13 +119,13 @@ function Diameter.UI:CreateResizer(mainFrame, scrollFrame)
 end
 
 
-function Diameter.UI:ApplyHighlightTexture(component)
+function UI:ApplyHighlightTexture(component)
     component:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
     component:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
 end
 
 
-function Diameter.UI:CalculateMaxHeight(frame) 
+function UI:CalculateMaxHeight(frame) 
     local contentHeight = self.filledBars * (self.step + self.spacing)
     local windowHeight = frame:GetHeight()
     local manualMax = math.max(0, contentHeight - windowHeight)
@@ -133,8 +134,11 @@ function Diameter.UI:CalculateMaxHeight(frame)
 end
 
 
-function Diameter.UI:TearDown()
+function UI:TearDown()
     self.mainFrame:Hide() -- Make it invisible
     self.mainFrame:UnregisterAllEvents()
     self:ReleaseBars()
 end
+
+
+Diameter.UI = UI

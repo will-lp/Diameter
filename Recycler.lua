@@ -7,22 +7,21 @@ local _, Diameter = ...
     be used elsewhere, though.
 ]]
 
-Diameter.Recycler = {}
-local pool = {}
+local Recycler = { pool = {} }
 
 --[[
     Pull from pool or create new
 ]]
-function Diameter.Recycler:Acquire()
+function Recycler:Acquire()
     
-    return table.remove(pool) or {}
+    return table.remove(self.pool) or {}
 end
 
 --[[
     Clear the tables/arrays that hold normalized data coming
     from C_DamageMeter, but not the array itself.
 ]]
-function Diameter.Recycler:ClearArray(targetArray)
+function Recycler:ClearArray(targetArray)
     for i = #targetArray, 1, -1 do
         local child = table.remove(targetArray, i)
         -- 2. Put the CHILD into the pool
@@ -33,9 +32,12 @@ end
 --[[
     After use, returns the table to the pool.
 ]]
-function Diameter.Recycler:Release(tbl)
+function Recycler:Release(tbl)
     if not tbl then return end
     wipe(tbl)
-    table.insert(pool, tbl)
+    table.insert(self.pool, tbl)
 
 end
+
+
+Diameter.Recycler = Recycler

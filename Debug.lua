@@ -1,9 +1,9 @@
 
-local addonName, Diameter = ...
+local _, Diameter = ...
 
-Diameter.Debug = {}
+local Debug = {}
 
-function Diameter.Debug:dump(val, indent)
+function Debug:dump(val, indent)
     indent = indent or 0
     local spaces = string.rep("  ", indent)
 
@@ -38,7 +38,7 @@ function Diameter.Debug:dump(val, indent)
     end
 end
 
-function Diameter.Debug:Frame(frame, color)
+function Debug:Frame(frame, color)
     
     local r, g, b = unpack(color or {1, 0, 0}) -- Default Red
     
@@ -55,3 +55,6 @@ function Diameter.Debug:Frame(frame, color)
     })
     border:SetBackdropBorderColor(r, g, b, 1)
 end
+
+
+Diameter.Debug = Debug

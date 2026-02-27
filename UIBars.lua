@@ -6,12 +6,12 @@ local _, Diameter = ...
 
 ]]--
 
-Diameter.UI = Diameter.UI or {}
+local UI = Diameter.UI
 
 local EVT = Diameter.EventBus.Events
 
 
-function Diameter.UI:ReleaseBars()
+function UI:ReleaseBars()
     local bars = self.mainFrame.ScrollChild.Bars
     Diameter.BarPool:ReleaseAll(bars)
     table.wipe(bars)
@@ -24,7 +24,7 @@ end
     The bars are pooled with BarPool. If we don't have enough bars to 
     cover #dataArray, we start to Acquire() from the BarPool.
 ]]--
-function Diameter.UI:UpdateBars(dataArray)
+function UI:UpdateBars(dataArray)
     local mainFrame = self.mainFrame
 
     local bars = mainFrame.ScrollChild.Bars
@@ -38,7 +38,7 @@ function Diameter.UI:UpdateBars(dataArray)
         local bar = bars[i]
 
         if not bar then
-            bar = Diameter.BarPool:Acquire(self)
+            bar = Diameter.BarPool:Acquire()
             bars[i] = bar
             bar.uiInstance = self
             bar:SetParent(scrollChild)
@@ -71,7 +71,7 @@ end
     @param data = table { name=string, value=number, icon=textureID, color={r,g,b} }
     @param topValue = number used as a reference to 100% fill
 ]]--
-function Diameter.UI:UpdateBar(bar, data, topValue)
+function UI:UpdateBar(bar, data, topValue)
     
     if data and topValue then
 

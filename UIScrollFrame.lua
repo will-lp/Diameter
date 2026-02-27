@@ -1,10 +1,10 @@
 local _, Diameter = ...
 
 
-Diameter.UI = Diameter.UI or {}
+local UI = Diameter.UI
 
 
-function Diameter.UI:CreateScrollEngine(mainFrame)
+function UI:CreateScrollEngine(mainFrame)
     -- We use a template to get a standard WoW scrollbar for free
     local scrollFrame = CreateFrame("ScrollFrame", "$parentScrollFrame", mainFrame)
     --Diameter.Debug:Frame(scrollFrame)
@@ -56,7 +56,7 @@ function Diameter.UI:CreateScrollEngine(mainFrame)
 end
 
 
-function Diameter.UI:CreateScrollChild(scrollFrame)
+function UI:CreateScrollChild(scrollFrame)
 
     local scrollChild = CreateFrame("Frame", "$parentScrollChild", scrollFrame, "BackdropTemplate")
 
@@ -72,7 +72,7 @@ function Diameter.UI:CreateScrollChild(scrollFrame)
 end
 
 
-function Diameter.UI:ResetScrollPosition()
+function UI:ResetScrollPosition()
 
     if self.mainFrame and self.mainFrame.ScrollFrame then
         self:UpdateScrollChildHeight()
@@ -90,7 +90,7 @@ end
     this way, we prevent the error that sometimes, combat will start, the data
     will be fetched, but the scroll child height will remain 0, causing a black frame.
 ]]
-function Diameter.UI:UpdateScrollChildHeight()
+function UI:UpdateScrollChildHeight()
 
     local scrollChild = self.mainFrame.ScrollChild
 

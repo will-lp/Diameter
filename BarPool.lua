@@ -8,15 +8,15 @@ local _, Diameter = ...
     Every bar must be cleared before being Released.
 ]]--
 
-Diameter.BarPool = {}
+local BarPool = {}
 
 
 -- use a bar pool instead of creating a bunch of bars.
-Diameter.BarPool.pool = CreateFramePool(
+BarPool.pool = CreateFramePool(
     "StatusBar", 
     nil, 
     "BackdropTemplate", 
-    function(pool, bar) Diameter.BarPool:InitializeBar(bar) end
+    function(pool, bar) BarPool:InitializeBar(bar) end
 )
 
 
@@ -26,7 +26,7 @@ Diameter.BarPool.pool = CreateFramePool(
     If any weird behaviours comes up, this can debug the source of calls:
     print ("InitializeBar", bar, debugstack(1, 10, 10))
 ]]--
-function Diameter.BarPool:InitializeBar(bar)
+function BarPool:InitializeBar(bar)
     local step = Diameter.UI.step
 
     bar:SetHeight(step)
@@ -71,7 +71,7 @@ function Diameter.BarPool:InitializeBar(bar)
 end
 
 
-function Diameter.BarPool:ReleaseBar(bar)
+function BarPool:ClearBar(bar)
     bar.nameText:SetText(nil)
     bar.valueText:SetText(nil)
     bar.icon:SetTexture(nil)
@@ -86,20 +86,20 @@ end
 --[[
     Clears every bar of their content and puts them back in the pool.
 ]]--
-function Diameter.BarPool:ReleaseAll(bars)
+function BarPool:ReleaseAll(bars)
     for _, bar in pairs(bars) do
-        self:ReleaseBar(bar)
+        self:ClearBar(bar)
         self.pool:Release(bar)
     end
 end
 
 
-function Diameter.BarPool:Acquire(uiInstance)
+function BarPool:Acquire()
     return self.pool:Acquire()
 end
 
 
-function Diameter.BarPool:AddVerticalGradient(bar)
+function BarPool:AddVerticalGradient(bar)
     if not bar.overlay then
         local barTexture = bar:GetStatusBarTexture()
 
@@ -117,7 +117,7 @@ function Diameter.BarPool:AddVerticalGradient(bar)
 end
 
 
-function Diameter.BarPool:SetGradientPoints(bar)
+function BarPool:SetGradientPoints(bar)
     local barTexture = bar:GetStatusBarTexture()
     bar.overlay:ClearAllPoints() -- wipe the "broken" state
     bar.overlay:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
@@ -126,7 +126,7 @@ function Diameter.BarPool:SetGradientPoints(bar)
 end
 
 
-function Diameter.BarPool:AddSparkLine(bar)
+function BarPool:AddSparkLine(bar)
     if not bar.spark then
         local barTexture = bar:GetStatusBarTexture()
         -- Create the Leading Edge ("Spark")
@@ -142,6 +142,9 @@ function Diameter.BarPool:AddSparkLine(bar)
 end
 
 
-function Diameter.BarPool:AddStatusBarGlow(bar)
+function BarPool:AddStatusBarGlow(bar)
     bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar-Glow")
 end
+
+
+Diameter.BarPool = BarPool

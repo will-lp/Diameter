@@ -18,13 +18,12 @@ local addonName, Diameter = ...
 
 local EVT = Diameter.EventBus.Events
 local Pages = Diameter.Pages
-local BDM = Diameter.BlizzardDamageMeter
 
 
-Diameter.Navigation = {}
-Diameter.Navigation.__index = Diameter.Navigation
+local Navigation = {}
+Navigation.__index = Navigation
 
-function Diameter.Navigation:New(eventBus)
+function Navigation:New(eventBus)
     local obj = setmetatable({}, self)
 
     obj.eventBus = eventBus
@@ -49,23 +48,23 @@ function Diameter.Navigation:New(eventBus)
 end
 
 
-function Diameter.Navigation:isSpellView()
+function Navigation:isSpellView()
     return self.viewState.page == Pages.SPELL
 end
 
-function Diameter.Navigation:isGroupView()
+function Navigation:isGroupView()
     return self.viewState.page == Pages.GROUP
 end
 
-function Diameter.Navigation:isModesView()
+function Navigation:isModesView()
     return self.viewState.page == Pages.MODES
 end
 
-function Diameter.Navigation:isPlayerSelectionMode()
+function Navigation:isPlayerSelectionMode()
     return self.viewState.page == Pages.PLAYER_SELECTION
 end
 
-function Diameter.Navigation:NavigateToGroup()
+function Navigation:NavigateToGroup()
     
     self.viewState.page = Pages.GROUP
     self.viewState.targetGUID = nil
@@ -83,7 +82,7 @@ end
     From GROUP, if there are no secret values, we go to SPELL
     From PLAYER_SELECTION we go to SPELL.
 ]]--
-function Diameter.Navigation:NavigateDown(data)
+function Navigation:NavigateDown(data)
     local viewState = self.viewState
     
     if self:isModesView() then 
@@ -114,7 +113,7 @@ function Diameter.Navigation:NavigateDown(data)
     self.eventBus:Fire(EVT.PAGE_CHANGED, viewState)
 end
 
-function Diameter.Navigation:FillViewStateWithDataForSpellPage(data)
+function Navigation:FillViewStateWithDataForSpellPage(data)
     local viewState = self.viewState
     viewState.page = Pages.SPELL
     viewState.targetGUID = data.sourceGUID
@@ -130,7 +129,7 @@ end
     From PLAYER_SELECTION we move up to GROUP.
     From GROUP we move up to MODES.
 ]]--
-function Diameter.Navigation:NavigateUp(data)
+function Navigation:NavigateUp(data)
     local viewState = self.viewState
     if self:isSpellView() then
         viewState.page = Pages.GROUP
@@ -147,3 +146,6 @@ function Diameter.Navigation:NavigateUp(data)
 
     self.eventBus:Fire(EVT.PAGE_CHANGED, viewState)
 end
+
+
+Diameter.Navigation = Navigation

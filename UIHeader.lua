@@ -10,11 +10,12 @@ local addonName, Diameter = ...
 
 local EVT = Diameter.EventBus.Events
 
-Diameter.UIHeader = {}
-Diameter.UIHeader.__index = Diameter.UIHeader
+local UIHeader = {}
+UIHeader.__index = UIHeader
 
-function Diameter.UIHeader:New(mainFrame, id, eventBus)
-    local obj = setmetatable({}, Diameter.UIHeader)
+
+function UIHeader:New(mainFrame, id, eventBus)
+    local obj = setmetatable({}, UIHeader)
 
     obj.id = id
     obj.mainFrame = mainFrame
@@ -47,7 +48,7 @@ function Diameter.UIHeader:New(mainFrame, id, eventBus)
 end
 
 
-function Diameter.UIHeader:CreateHeader(mainFrame)
+function UIHeader:CreateHeader(mainFrame)
     
     -- Draggable Header Bar
     local Header = CreateFrame("Frame", nil, mainFrame, "BackdropTemplate")
@@ -66,7 +67,7 @@ function Diameter.UIHeader:CreateHeader(mainFrame)
     return Header
 end
 
-function Diameter.UIHeader:CreateHeaderText(Header)
+function UIHeader:CreateHeaderText(Header)
     local HeaderText = Header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     HeaderText:SetPoint("LEFT", self.MenuBtn, "RIGHT", 5, 0)
 
@@ -84,7 +85,7 @@ local HeaderIconColor = {
 }
 
 
-function Diameter.UIHeader:ApplyHighlight(component)
+function UIHeader:ApplyHighlight(component)
     component:SetHighlightTexture("Interface\\Buttons\\WHITE8X8")
     
     local highlight = component:GetHighlightTexture()
@@ -94,7 +95,7 @@ function Diameter.UIHeader:ApplyHighlight(component)
 end
 
 
-function Diameter.UIHeader:CreateMenuButton(Header)
+function UIHeader:CreateMenuButton(Header)
     local pixel = 1 / self.mainFrame:GetEffectiveScale()
 
     local menuBtn = CreateFrame("Button", nil, Header, "BackdropTemplate")
@@ -127,7 +128,7 @@ function Diameter.UIHeader:CreateMenuButton(Header)
 end
 
 
-function Diameter.UIHeader:CreateSegmentButton(Header)
+function UIHeader:CreateSegmentButton(Header)
 
     local segmentBtn = CreateFrame("Button", nil, Header, "BackdropTemplate")
     segmentBtn:SetSize(35, 18)
@@ -162,9 +163,7 @@ function Diameter.UIHeader:CreateSegmentButton(Header)
 end
 
 
-function Diameter.UIHeader:CreateChevron(segmentBtn)
-
-    
+function UIHeader:CreateChevron(segmentBtn)
 
     local chevronGlow = segmentBtn:CreateTexture(nil, "ARTWORK")
     chevronGlow:SetSize(16, 16) -- 4px larger than the actual chevron
@@ -193,7 +192,7 @@ function Diameter.UIHeader:CreateChevron(segmentBtn)
 end
 
 
-function Diameter.UIHeader:GetIndicatorText(current)
+function UIHeader:GetIndicatorText(current)
     if current.SessionType == Diameter.BlizzardDamageMeter.SessionType.Overall then 
         return "O" 
     end
@@ -204,3 +203,6 @@ function Diameter.UIHeader:GetIndicatorText(current)
     
     return current.SessionID
 end
+
+
+Diameter.UIHeader = UIHeader

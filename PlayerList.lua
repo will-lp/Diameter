@@ -10,12 +10,13 @@ local _, Diameter = ...
 ]]
 
 local EVT = Diameter.EventBus.Events
-
-Diameter.PlayerList = {}
-
 local color = Diameter.Color
 
-function Diameter.PlayerList:GetPlayerList()
+
+local PlayerList = {}
+
+
+function PlayerList:GetPlayerList()
     
     local players = self:LoopThroughPlayers()
     players.topValue = 1
@@ -31,16 +32,16 @@ end
         unit, sourceGUID, name, classFileName, value, icon, color
     }
 ]]
-function Diameter.PlayerList:BuildPlayerData(unit)
+function PlayerList:BuildPlayerData(unit)
     local _, classFileName = UnitClass(unit)
 
     local safeClass = classFileName or "UNKNOWN"
-    local name = UnitName(unit) or "Unknown"
+    local unitName = UnitName(unit) or "Unknown"
 
     return {
         unit = unit,
         sourceGUID = UnitGUID(unit),
-        name = UnitName(unit),
+        name = unitName,
         classFileName = safeClass,
         value = 1,
         icon = "classicon-" .. string.lower(safeClass),
@@ -61,7 +62,7 @@ end
     only iterate through "raid#", as we are assigned a "raid#" for
     ourselves.
 ]]
-function Diameter.PlayerList:LoopThroughPlayers()
+function PlayerList:LoopThroughPlayers()
     local numMembers = GetNumGroupMembers() -- "0" means solo
 
     local players = {}
@@ -82,3 +83,6 @@ function Diameter.PlayerList:LoopThroughPlayers()
 
     return players
 end
+
+
+Diameter.PlayerList = PlayerList

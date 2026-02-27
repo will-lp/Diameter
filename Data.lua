@@ -17,12 +17,8 @@ local addonName, Diameter = ...
     GetCombatSessionSourceFromType
 ]]--
 
-Diameter.Data = {}
-
 local color = Diameter.Color
-
 local Recycler = Diameter.Recycler
-
 local BDM = Diameter.BlizzardDamageMeter
 
 local ModeToField ={
@@ -39,7 +35,9 @@ local ModeToField ={
     [BDM.Mode.AvoidableDamageTaken] = "amountPerSecond",
 }
 
-Diameter.Data.ModeToField = ModeToField
+local Data = {}
+
+Data.ModeToField = ModeToField
 
 
 --[[
@@ -48,7 +46,7 @@ Diameter.Data.ModeToField = ModeToField
     
     @return dataArray in a format Loop can understand.
 ]]--
-function Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
+function Data:GetGroupMeter(sessionID, mode, sessionType)
 
     local dataArray = {}
     local SessionType = Diameter.BlizzardDamageMeter.SessionType
@@ -95,7 +93,7 @@ end
     @param sessionID The ID of the combat session.
     @return A table containing spell meter data formatted for the UI.
 ]]--
-function Diameter.Data:GetSpellMeter(viewState, mode, sessionID, sessionType)
+function Data:GetSpellMeter(viewState, mode, sessionID, sessionType)
     
     local targetGUID = viewState.targetGUID
     local sourceCreatureID = viewState.sourceCreatureID
@@ -137,7 +135,7 @@ end
 
 
 
-function Diameter.Data:GetColor(mode, classColor)
+function Data:GetColor(mode, classColor)
     if mode == BDM.Mode.DamageTaken then
         return color.ShadowViolet
     elseif mode == BDM.Mode.AvoidableDamageTaken then
@@ -156,8 +154,11 @@ end
 
     @return @type name=string, sessionID=number
 ]]--
-function Diameter.Data:GetSessions()
+function Data:GetSessions()
     local sessions = C_DamageMeter.GetAvailableCombatSessions()
 
     return sessions
 end
+
+
+Diameter.Data = Data

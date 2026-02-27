@@ -10,10 +10,10 @@ local Pages = Diameter.Pages
 local EVT = Diameter.EventBus.Events
 local color = Diameter.Color
 
-Diameter.Presenter = {}
-Diameter.Presenter.__index = Diameter.Presenter
+local Presenter = {}
+Presenter.__index = Presenter
 
-function Diameter.Presenter:New(id)
+function Presenter:New(id)
     local obj = setmetatable({}, self)
 
     obj.viewState = { 
@@ -78,6 +78,11 @@ function Diameter.Presenter:New(id)
         obj:UpdateBars()
     end)
 
+    --[[
+        These Listen() calls are subscribing to the global EventBus, 
+        hence the third parameter to be able to unsubscribe when the
+        window is closed.
+    ]]
     Diameter.EventBus:Listen(EVT.DATA_RESET, function(_)
         local data = {
             SessionType = Diameter.BlizzardDamageMeter.SessionType.Current,
@@ -101,7 +106,7 @@ end
     If we are not in combat, we have to pull data one more time to 
     clear the secrets from the data, hence the flag 'secretCleanupDone'.
 ]]
-function Diameter.Presenter:UpdateMeter()
+function Presenter:UpdateMeter()
     if InCombatLockdown() then
         self.secretCleanupDone = false
         self:UpdateBars()
@@ -112,14 +117,18 @@ function Diameter.Presenter:UpdateMeter()
 end
 
 
-function Diameter.Presenter:TearDown() 
+--[[
+    Invoked when the window is closed. 
+    Currently cascading down to UI.
+]]--
+function Presenter:TearDown() 
     self.uiInstance:TearDown()
     Diameter.EventBus:Unregister(self)
     Diameter.Database:Remove(self.id)
 end
 
 
-function Diameter.Presenter:UpdateBars() 
+function Presenter:UpdateBars() 
     if self.viewState.page == Pages.MODES then
         self:PrintModesMenu()
         return
@@ -142,12 +151,12 @@ function Diameter.Presenter:UpdateBars()
 end
 
 
-function Diameter.Presenter:PrintPlayerSelection()
+function Presenter:PrintPlayerSelection()
     self:UpdateBarsFromDataArray(self.playerList)
 end
 
 
-function Diameter.Presenter:PrintModesMenu()
+function Presenter:PrintModesMenu()
     local modes = { topValue = "1" }
 
     for _, mode in ipairs(Diameter.Menu.MenuOrder) do
@@ -169,7 +178,7 @@ function Diameter.Presenter:PrintModesMenu()
 end
 
 
-function Diameter.Presenter:UpdatePlayerSpellMeter(sessionID, mode, sessionType)
+function Presenter:UpdatePlayerSpellMeter(sessionID, mode, sessionType)
     local dataArray = Diameter.Data:GetSpellMeter(
             self.viewState, 
             mode, 
@@ -180,20 +189,21 @@ function Diameter.Presenter:UpdatePlayerSpellMeter(sessionID, mode, sessionType)
 end
 
 
-function Diameter.Presenter:UpdateGroupMeter(sessionID, mode, sessionType)
+function Presenter:UpdateGroupMeter(sessionID, mode, sessionType)
     local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
 
     self:UpdateBarsFromDataArray(dataArray)
 end
 
 
-function Diameter.Presenter:ClearBars()
+function Presenter:ClearBars()
     self:UpdateBarsFromDataArray({})
 end
 
 
-function Diameter.Presenter:UpdateBarsFromDataArray(dataArray)
+function Presenter:UpdateBarsFromDataArray(dataArray)
     self.uiInstance:UpdateBars(dataArray)
 end
 
 
+Diameter.Presenter = Presenter
