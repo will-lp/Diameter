@@ -45,12 +45,13 @@ Stuff to do:
 - [ ] spell tooltip
 - [ ] group data has two values that should be shown, like blizz addon meter does: totalAmount and amountPerSecond.
 - [ ] dialog positioning sometimes reset. We might have to persist those in the DB
-- [ ] there's a bug with the gradients. Sometimes, some bars don't get the gradient or it is stuck at width 0
+- [x] there's a bug with the gradients. Sometimes, some bars don't get the gradient or it is stuck at width 0
+  - rough one. Corrected in BarPool by setting a sub lauer (4th param)
 
 ## low priority
 - [ ] a few tooltips would be nice
 - [x] paint bars different color per mode; we healing? maybe green bars. absorbs? cyan. damage taken? red/yellow.
-- [ ] EventBus has now Diameter.EventBus for global and Diameter.EventBusClass to create instances. I don't like it :-(
+- [ ] EventBus has now Diameter.EventBus for global and Diameter.EventBusClass to create instances. I feel like either we follow a pattern or we don't.
 - [ ] change all the "Diameter.Module" into only "Module."
 - [x] UI improvements: it is a bit ugly now, specially the bar colors
   - the gradient is cute! it's not perfect, but hey! At some point we could look at some presets, maybe
