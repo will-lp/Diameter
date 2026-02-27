@@ -94,12 +94,6 @@ function Diameter.UI:UpdateBar(bar, data, topValue)
         bar:SetMinMaxValues(0, topValue)
         bar:SetValue(displayValue)
 
-        -- this is a bit of a lame solution, but sometimes the bar starts at width 0 
-        -- and the gradient never gets updated once the bar starts to grow.
-        if not bar.overlay:IsVisible() then
-            Diameter.BarPool:SetGradientPoints(bar)
-        end
-
         bar:Show()
     else
         -- Hide bars if there's no player data for this slot

@@ -96,7 +96,10 @@ function Diameter.BarPool:AddVerticalGradient(bar)
     if not bar.overlay then
         local barTexture = bar:GetStatusBarTexture()
 
-        bar.overlay = bar:CreateTexture(nil, "ARTWORK")
+        -- the "nil, 1" arguments is to try to fix an error where
+        -- the gradient would stop showing on some bars.
+        -- this way we force a sub-layer to stay above the bar, hopefully.
+        bar.overlay = bar:CreateTexture(nil, "ARTWORK", nil, 1)
         bar.overlay:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
         bar.overlay:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, 0)
         bar.overlay:SetPoint("RIGHT", barTexture, "RIGHT", 0, 0)
