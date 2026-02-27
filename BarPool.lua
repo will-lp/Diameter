@@ -1,5 +1,12 @@
 local _, Diameter = ...
 
+--[[
+    Responsible for abstracting the bar pool so we don't keep a
+    fixed-size array for each window.
+
+    Every bar is initialized when we Acquire one.
+    Every bar must be cleared before being Released.
+]]--
 
 Diameter.BarPool = {}
 

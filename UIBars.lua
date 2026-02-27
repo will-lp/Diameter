@@ -1,6 +1,11 @@
 local _, Diameter = ...
 
 
+--[[
+    Module responsible to handle the bars acquisition, releasing and updating them.
+
+]]--
+
 Diameter.UI = Diameter.UI or {}
 
 local EVT = Diameter.EventBus.Events
