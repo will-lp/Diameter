@@ -46,7 +46,7 @@ Stuff to do:
 - [ ] group data has two values that should be shown, like blizz addon meter does: totalAmount and amountPerSecond.
 - [ ] dialog positioning sometimes reset. We might have to persist those in the DB
 - [x] there's a bug with the gradients. Sometimes, some bars don't get the gradient or it is stuck at width 0
-  - rough one. Corrected in BarPool by setting a sub lauer (4th param)
+  - rough one. Corrected in BarPool by setting a sub layer (4th param)
 
 ## low priority
 - [ ] a few tooltips would be nice

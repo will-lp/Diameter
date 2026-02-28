@@ -3,7 +3,7 @@
 A lightweight DPS meter addon for World of Warcraft.
 
 - You can navigate between Modes, Group and Breakdown using right and left clicks.
-- Multiple windows support. On version v2.0.0, with 6 open windows it was consuming 295 KB of memory and 0.05% CPU during a dungeon run.
+- Multiple windows support. On version v2.3.0, with 4 open windows it was consuming 210 KB of memory and 0.3% CPU during a dungeon run.
 - You can look at your spell breakdown at all times; if you want to look at your most damaging spells or someone's healing spells or the tank damage taken, Diameter got you.
 - Access player breakdowns during combat via a two-step selection process: by clicking on a player you will be prompted to select the player from a second list and then you can see the breakdown. This is due to a Blizzard restriction on their API.
 - It's written from scratch with Blizzard's new C_DamageMeter API in mind, so no legacy code with CLEU parsing.
