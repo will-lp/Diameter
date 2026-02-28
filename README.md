@@ -12,7 +12,7 @@ Inspired by an addon called Skada.
 
 ## New in v2.4.0 
 
-- Header is now a bit more explicative:
+- Header is now a bit more explanatory:
   - when on modes, header text is "Diameter: Modes";
   - when on group, header text keeps the usual "Diameter: $Mode";
   - when on player selection mode, header text is "$Mode: Select player";
