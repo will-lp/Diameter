@@ -50,6 +50,7 @@ Stuff to do:
   - rough one. Corrected in BarPool by setting a sub layer (4th param)
 - [ ] Constants is polluting the global name space
 - [ ] While scrolling through Damage Done players in a 25P raid group some bars wouldn't accept a click to go to player selection mode. Switching to Modes and back to Group fixed it, but couldn't reproduce anymore. Feels like a problem in BarPool.
+- [ ] there's this little "1" at the end of bars without data like "modes" and "player selection". It doesn't impact, but shouldn't really be there.
 
 ## low priority
 - [ ] a few tooltips would be nice

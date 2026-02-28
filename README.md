@@ -10,6 +10,16 @@ A lightweight DPS meter addon for World of Warcraft.
 
 Inspired by an addon called Skada.
 
+## New in v2.4.0 
+
+- Header is now a bit more explicative:
+  - when on modes, header text is "Diameter: Modes";
+  - when on group, header text keeps the usual "Diameter: $Mode";
+  - when on player selection mode, header text is "$Mode: Select player";
+  - when on breakdown, header text is "DPS: $PlayerName".
+- Modules refactored to avoid the "Diameter." boilerplate on every function.
+- Added a small optimization: when a group change happens (player join/leave) we flag the PlayerList as "needsRefresh" and, if needed, we build the PlayerList only when the Player Selection Mode is necessary.
+- Fixed a mismatch between Class and Color fields concerning the data transitioning between the pages.
 
 ## New in v2.3.0
 
