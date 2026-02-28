@@ -44,4 +44,13 @@ Diameter.Util = {
         return count
     end,
 
+    colorizeName = function(name, classTag)
+        if not name or name == "" then return name end
+        if not classTag or not RAID_CLASS_COLORS[classTag] then return name end
+
+        local color = RAID_CLASS_COLORS[classTag]
+        
+        return string.format("|c%s%s|r", color.colorStr, name)
+    end
+
 }

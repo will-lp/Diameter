@@ -33,16 +33,10 @@ function Navigation:New(eventBus)
         targetName = nil,
         targetIndex = nil,
         targetClass = nil,
+        color = nil,
         secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for it now, though :-(
+        originalTargetName = nil
     }
-
-    obj.eventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
-        if playerSelectionMode == true then 
-            obj.viewState.page = Pages.PLAYER_SELECTION
-        else 
-            obj.viewState.page = Pages.GROUP
-        end
-    end)
 
     return obj
 end
@@ -69,6 +63,7 @@ function Navigation:NavigateToGroup()
     self.viewState.page = Pages.GROUP
     self.viewState.targetGUID = nil
     self.viewState.targetName = nil
+    self.viewState.originalTargetName = nil
 
     self.eventBus:Fire(EVT.PAGE_CHANGED, self.viewState)
 end
@@ -99,7 +94,8 @@ function Navigation:NavigateDown(data)
         -- The current "workaround" is using Player Selection Mode.
 
         if issecretvalue(data.sourceGUID) then
-            self.eventBus:Fire(EVT.PLAYER_SELECTION_MODE, true)
+            viewState.page = Pages.PLAYER_SELECTION
+            self.eventBus:Fire(EVT.PAGE_CHANGED, viewState)
             return
         end
 
@@ -113,14 +109,18 @@ function Navigation:NavigateDown(data)
     self.eventBus:Fire(EVT.PAGE_CHANGED, viewState)
 end
 
+
 function Navigation:FillViewStateWithDataForSpellPage(data)
     local viewState = self.viewState
     viewState.page = Pages.SPELL
     viewState.targetGUID = data.sourceGUID
     viewState.sourceCreatureID = data.sourceCreatureID
     viewState.targetName = data.name
-    viewState.targetClass = data.color
+    viewState.targetClass = data.class
+    viewState.color = data.color
+    viewState.originalTargetName = data.originalName
 end
+
 
 --[[
     NavigateUp flow:
@@ -137,7 +137,9 @@ function Navigation:NavigateUp(data)
         viewState.targetName = nil
         viewState.targetClass = nil
         viewState.targetIndex = nil
+        viewState.color = nil
         viewState.secretTargetGUID = nil
+        viewState.originalTargetName = nil
     elseif self:isPlayerSelectionMode() then
         viewState.page = Pages.GROUP
     elseif self:isGroupView()  then

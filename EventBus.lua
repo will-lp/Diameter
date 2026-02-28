@@ -27,16 +27,16 @@ local events = createEventTable({
     -- a combo of session/mode/sessionType changed. this name is awful.
     "CURRENT_CHANGED", 
 
-    -- just the mode changed
+    -- just the mode changed (dps, absorbs, healing done, etc.)
     "MODE_CHANGED",
 
-    -- just the session type changed (history or current or overall)
+    -- just the session type changed (current or overall)
     "SESSION_TYPE_CHANGED",
 
     -- both sessionType and ID changed; user wants to look at an older fight
     "SESSION_TYPE_ID_CHANGED",
 
-    -- When new data was loaded. Loop fires it and UI listens to it.
+    -- When new data was loaded. Presenter fires it and UI listens to it.
     "PAGE_DATA_LOADED",
 
     -- user clicked on data reset
@@ -44,9 +44,6 @@ local events = createEventTable({
 
     -- new people joined or left the group
     "GROUP_CHANGED",
-
-    -- user clicked the "Player Selection" toggle
-    "PLAYER_SELECTION_MODE",
 
     -- I am not explaining those two, c'mon >:(
     "NEW_WINDOW",

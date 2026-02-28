@@ -9,6 +9,8 @@ local addonName, Diameter = ...
 ]]
 
 local EVT = Diameter.EventBus.Events
+local Pages = Diameter.Pages
+
 
 local UIHeader = {}
 UIHeader.__index = UIHeader
@@ -27,6 +29,8 @@ function UIHeader:New(mainFrame, id, eventBus)
     obj.SegmentBtn = obj:CreateSegmentButton(obj.Header)
     obj.HeaderText = obj:CreateHeaderText(obj.Header)
 
+    obj.mode = nil
+
     obj.eventBus:Listen(EVT.CURRENT_CHANGED, function(data)
         obj.SegmentBtn:SetText(obj:GetIndicatorText(data))
     end)
@@ -40,11 +44,40 @@ function UIHeader:New(mainFrame, id, eventBus)
     end)
 
     obj.eventBus:Listen(EVT.MODE_CHANGED, function (mode)
-        local label = Diameter.Menu.Labels[mode]
-        obj.HeaderText:SetText(addonName .. ": " .. label)
+        obj.mode = mode
+        obj:SetHeader(obj:GetModeLabel())
+    end)
+
+    obj.eventBus:Listen(EVT.PAGE_CHANGED, function(viewState)
+        if viewState.page == Pages.MODES then
+            obj:SetHeader("Modes")
+        elseif viewState.page == Pages.PLAYER_SELECTION then
+            obj:SetHeader(obj:GetModeLabel(), "Select player")
+        elseif viewState.page == Pages.SPELL then
+            local fullName = viewState.originalTargetName or viewState.targetName
+            local shortName = strsplit("-", fullName) 
+            local coloredShortName = Diameter.Util.colorizeName(shortName, viewState.targetClass)
+            obj:SetHeader(obj:GetModeLabel(), coloredShortName)
+        else
+            obj:SetHeader(obj:GetModeLabel())
+        end
     end)
 
     return obj
+end
+
+
+function UIHeader:GetModeLabel()
+    return Diameter.Menu.Labels[self.mode]
+end
+
+
+function UIHeader:SetHeader(prefix, suffix)
+    if not suffix then
+        suffix = prefix
+        prefix = addonName
+    end
+    self.HeaderText:SetText(prefix .. ": " .. suffix)
 end
 
 
@@ -70,6 +103,12 @@ end
 function UIHeader:CreateHeaderText(Header)
     local HeaderText = Header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     HeaderText:SetPoint("LEFT", self.MenuBtn, "RIGHT", 5, 0)
+    HeaderText:SetPoint("RIGHT", self.SegmentBtn, "LEFT", -5, 0)
+
+    -- so we don't get floating words all around
+    HeaderText:SetWordWrap(false)
+    HeaderText:SetNonSpaceWrap(false)
+    HeaderText:SetJustifyH("LEFT")
 
     return HeaderText
 end

@@ -19,7 +19,7 @@ Stuff to do:
   - replaced with some neat glow-ups
 - [x] new prints for the new version, let's get over with the bottle texture for bars
 - [x] Bar pool needs to be dynamic; I already bugged it with a tank's Damage Taken after a dungeon run
-- [ ] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
+- [x] attaching the Name of the player being inspected to UIHeader (this will look epic cute)
   - the class color can be obtained with UnitClass and RAID_CLASS_COLOR
 - [x] Menu.lua has a weird parameter being passed, I think it's ID and it's not being used. Ponder removal
   - it is needed.
@@ -38,7 +38,8 @@ Stuff to do:
   - [x] Bar creation could move
 - [ ] ponder the orb: unit testing. Do we even have those in wow lua addon development?
 - [ ] customization: for starters, allow users to set bar height
-- [ ] in Presenter, obj.playerList is instanced, but maybe it could be class-wide OR it could consider the data without secrets
+- [x] in Presenter, obj.playerList is instanced, but maybe it could be class-wide OR it could consider the data without secrets
+  - added some optimization to it; it is singleton scoped and we only fetch it IF there was an update and someone asks for this data
 - [x] disable Player Selection toggle when looking at historical data
 - [ ] more viewState data could be persisted into the DB. But this might cause problems on Reset Data or Addon Boot
 - [ ] Diameter.lua is starting to do a lot of window management that could move into its own module
@@ -47,6 +48,8 @@ Stuff to do:
 - [ ] dialog positioning sometimes reset. We might have to persist those in the DB
 - [x] there's a bug with the gradients. Sometimes, some bars don't get the gradient or it is stuck at width 0
   - rough one. Corrected in BarPool by setting a sub layer (4th param)
+- [ ] Constants is polluting the global name space
+- [ ] While scrolling through Damage Done players in a 25P raid group some bars wouldn't accept a click to go to player selection mode. Switching to Modes and back to Group fixed it, but couldn't reproduce anymore. Feels like a problem in BarPool.
 
 ## low priority
 - [ ] a few tooltips would be nice

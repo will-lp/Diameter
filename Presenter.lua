@@ -58,15 +58,6 @@ function Presenter:New(id)
         obj:UpdateBars()
     end)
 
-    obj.eventBus:Listen(EVT.PLAYER_SELECTION_MODE, function(playerSelectionMode)
-        if playerSelectionMode == true then 
-            obj.viewState.page = Pages.PLAYER_SELECTION
-        else 
-            obj.viewState.page = Pages.GROUP
-        end
-        obj:UpdateBars()
-    end)
-
     --[[
         When a page is changed we store that data and do a 
         single UpdateBars in case we are not in combat.
@@ -90,10 +81,6 @@ function Presenter:New(id)
         }
         obj.eventBus:Fire(EVT.SESSION_TYPE_ID_CHANGED, data)
         obj:ClearBars()
-    end, obj)
-
-    Diameter.EventBus:Listen(EVT.GROUP_CHANGED, function(_)
-        obj.playerList = Diameter.PlayerList:GetPlayerList()
     end, obj)
 
     return obj
@@ -152,7 +139,14 @@ end
 
 
 function Presenter:PrintPlayerSelection()
-    self:UpdateBarsFromDataArray(self.playerList)
+    local playersList = Diameter.PlayerList:GetPlayerList()
+
+    for _, data in ipairs(playersList) do
+        data.originalName = data.name
+        data.name = "Select " .. data.originalName
+    end
+
+    self:UpdateBarsFromDataArray(playersList)
 end
 
 
@@ -178,19 +172,19 @@ function Presenter:PrintModesMenu()
 end
 
 
+function Presenter:UpdateGroupMeter(sessionID, mode, sessionType)
+    local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
+
+    self:UpdateBarsFromDataArray(dataArray)
+end
+
+
 function Presenter:UpdatePlayerSpellMeter(sessionID, mode, sessionType)
     local dataArray = Diameter.Data:GetSpellMeter(
             self.viewState, 
             mode, 
             sessionID, 
             sessionType)
-
-    self:UpdateBarsFromDataArray(dataArray)
-end
-
-
-function Presenter:UpdateGroupMeter(sessionID, mode, sessionType)
-    local dataArray = Diameter.Data:GetGroupMeter(sessionID, mode, sessionType)
 
     self:UpdateBarsFromDataArray(dataArray)
 end

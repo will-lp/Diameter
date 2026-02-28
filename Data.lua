@@ -68,11 +68,13 @@ function Data:GetGroupMeter(sessionID, mode, sessionType)
 
         for i = 1, #sources do
             local data = Recycler:Acquire()
+            local class = sources[i].classFilename
 
             data.value = sources[i][field]
             data.icon = sources[i].specIconID
             data.name = sources[i].name
-            data.color = Diameter.ClassColors[sources[i].classFilename] or color.Gray
+            data.class = class
+            data.color = Diameter.ClassColors[class] or color.Gray
             data.sourceGUID = sources[i].sourceGUID
             data.sourceCreatureID = sources[i].sourceCreatureID
             
@@ -122,7 +124,7 @@ function Data:GetSpellMeter(viewState, mode, sessionID, sessionType)
             data.name = C_Spell.GetSpellName(combatSpell.spellID) or "Unknown"
             data.value = combatSpell[ModeToField[mode]] or ""
             data.icon = C_Spell.GetSpellTexture(combatSpell.spellID)
-            data.color = color.Gray
+            data.class = viewState.targetClass
             data.sourceGUID = combatSpell.sourceGUID
             data.color = self:GetColor(mode, viewState.targetClass)
             
@@ -145,7 +147,7 @@ function Data:GetColor(mode, classColor)
     elseif mode == BDM.Mode.Interrupts then
         return color.SteelBlue
     else 
-        return classColor
+        return Diameter.ClassColors[classColor]
     end
 end
 

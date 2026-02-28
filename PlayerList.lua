@@ -15,11 +15,21 @@ local color = Diameter.Color
 
 local PlayerList = {}
 
+local players = nil
+local needsRefresh = true
+
+
+Diameter.EventBus:Listen(EVT.GROUP_CHANGED, function(_)
+    needsRefresh = true
+end)
+
 
 function PlayerList:GetPlayerList()
-    
-    local players = self:LoopThroughPlayers()
-    players.topValue = 1
+    if needsRefresh or not players then
+        players = self:LoopThroughPlayers()
+        players.topValue = 1
+    end
+
     return players
 end
 
@@ -42,7 +52,7 @@ function PlayerList:BuildPlayerData(unit)
         unit = unit,
         sourceGUID = UnitGUID(unit),
         name = unitName,
-        classFileName = safeClass,
+        class = safeClass,
         value = 1,
         icon = "classicon-" .. string.lower(safeClass),
         color = Diameter.ClassColors[safeClass] or color.Gray,
