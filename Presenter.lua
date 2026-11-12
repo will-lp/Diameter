@@ -28,10 +28,9 @@ function Presenter:New(id)
     obj.current.Mode = obj.current.Mode or Diameter.BlizzardDamageMeter.Mode.DamageDone
     obj.current.SessionType = obj.current.SessionType or Diameter.BlizzardDamageMeter.SessionType.Current
     obj.current.SessionID = obj.current.SessionID or nil
-    obj.viewState = obj.current.viewState or obj.viewState
 
     obj.eventBus = Diameter.EventBusClass:New()
-    obj.uiInstance = Diameter.UI:New(id, obj.eventBus, obj.viewState)
+    obj.uiInstance = Diameter.UI:New(id, obj.eventBus)
     obj.mainFrame = obj.uiInstance.mainFrame
     obj.playerList = Diameter.PlayerList:GetPlayerList()
 
@@ -71,6 +70,9 @@ function Presenter:New(id)
         obj.current.viewState = data
         obj:UpdateBars()
     end)
+
+    -- we just loaded the viewState, hopefully
+    obj.eventBus:Fire(EVT.PAGE_CHANGED, obj.current.viewState or obj.viewState)
 
     --[[
         These Listen() calls are subscribing to the global EventBus, 

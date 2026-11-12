@@ -127,6 +127,7 @@ function Data:GetSpellMeter(viewState, mode, sessionID, sessionType)
             data.class = viewState.targetClass
             data.sourceGUID = combatSpell.sourceGUID
             data.color = self:GetColor(mode, viewState.targetClass)
+            data.spellID = combatSpell.spellID
             
             table.insert(dataArray, data)
         end

@@ -46,6 +46,19 @@ function BarPool:InitializeBar(bar)
         end
     end)
 
+    -- Tooltip on icon mouse over
+    bar:SetScript("OnEnter", function(self)
+        if not self.data then return end
+        
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+
+        if self.data.spellID then
+            GameTooltip:SetSpellByID(self.data.spellID)
+        end
+
+        GameTooltip:Show()
+    end)
+
     -- Create the Icon Texture
     bar.icon = bar:CreateTexture(nil, "OVERLAY")
     bar.icon:SetSize(step - 2, step - 2) -- Slightly smaller than the bar height

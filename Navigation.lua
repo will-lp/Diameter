@@ -23,11 +23,11 @@ local Pages = Diameter.Pages
 local Navigation = {}
 Navigation.__index = Navigation
 
-function Navigation:New(eventBus, viewState)
+function Navigation:New(eventBus)
     local obj = setmetatable({}, self)
 
     obj.eventBus = eventBus
-    obj.viewState = viewState or {
+    obj.viewState = {
         page = Pages.GROUP,
         targetGUID = nil,
         targetName = nil,
@@ -37,6 +37,10 @@ function Navigation:New(eventBus, viewState)
         secretTargetGUID = nil, -- here we hold the secretTargetGUID. No use for it now, though :-(
         originalTargetName = nil
     }
+
+    obj.eventBus:Listen(EVT.PAGE_CHANGED, function(data)
+        obj.viewState = data
+    end)
 
     return obj
 end
