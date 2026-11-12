@@ -23,11 +23,11 @@ local Pages = Diameter.Pages
 local Navigation = {}
 Navigation.__index = Navigation
 
-function Navigation:New(eventBus)
+function Navigation:New(eventBus, viewState)
     local obj = setmetatable({}, self)
 
     obj.eventBus = eventBus
-    obj.viewState = {
+    obj.viewState = viewState or {
         page = Pages.GROUP,
         targetGUID = nil,
         targetName = nil,

@@ -1,4 +1,4 @@
-## Interface: 120100
+## Interface: 11509, 16001, 20506, 38010, 50500, 120100
 ## Title: Diameter
 ## Notes: A lightweight damage meter for the Midnight API. Features navigation through right and left clicks.
 ## Author: will-lp

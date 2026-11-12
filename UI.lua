@@ -19,14 +19,14 @@ local UI = {
 UI.__index = UI
 
 
-function UI:New(id, eventBus)
+function UI:New(id, eventBus, viewState)
     local obj = setmetatable({}, self)
 
     obj.id = id
     obj.filledBars = 0
     obj.currentScrollPos = 0
     obj.eventBus = eventBus
-    obj.navigation = Diameter.Navigation:New(eventBus)
+    obj.navigation = Diameter.Navigation:New(eventBus, viewState)
     obj.mainFrame = obj:Boot()
 
     --[[

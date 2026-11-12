@@ -21,10 +21,6 @@ function Presenter:New(id)
     }
 
     obj.id = id
-    obj.eventBus = Diameter.EventBusClass:New()
-    obj.uiInstance = Diameter.UI:New(id, obj.eventBus)
-    obj.mainFrame = obj.uiInstance.mainFrame
-    obj.playerList = Diameter.PlayerList:GetPlayerList()
 
     -- these are the options loaded when the addon is booted on the very first time
     -- or a new window is created.
@@ -32,6 +28,12 @@ function Presenter:New(id)
     obj.current.Mode = obj.current.Mode or Diameter.BlizzardDamageMeter.Mode.DamageDone
     obj.current.SessionType = obj.current.SessionType or Diameter.BlizzardDamageMeter.SessionType.Current
     obj.current.SessionID = obj.current.SessionID or nil
+    obj.viewState = obj.current.viewState or obj.viewState
+
+    obj.eventBus = Diameter.EventBusClass:New()
+    obj.uiInstance = Diameter.UI:New(id, obj.eventBus, obj.viewState)
+    obj.mainFrame = obj.uiInstance.mainFrame
+    obj.playerList = Diameter.PlayerList:GetPlayerList()
 
     obj:UpdateBars()
     obj.eventBus:Fire(EVT.CURRENT_CHANGED, obj.current)
@@ -66,6 +68,7 @@ function Presenter:New(id)
     ]]
     obj.eventBus:Listen(EVT.PAGE_CHANGED, function(data)
         obj.viewState = data
+        obj.current.viewState = data
         obj:UpdateBars()
     end)
 
